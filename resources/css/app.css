@@ -1,0 +1,105 @@
+
+
+
+
+@import "bootswatch/dist/litera/bootstrap.min.css";
+
+@import 'tailwindcss';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../**/*.blade.php';
+@source '../**/*.js';
+
+@import "@fullcalendar/list/index.css";
+
+@theme {
+    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+        'Segoe UI Symbol', 'Noto Color Emoji';
+}
+
+:root {
+    --nevi-morado: #7560a8;
+    --nevi-azul: #4f84c4;
+    --nevi-teal: #6fb0ad;
+    --nevi-lavender: #b3b9cf;
+    --nevi-slate: #42526e;
+}
+
+.btn-gradient {
+    background: linear-gradient(120deg, var(--nevi-morado) 0%, var(--nevi-azul) 55%, var(--nevi-teal) 100%);
+    color: #fff;
+    border: none;
+    transition: transform 0.1s ease, box-shadow 0.2s ease;
+    box-shadow: 0 0.5rem 1rem rgba(80, 96, 176, 0.2);
+}
+
+.btn-gradient:hover,
+.btn-gradient:focus {
+    color: #fff;
+    box-shadow: 0 0.75rem 1.5rem rgba(79, 115, 196, 0.3);
+}
+
+.btn-gradient:active {
+    transform: translateY(1px);
+}
+
+.patient-hero {
+    background: radial-gradient(circle at 10% 20%, rgba(255, 255, 255, 0.15), transparent 35%),
+        radial-gradient(circle at 80% 0%, rgba(255, 255, 255, 0.12), transparent 28%),
+        linear-gradient(135deg, var(--nevi-morado) 0%, var(--nevi-azul) 60%, var(--nevi-teal) 100%);
+    color: #fff;
+    border: none;
+    overflow: hidden;
+}
+
+.patient-hero .avatar-xl {
+    width: 82px;
+    height: 82px;
+    border: 3px solid rgba(255, 255, 255, 0.5);
+    box-shadow: 0 0.75rem 2rem rgba(23, 37, 84, 0.2);
+}
+
+.patient-hero .stat-pill {
+    background: rgba(255, 255, 255, 0.14);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #eef2ff;
+}
+
+.info-chip {
+    background: rgba(117, 96, 168, 0.1);
+    border: 1px solid rgba(117, 96, 168, 0.25);
+    color: var(--nevi-slate);
+    border-radius: 0.75rem;
+    padding: 0.75rem 0.9rem;
+}
+
+.info-chip i {
+    color: var(--nevi-morado);
+}
+
+.surface-card {
+    background: #f7f9fd;
+    border: 1px solid #e5e7f1;
+    border-radius: 1rem;
+}
+
+.surface-card .badge,
+.surface-card .list-group-item {
+    border-radius: 0.75rem;
+}
+
+.metric-tile {
+    background: linear-gradient(180deg, #ffffff 0%, #eef2fb 100%);
+    border: 1px solid #e3e7f5;
+    border-radius: 0.9rem;
+}
+
+.metric-tile h5 {
+    color: var(--nevi-slate);
+}
+
+.section-title {
+    color: var(--nevi-slate);
+    font-weight: 700;
+}

@@ -1,0 +1,77 @@
+<?php
+
+namespace App\Models;
+
+// use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
+use Spatie\Permission\Traits\HasRoles;
+use App\Models\Clinica;
+
+class User extends Authenticatable
+{
+	 protected $connection = 'mysql';
+    /** @use HasFactory<\Database\Factories\UserFactory> */
+	 use HasRoles; 
+    use HasFactory, Notifiable;
+	 protected $table = 'usuarios';
+	 
+	  protected $casts = [
+        'db' => 'string',
+    ];
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array<int, string>
+     */
+    protected $fillable = [
+        'nombre',
+        'apellidos',
+        'email',
+        'nivel',
+        'tipo_identificacion',
+        'numero_identificacion',
+        'direccion',
+        'whatsapp',
+        'ciudad',
+        'password',
+        'peluqueria_id',
+        'role',
+        'color',
+    ];
+
+    /**
+     * The attributes that should be hidden for serialization.
+     *
+     * @var array<int, string>
+     */
+    protected $hidden = [
+        'password',
+        'remember_token',
+    ];
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'email_verified_at' => 'datetime',
+            'password' => 'hashed',
+        ];
+    }
+	// Aquí definimos la relación "item" (o como prefieras nombrarla):
+    public function peluqueria()
+    {
+        // 'producto' es la FK en 'ventas' que apunta a 'id' de 'items'
+        return $this->belongsTo(Clinica::class, 'peluqueria_id', 'id');
+    }
+
+    public function clinica()
+    {
+        return $this->belongsTo(Clinica::class, 'peluqueria_id', 'id');
+    }
+}

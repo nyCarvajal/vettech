@@ -1,0 +1,1 @@
+-- Seed data for clinicas can be added here.
