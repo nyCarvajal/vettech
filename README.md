@@ -66,3 +66,27 @@ If you discover a security vulnerability within Laravel, please send an e-mail t
 The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
 "# smashstech" 
 "# NEVI" 
+
+## Módulo veterinario V1
+
+### Migraciones
+Ejecuta `php artisan migrate --path=database/migrations/2025_12_01_*` para crear las tablas de inventario, dispensación, hospital y caja. Las migraciones usan la tabla `usuarios` como referencia para usuarios.
+
+### Seeders
+Ejecuta `php artisan db:seed --class=VettechSeeder` para crear roles/permisos base, turnos y jaulas de ejemplo.
+
+### Servicios incluidos
+- InventoryService (FEFO, movimientos y validación de stock)
+- DispenseService (dispensación parcial/total)
+- HospitalService (admisión, alta, registro de tareas y consumos)
+- BillingService (cuentas por dispensación y alta)
+- AuditService (bitácora simple)
+
+### Rutas principales
+Se agrupan bajo `/vet` (middleware `auth`): inventario, fórmulas/dispensación, tablero hospital, ventas y caja.
+
+### Tests
+Ejecuta `php artisan test --filter=VettechModuleTest` para validar FEFO, no-negativos, lote obligatorio y permisos.
+
+### UI mínima
+Las vistas Blade se ubican en `resources/views` bajo carpetas `inventory`, `dispensation`, `hospital`, `sales` y `cash` con formularios simples en español.
