@@ -192,12 +192,37 @@ Route::get('/departamentos', [LocationController::class, 'departamentos']);
 	
 Route::match(['GET','POST'], 'webhook/whatsapp',
     \App\Http\Controllers\WhatsappWebhookController::class);
-	
+
 
 
 
  Route::get('', [RoutingController::class, 'index'])->name('root');
     Route::get('{first}/{second}/{third}', [RoutingController::class, 'thirdLevel'])->name('third');
+
+// Vettech módulo V1
+Route::middleware(['auth'])
+    ->prefix('vet')
+    ->group(function () {
+        Route::resource('products', \App\Http\Controllers\ProductsController::class)->except(['show', 'destroy']);
+        Route::resource('batches', \App\Http\Controllers\BatchesController::class)->only(['index', 'create', 'store']);
+        Route::get('kardex', [\App\Http\Controllers\KardexController::class, 'index'])->name('kardex.index');
+
+        Route::resource('prescriptions', \App\Http\Controllers\PrescriptionsController::class)->only(['index', 'create', 'store']);
+        Route::get('dispensations', [\App\Http\Controllers\DispensationsController::class, 'index'])->name('dispensations.index');
+        Route::post('dispensations/{prescription}', [\App\Http\Controllers\DispensationsController::class, 'store'])->name('dispensations.store');
+
+        Route::get('hospital/board', \App\Http\Controllers\HospitalBoardController::class)->name('hospital.board');
+        Route::resource('hospital/stays', \App\Http\Controllers\HospitalStaysController::class)->only(['index', 'create', 'store']);
+        Route::post('hospital/stays/{stay}/discharge', [\App\Http\Controllers\HospitalStaysController::class, 'discharge'])->name('hospital.stays.discharge');
+        Route::resource('hospital/tasks', \App\Http\Controllers\HospitalTasksController::class)->only(['create', 'store']);
+        Route::post('hospital/handoff', [\App\Http\Controllers\HandoffController::class, 'store'])->name('hospital.handoff.store');
+
+        Route::resource('sales', \App\Http\Controllers\SalesController::class)->only(['index', 'store', 'show']);
+        Route::get('cash/sessions', [\App\Http\Controllers\CashSessionsController::class, 'index'])->name('cash.sessions.index');
+        Route::post('cash/sessions', [\App\Http\Controllers\CashSessionsController::class, 'store'])->name('cash.sessions.store');
+        Route::post('cash/sessions/{cashSession}/close', [\App\Http\Controllers\CashSessionsController::class, 'close'])->name('cash.sessions.close');
+        Route::post('cash/movements', [\App\Http\Controllers\CashMovementsController::class, 'store'])->name('cash.movements.store');
+    });
     Route::get('{first}/{second}', [RoutingController::class, 'secondLevel'])->name('second');
     Route::get('{any}', [RoutingController::class, 'root'])->name('any');
 
