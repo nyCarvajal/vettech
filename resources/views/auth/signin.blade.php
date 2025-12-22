@@ -13,7 +13,7 @@
             </div>
         </div>
 
-        <form method="POST" action="{{ url('/signin') }}" class="space-y-6">
+        <form method="POST" action="{{ route('signin.store') }}" class="space-y-6">
             @csrf
             <div class="space-y-2">
                 <label for="email" class="block text-sm font-medium text-[#111827]">Correo</label>
