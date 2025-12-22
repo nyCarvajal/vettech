@@ -90,3 +90,12 @@ Ejecuta `php artisan test --filter=VettechModuleTest` para validar FEFO, no-nega
 
 ### UI mínima
 Las vistas Blade se ubican en `resources/views` bajo carpetas `inventory`, `dispensation`, `hospital`, `sales` y `cash` con formularios simples en español.
+
+## Dashboard multi-rol
+- Autenticación basada en Laravel Breeze (Blade). Si no está instalado, ejecutar:
+  - `composer require laravel/breeze --dev`
+  - `php artisan breeze:install blade`
+  - `npm install && npm run build`
+  - `php artisan migrate`
+- Ingreso único `/dashboard` redirige según rol (Admin, Medico, Contador).
+- Timezone por defecto: America/Bogota.

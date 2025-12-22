@@ -25,7 +25,11 @@ use App\Http\Controllers\HistoriaClinicaController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\AdministrativeReportController;
+use App\Http\Controllers\AdminDashboardController;
 use App\Http\Middleware\ConnectTenantDB;
+use App\Http\Controllers\ContadorDashboardController;
+use App\Http\Controllers\DashboardRedirectController;
+use App\Http\Controllers\MedicoDashboardController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Public\BookingController;
 
@@ -94,11 +98,20 @@ Route::resource('proveedores', ProveedorController::class);
 Route::resource('tipo-identificaciones', TipoIdentificacionController::class)->except(['show']);
 Route::resource('areas', AreaController::class)->except(['show', 'destroy']);
 		 
-        Route::get('/dashboard', [DashboardController::class, 'index'])
-    ->name('dashboard');
+        Route::get('/dashboard', DashboardRedirectController::class)
+            ->name('dashboard');
 
-        Route::view('/dashboard/clinico', 'pages.clinical-dashboard')
-    ->name('dashboard.clinico');
+        Route::get('/dashboard/admin', [AdminDashboardController::class, 'index'])
+            ->middleware('ensureRole:admin')
+            ->name('dashboard.admin');
+
+        Route::get('/dashboard/medico', [MedicoDashboardController::class, 'index'])
+            ->middleware('ensureRole:medico')
+            ->name('dashboard.medico');
+
+        Route::get('/dashboard/contador', [ContadorDashboardController::class, 'index'])
+            ->middleware('ensureRole:contador')
+            ->name('dashboard.contador');
 
     Route::get('users/entrenadores/create', 
               [UsuarioController::class, 'createTrainer'])
