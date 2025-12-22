@@ -18,7 +18,7 @@
 
         <main class="relative z-10 flex min-h-screen items-center justify-center px-4 py-12">
             <div class="w-full max-w-xl flex justify-center">
-                {{ $slot }}
+                @yield('content')
             </div>
         </main>
     </div>
