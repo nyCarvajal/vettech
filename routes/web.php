@@ -22,6 +22,9 @@ use App\Http\Controllers\TipoIdentificacionController;
 use App\Http\Controllers\AreaController;
 use App\Http\Controllers\ProveedorController;
 use App\Http\Controllers\HistoriaClinicaController;
+use App\Http\Controllers\OwnersController;
+use App\Http\Controllers\PatientsController;
+use App\Http\Controllers\BreedsController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\AdministrativeReportController;
@@ -81,9 +84,13 @@ Route::middleware([
         Authenticate::class,           // 1️⃣ primero autentica
         ConnectTenantDB::class, // 2️⃣ luego conecta tenant
         SubstituteBindings::class,
-		
+
     ])
-	 ->group(function () {
+         ->group(function () {
+
+Route::resource('owners', OwnersController::class);
+Route::resource('patients', PatientsController::class);
+Route::get('/breeds', BreedsController::class)->name('breeds.index');
 		 
 		 
 Route::get('/ordenes/{orden}/pdf', [OrdendecompraController::class, 'pdf'])->name('ordenes.pdf');
