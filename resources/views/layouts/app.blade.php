@@ -1,90 +1,96 @@
-<!doctype html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<!DOCTYPE html>
+<html lang="es">
 <head>
+    @php use Illuminate\Support\Str; @endphp
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-
-    <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
-
-    <title>{{ config('app.name', 'Laravel') }}</title>
-
-    <!-- Fonts -->
-    <link rel="dns-prefetch" href="//fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=Nunito" rel="stylesheet">
-
-    <!-- Scripts -->
-        @vite(['resources/scss/icons.scss', 'resources/js/app.js'])
-    @vite(['resources/js/app.js', 'resources/sacss/style.scss'])
-    @stack('styles')
+    <title>{{ config('app.name', 'VetTech') }}</title>
+    @vite(['resources/css/app.css', 'resources/js/app.js', 'resources/scss/icons.scss', 'resources/scss/style.scss', 'resources/sass/app.scss'])
 </head>
-<body class="@yield('body-class')">
-    <div id="app">
-        <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm">
-            <div class="container">
-                <a class="navbar-brand" href="{{ url('/') }}">
-                    {{ config('app.name', 'Laravel') }}
-                </a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="{{ __('Toggle navigation') }}">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-
-                <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                    <!-- Left Side Of Navbar -->
-                    <ul class="navbar-nav me-auto">
-
-                    </ul>
-
-                    <!-- Right Side Of Navbar -->
-                    <ul class="navbar-nav ms-auto align-items-center">
-                        <!-- Authentication Links -->
-                        @guest
-                            @if (Route::has('login'))
-                                <li class="nav-item">
-                                    <a class="nav-link" href="{{ route('login') }}">{{ __('Login') }}</a>
-                                </li>
-                            @endif
-
-                            @if (Route::has('register'))
-                                <li class="nav-item">
-                                    <a class="nav-link" href="{{ route('register') }}">{{ __('Register') }}</a>
-                                </li>
-                            @endif
-                        @else
-                            <li class="nav-item me-2">
-                                <a class="nav-link position-relative" href="{{ route('reservas.pending') }}" aria-label="Reservas pendientes">
-                                    <span class="me-1" aria-hidden="true">🔔</span>
-                                    <span class="badge bg-danger rounded-pill position-absolute top-0 start-100 translate-middle">
-                                        {{ $pendingReservationsCount ?? 0 }}
-                                    </span>
-                                </a>
-                            </li>
-                            <li class="nav-item dropdown">
-                                <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
-                                    {{ Auth::user()->name }}
-                                </a>
-
-                                <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                                    <a class="dropdown-item" href="{{ route('logout') }}"
-                                       onclick="event.preventDefault();
-                                                     document.getElementById('logout-form').submit();">
-                                        {{ __('Logout') }}
-                                    </a>
-
-                                    <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
-                                        @csrf
-                                    </form>
-                                </div>
-                            </li>
-                        @endguest
-                    </ul>
+<body class="bg-gray-50">
+    <div id="app" class="min-h-screen flex flex-col">
+        <header class="bg-white border-b border-gray-200">
+            <div class="h-16 px-6 flex items-center justify-between gap-6">
+                <div class="flex items-center gap-3">
+                    <div class="h-10 w-10 rounded-lg bg-mint-50 text-mint-600 flex items-center justify-center font-semibold">VT</div>
+                    <div>
+                        <p class="text-lg font-semibold text-gray-900">{{ config('app.name', 'VetTech') }}</p>
+                        <p class="text-xs text-gray-500">Clínica veterinaria</p>
+                    </div>
+                </div>
+                <div class="hidden md:flex items-center gap-2 text-sm text-gray-500">
+                    @yield('breadcrumbs')
+                </div>
+                <div class="flex items-center gap-3">
+                    @auth
+                        <div class="relative">
+                            <button class="inline-flex items-center gap-2 rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50" data-bs-toggle="dropdown" aria-expanded="false">
+                                <span class="h-8 w-8 rounded-full bg-mint-50 text-mint-600 flex items-center justify-center font-semibold">{{ strtoupper(Str::substr(Auth::user()->name, 0, 1)) }}</span>
+                                <span class="text-sm font-medium">{{ Auth::user()->name }}</span>
+                            </button>
+                            <div class="dropdown-menu dropdown-menu-end mt-2 rounded-xl shadow-soft border border-gray-100 py-2 text-sm" aria-label="Menú de usuario">
+                                <a class="dropdown-item" href="{{ Route::has('profile.edit') ? route('profile.edit') : '#' }}">Perfil</a>
+                                <div class="dropdown-divider"></div>
+                                <form method="POST" action="{{ route('logout') }}">
+                                    @csrf
+                                    <button type="submit" class="dropdown-item text-danger-500">Cerrar sesión</button>
+                                </form>
+                            </div>
+                        </div>
+                    @endauth
                 </div>
             </div>
-        </nav>
+        </header>
 
-        <main class="py-4">
-            @yield('content')
-        </main>
+        <div class="flex flex-1">
+            <aside class="hidden lg:block w-64 bg-white border-r border-gray-200">
+                @php
+                    $navItems = [
+                        ['label' => 'Dashboard', 'route' => 'dashboard'],
+                        ['label' => 'Tutores', 'route' => 'owners.index'],
+                        ['label' => 'Pacientes', 'route' => 'pacientes.index'],
+                        ['label' => 'Agenda', 'route' => 'reservas.index'],
+                        ['label' => 'Hospitalización 24/7', 'route' => 'hospital.board'],
+                        ['label' => 'Dispensación', 'route' => 'dispensations.index'],
+                        ['label' => 'Ventas', 'route' => 'sales.index'],
+                        ['label' => 'Caja', 'route' => 'cash.sessions.index'],
+                        ['label' => 'Reportes', 'route' => 'kardex.index'],
+                    ];
+                @endphp
+                <nav class="p-4 space-y-1">
+                    @foreach($navItems as $item)
+                        @php
+                            $isAvailable = isset($item['route']) && Route::has($item['route']);
+                            $url = $isAvailable ? route($item['route']) : '#';
+                            $active = $isAvailable && request()->routeIs($item['route'] . '*');
+                        @endphp
+                        <a href="{{ $url }}" class="sidebar-link {{ $active ? 'sidebar-link-active' : '' }}">
+                            <span>{{ $item['label'] }}</span>
+                        </a>
+                    @endforeach
+                </nav>
+            </aside>
+
+            <main class="flex-1">
+                <div class="max-w-7xl mx-auto px-6 py-8 space-y-4">
+                    @if(session('status'))
+                        <x-alert type="success">{{ session('status') }}</x-alert>
+                    @endif
+                    @if(session('success'))
+                        <x-alert type="success">{{ session('success') }}</x-alert>
+                    @endif
+                    @if(session('error'))
+                        <x-alert type="error">{{ session('error') }}</x-alert>
+                    @endif
+                    @if(session('info'))
+                        <x-alert type="info">{{ session('info') }}</x-alert>
+                    @endif
+
+                    @yield('content')
+                </div>
+            </main>
+        </div>
     </div>
 </body>
 </html>
