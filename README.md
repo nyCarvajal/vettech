@@ -1,101 +1,44 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# UI clínico VetTech
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Sistema Blade con estilo clínico, limpio y amigable basado en Tailwind CSS. Paleta: blanco base, menta como acento y grises suaves para texto/bordes.
 
-## About Laravel
+## Tailwind Setup
+- Dependencias ya incluidas en `package.json` (Tailwind, Vite, PostCSS). Si necesitas reinstalar:
+  1. `npm install`
+  2. `npx tailwindcss init -p` (ya generado como `tailwind.config.js`).
+- Comandos de assets:
+  - `npm run dev` para desarrollo con Vite.
+  - `npm run build` para compilar CSS/JS.
+- Tokens de color definidos en `resources/css/app.css` y expuestos en `tailwind.config.js`:
+  - Menta: `--mint-50`, `--mint-100`, `--mint-200`, `--mint-500`, `--mint-600`.
+  - Grises: `--gray-50`, `--gray-100`, `--gray-200`, `--gray-500`, `--gray-700`.
+  - Alertas: `--danger-500`, `--warning-500`.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Layouts
+- `resources/views/layouts/app.blade.php`: layout principal con navbar superior (logo, breadcrumbs opcionales, usuario con dropdown) y sidebar fijo en desktop. Contenido limitado a `max-w-7xl` con fondo gris muy claro.
+- `resources/views/layouts/guest.blade.php`: layout centrado para login/register (Breeze), card con borde gris y botón/acento menta.
+- Mensajes flash gestionados con `<x-alert>`.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Components
+Componentes Blade reutilizables en `resources/views/components`:
+- `<x-card>`: borde gris-200, esquinas redondeadas, sombra suave y soporte de título/subtítulo/acciones.
+- `<x-kpi>`: card compacta con borde superior menta, valor grande y pista secundaria.
+- `<x-badge>`: variantes `mint|gray|danger|warning`, estilo píldora.
+- `<x-button>`: variantes `primary|secondary|ghost|danger`, tamaños `sm|md`, soporta `href`.
+- `<x-table>`: tabla estándar con encabezado gris, hover gris-50 y estado vacío.
+- `<x-alert>`: barra con borde izquierdo por tipo (`success|error|info|warning`).
+- `<x-input>`, `<x-select>`, `<x-textarea>`: campos con borde gris y focus ring menta; soporte de label y error.
+- `<x-empty>`: estado vacío con icono y acción opcional.
+- `<x-inline-actions>`: helper para renderizar conjuntos de botones compactos.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## Sidebar/Nav
+- Sidebar en `app.blade.php` con enlaces: Dashboard, Tutores, Pacientes, Agenda, Hospitalización 24/7, Dispensación, Ventas, Caja, Reportes.
+- Item activo resalta con borde menta y fondo menta muy claro (`sidebar-link-active`).
 
-## Learning Laravel
+## Updated Dashboards
+- `dashboards/admin.blade.php`: KPIs en `<x-kpi>`, secciones en `<x-card>`, badges para estados y estados vacíos claros.
+- `dashboards/medico.blade.php`: agenda, hospitalización y alertas con cards/badges; acciones rápidas en botones menta/gris.
+- `dashboards/contador.blade.php`: filtros con inputs menta, KPIs financieros, cierre de caja en `<x-table>` y badges por estado.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
-
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
-
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
-
-## Laravel Sponsors
-
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
-
-### Premium Partners
-
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
-
-## Contributing
-
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
-
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
-"# smashstech" 
-"# NEVI" 
-
-## Módulo veterinario V1
-
-### Migraciones
-Ejecuta `php artisan migrate --path=database/migrations/2025_12_01_*` para crear las tablas de inventario, dispensación, hospital y caja. Las migraciones usan la tabla `usuarios` como referencia para usuarios.
-
-### Seeders
-Ejecuta `php artisan db:seed --class=VettechSeeder` para crear roles/permisos base, turnos y jaulas de ejemplo.
-
-### Servicios incluidos
-- InventoryService (FEFO, movimientos y validación de stock)
-- DispenseService (dispensación parcial/total)
-- HospitalService (admisión, alta, registro de tareas y consumos)
-- BillingService (cuentas por dispensación y alta)
-- AuditService (bitácora simple)
-
-### Rutas principales
-Se agrupan bajo `/vet` (middleware `auth`): inventario, fórmulas/dispensación, tablero hospital, ventas y caja.
-
-### Tests
-Ejecuta `php artisan test --filter=VettechModuleTest` para validar FEFO, no-negativos, lote obligatorio y permisos.
-
-### UI mínima
-Las vistas Blade se ubican en `resources/views` bajo carpetas `inventory`, `dispensation`, `hospital`, `sales` y `cash` con formularios simples en español.
-
-## Dashboard multi-rol
-- Autenticación basada en Laravel Breeze (Blade). Si no está instalado, ejecutar:
-  - `composer require laravel/breeze --dev`
-  - `php artisan breeze:install blade`
-  - `npm install && npm run build`
-  - `php artisan migrate`
-- Ingreso único `/dashboard` redirige según rol (Admin, Medico, Contador).
-- Timezone por defecto: America/Bogota.
+## Captura mental del diseño
+Menta se usa solo como acento: borde superior de KPIs, resaltado de sidebar activo, fondos muy claros en badges/botones primarios y contenedores de iconos. El fondo general permanece blanco/gris para mantener el espacio en blanco y la sensación clínica.

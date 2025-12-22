@@ -2,104 +2,47 @@
 
 
 
-@import "bootswatch/dist/litera/bootstrap.min.css";
-
-@import 'tailwindcss';
-
-@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
-@source '../../storage/framework/views/*.php';
-@source '../**/*.blade.php';
-@source '../**/*.js';
-
-@import "@fullcalendar/list/index.css";
-
-@theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-        'Segoe UI Symbol', 'Noto Color Emoji';
-}
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
 
 :root {
-    --nevi-morado: #7560a8;
-    --nevi-azul: #4f84c4;
-    --nevi-teal: #6fb0ad;
-    --nevi-lavender: #b3b9cf;
-    --nevi-slate: #42526e;
+    --mint-50: #f4fbf7;
+    --mint-100: #e5f7ef;
+    --mint-200: #c7ebdb;
+    --mint-500: #35b28c;
+    --mint-600: #2a8f72;
+    --mint-700: #1f7a60;
+    --gray-50: #f8fafc;
+    --gray-100: #f1f5f9;
+    --gray-200: #e2e8f0;
+    --gray-500: #64748b;
+    --gray-700: #334155;
+    --danger-500: #f87171;
+    --warning-500: #f59e0b;
+    --font-sans: 'Inter', 'Nunito', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
 }
 
-.btn-gradient {
-    background: linear-gradient(120deg, var(--nevi-morado) 0%, var(--nevi-azul) 55%, var(--nevi-teal) 100%);
-    color: #fff;
-    border: none;
-    transition: transform 0.1s ease, box-shadow 0.2s ease;
-    box-shadow: 0 0.5rem 1rem rgba(80, 96, 176, 0.2);
+@layer base {
+    body {
+        @apply bg-gray-50 text-gray-700 font-sans;
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+        @apply font-semibold text-gray-900;
+    }
 }
 
-.btn-gradient:hover,
-.btn-gradient:focus {
-    color: #fff;
-    box-shadow: 0 0.75rem 1.5rem rgba(79, 115, 196, 0.3);
-}
+@layer components {
+    .sidebar-link {
+        @apply flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-gray-600 transition;
+    }
 
-.btn-gradient:active {
-    transform: translateY(1px);
-}
+    .sidebar-link:hover {
+        @apply bg-gray-100 text-gray-800;
+    }
 
-.patient-hero {
-    background: radial-gradient(circle at 10% 20%, rgba(255, 255, 255, 0.15), transparent 35%),
-        radial-gradient(circle at 80% 0%, rgba(255, 255, 255, 0.12), transparent 28%),
-        linear-gradient(135deg, var(--nevi-morado) 0%, var(--nevi-azul) 60%, var(--nevi-teal) 100%);
-    color: #fff;
-    border: none;
-    overflow: hidden;
-}
-
-.patient-hero .avatar-xl {
-    width: 82px;
-    height: 82px;
-    border: 3px solid rgba(255, 255, 255, 0.5);
-    box-shadow: 0 0.75rem 2rem rgba(23, 37, 84, 0.2);
-}
-
-.patient-hero .stat-pill {
-    background: rgba(255, 255, 255, 0.14);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    color: #eef2ff;
-}
-
-.info-chip {
-    background: rgba(117, 96, 168, 0.1);
-    border: 1px solid rgba(117, 96, 168, 0.25);
-    color: var(--nevi-slate);
-    border-radius: 0.75rem;
-    padding: 0.75rem 0.9rem;
-}
-
-.info-chip i {
-    color: var(--nevi-morado);
-}
-
-.surface-card {
-    background: #f7f9fd;
-    border: 1px solid #e5e7f1;
-    border-radius: 1rem;
-}
-
-.surface-card .badge,
-.surface-card .list-group-item {
-    border-radius: 0.75rem;
-}
-
-.metric-tile {
-    background: linear-gradient(180deg, #ffffff 0%, #eef2fb 100%);
-    border: 1px solid #e3e7f5;
-    border-radius: 0.9rem;
-}
-
-.metric-tile h5 {
-    color: var(--nevi-slate);
-}
-
-.section-title {
-    color: var(--nevi-slate);
-    font-weight: 700;
+    .sidebar-link-active {
+        @apply border border-mint-200 bg-mint-50 text-mint-700;
+    }
 }
