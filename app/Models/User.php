@@ -11,13 +11,16 @@ use App\Models\Clinica;
 
 class User extends Authenticatable
 {
-	 protected $connection = 'mysql';
     /** @use HasFactory<\Database\Factories\UserFactory> */
-	 use HasRoles; 
+    use HasRoles;
     use HasFactory, Notifiable;
-	 protected $table = 'usuarios';
-	 
-	  protected $casts = [
+
+    protected $connection = 'mysql';
+
+    // Modelo de autenticación apuntando a la tabla de usuarios
+    protected $table = 'users';
+
+    protected $casts = [
         'db' => 'string',
     ];
     /**

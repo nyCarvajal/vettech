@@ -24,6 +24,15 @@ Route::get('/login', [AuthenticatedSessionController::class, 'create'])
 Route::post('/login', [AuthenticatedSessionController::class, 'store'])
     ->middleware('guest');
 
+// Alias de inicio de sesión para la vista personalizada
+Route::get('/signin', [AuthenticatedSessionController::class, 'create'])
+    ->middleware('guest')
+    ->name('signin');
+
+Route::post('/signin', [AuthenticatedSessionController::class, 'store'])
+    ->middleware('guest')
+    ->name('signin.store');
+
 Route::get('/forgot-password', [PasswordResetLinkController::class, 'create'])
     ->middleware('guest')
     ->name('password.request');
