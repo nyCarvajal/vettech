@@ -870,3 +870,33 @@ if (document.readyState === 'loading') {
 } else {
   bootReservationUi();
 }
+
+// ==== Toggle de visibilidad de contraseña ====
+
+const bootPasswordToggles = () => {
+  const toggles = document.querySelectorAll('[data-toggle-password]');
+
+  toggles.forEach((toggle) => {
+    const targetId = toggle.getAttribute('data-target');
+    if (!targetId) return;
+
+    const input = document.getElementById(targetId);
+    if (!input) return;
+
+    const showText = toggle.getAttribute('data-show-text') || 'Ver contraseña';
+    const hideText = toggle.getAttribute('data-hide-text') || 'Ocultar';
+
+    toggle.addEventListener('click', () => {
+      const showingPassword = input.type === 'password';
+      input.type = showingPassword ? 'text' : 'password';
+      toggle.textContent = showingPassword ? hideText : showText;
+      input.focus();
+    });
+  });
+};
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', bootPasswordToggles, { once: true });
+} else {
+  bootPasswordToggles();
+}
