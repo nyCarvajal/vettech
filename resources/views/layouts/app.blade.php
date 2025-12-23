@@ -6,7 +6,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ config('app.name', 'VetTech') }}</title>
-    @vite(['resources/css/app.css', 'resources/js/app.js', 'resources/scss/icons.scss', 'resources/scss/style.scss', 'resources/sass/app.scss'])
+    @php
+        $hasViteAssets = file_exists(public_path('hot')) || file_exists(public_path('build/manifest.json'));
+    @endphp
+    @if($hasViteAssets)
+        @vite(['resources/css/app.css', 'resources/js/app.js', 'resources/scss/icons.scss', 'resources/scss/style.scss', 'resources/sass/app.scss'])
+    @else
+        <link rel="stylesheet" href="{{ asset('css/app-fallback.css') }}">
+    @endif
 </head>
 <body class="bg-gray-50">
     <div id="app" class="min-h-screen flex flex-col">
