@@ -97,7 +97,7 @@ class DashboardMetricsService
                 $q->whereNull('status')->orWhere('status', '!=', 'void');
             })
                 ->whereBetween('created_at', [$todayStart, $todayEnd])
-                ->selectRaw('coalesce(payment_method, "desconocido") as method, sum(total) as total')
+                ->selectRaw('"desconocido" as method, sum(total) as total')
                 ->groupBy('method')
                 ->get();
         });
@@ -107,7 +107,7 @@ class DashboardMetricsService
                 $q->whereNull('status')->orWhere('status', '!=', 'void');
             })
                 ->whereBetween('created_at', [$monthStart, $todayEnd])
-                ->selectRaw('coalesce(payment_method, "desconocido") as method, sum(total) as total')
+                ->selectRaw('"desconocido" as method, sum(total) as total')
                 ->groupBy('method')
                 ->get();
         });
@@ -174,7 +174,7 @@ class DashboardMetricsService
             $q->whereNull('status')->orWhere('status', '!=', 'void');
         })
             ->whereBetween('created_at', [$dateFrom, $dateTo])
-            ->selectRaw('coalesce(payment_method, "desconocido") as method, sum(total) as total')
+            ->selectRaw('"desconocido" as method, sum(total) as total')
             ->groupBy('method')
             ->get();
 
