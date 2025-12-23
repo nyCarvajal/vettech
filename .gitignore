@@ -1,7 +1,7 @@
 /.phpunit.cache
 /node_modules
-/public/build
 /public/hot
+/public/build
 /public/storage
 /storage/*.key
 /storage/pail
@@ -24,5 +24,4 @@ yarn-error.log
 
 /node_modules/
 /vendor/
-/public/build/
 /.env
