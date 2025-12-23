@@ -126,11 +126,15 @@ class DashboardMetricsService
         $hospitalOccupancy = HospitalStay::selectRaw('count(*) as total, sum(case when discharged_at is null then 1 else 0 end) as active')
             ->first();
 
-        $hospitalRevenueToday = Sale::where('type', 'hospitalization')
+        $hospitalRevenueToday = Sale::where(function ($q) {
+            $q->whereNull('status')->orWhere('status', '!=', 'void');
+        })
             ->whereBetween('created_at', [$todayStart, $todayEnd])
             ->sum('total');
 
-        $hospitalRevenueMonth = Sale::where('type', 'hospitalization')
+        $hospitalRevenueMonth = Sale::where(function ($q) {
+            $q->whereNull('status')->orWhere('status', '!=', 'void');
+        })
             ->whereBetween('created_at', [$monthStart, $todayEnd])
             ->sum('total');
 
