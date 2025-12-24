@@ -108,7 +108,9 @@
     <x-card title="Acciones rápidas" class="mt-6">
         <div class="flex flex-wrap gap-2">
             <x-button href="{{ route('historias-clinicas.create') }}">Nueva consulta</x-button>
-            <x-button variant="secondary" href="{{ route('hospital.stays.create') }}">Hospitalizar paciente</x-button>
+            @if (Route::has('hospital.stays.create'))
+                <x-button variant="secondary" href="{{ route('hospital.stays.create') }}">Hospitalizar paciente</x-button>
+            @endif
             <x-button variant="ghost" href="{{ route('prescriptions.create') }}">Crear fórmula</x-button>
             <x-button variant="secondary" href="{{ route('reservas.create') }}">Agendar control</x-button>
         </div>

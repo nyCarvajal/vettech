@@ -15,6 +15,7 @@ use App\Models\Sale;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Schema;
 
 class DashboardMetricsService
 {
@@ -65,12 +66,15 @@ class DashboardMetricsService
             ->limit(10)
             ->get();
 
-        $patientsWithOverdueControls = Paciente::query()
-            ->whereNotNull('proximo_control_at')
-            ->where('proximo_control_at', '<', $startOfDay)
-            ->orderBy('proximo_control_at')
-            ->limit(10)
-            ->get();
+        $patientsWithOverdueControls = collect();
+        if (Schema::hasColumn('pacientes', 'proximo_control_at')) {
+            $patientsWithOverdueControls = Paciente::query()
+                ->whereNotNull('proximo_control_at')
+                ->where('proximo_control_at', '<', $startOfDay)
+                ->orderBy('proximo_control_at')
+                ->limit(10)
+                ->get();
+        }
 
         return [
             'appointments' => $appointments,
