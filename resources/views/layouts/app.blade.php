@@ -6,7 +6,30 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ config('app.name', 'VetTech') }}</title>
-    @vite(['resources/css/app.css', 'resources/js/app.js', 'resources/scss/icons.scss', 'resources/scss/style.scss', 'resources/sass/app.scss'])
+    @php
+        $hasViteAssets = file_exists(public_path('hot')) || file_exists(public_path('build/manifest.json'));
+    @endphp
+    @if($hasViteAssets)
+        @vite(['resources/css/app.css', 'resources/js/app.js', 'resources/scss/icons.scss', 'resources/scss/style.scss', 'resources/sass/app.scss'])
+    @endif
+
+    <!-- Fallback CSS para cuando Vite no está disponible o el bundle no carga -->
+    <link rel="stylesheet" href="{{ asset('css/app-fallback.css') }}">
+    <noscript>
+        <link rel="stylesheet" href="{{ asset('css/app-fallback.css') }}">
+    </noscript>
+    <script>
+        window.addEventListener('load', function () {
+            const mint600 = getComputedStyle(document.documentElement).getPropertyValue('--mint-600');
+            const hasMint = mint600 && mint600.trim().length > 0;
+            if (!hasMint) {
+                const fallbackLink = document.createElement('link');
+                fallbackLink.rel = 'stylesheet';
+                fallbackLink.href = '{{ asset('css/app-fallback.css') }}';
+                document.head.appendChild(fallbackLink);
+            }
+        });
+    </script>
 </head>
 <body class="bg-gray-50">
     <div id="app" class="min-h-screen flex flex-col">
