@@ -24,15 +24,15 @@ class BaseModel extends Model
         /** @var Tenancy|null $tenancy */
         $tenancy = app()->bound('tenancy') ? app('tenancy') : null;
 
-        if ($tenancy && $tenancy->initialized) {
+        $tenantDatabase = config('database.connections.tenant.database');
+
+        if ($tenancy && $tenancy->initialized && $tenantDatabase) {
             return 'tenant';
         }
 
         // Si ya existe una base de datos configurada para la conexión tenant,
         // úsala para evitar leer desde la base "comun" en rutas que sí
         // inicializan la conexión pero aún no el objeto Tenancy.
-        $tenantDatabase = config('database.connections.tenant.database');
-
         return $tenantDatabase
             ? 'tenant'
             : parent::getConnectionName();
