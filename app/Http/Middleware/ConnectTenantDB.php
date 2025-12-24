@@ -30,6 +30,10 @@ class ConnectTenantDB
             $connection->setDatabaseName($database);
             $connection->reconnect();
 
+            // Asegura que la sesión SQL quedó apuntando a la DB correcta.
+            // Algunos hosts no respetan el nombre configurado hasta ejecutar "USE <db>".
+            $connection->getPdo()->exec("use `{$database}`");
+
             // 3) Forzar "USE <db>" y dejar el default en tenant
             DB::setDefaultConnection('tenant');
 
