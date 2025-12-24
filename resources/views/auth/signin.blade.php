@@ -2,9 +2,10 @@
 
 @section('content')
 <div class="w-full max-w-xl">
-    <div class="bg-white border border-[#E5E7EB] shadow-lg shadow-slate-200/40 rounded-2xl p-8 sm:p-10 space-y-8">
+    <div class="bg-white border border-[#E5E7EB] shadow-xl shadow-[#8b5cf6]/10 rounded-3xl p-8 sm:p-10 space-y-8 relative overflow-hidden">
+        <div class="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-[#8b5cf6] via-[#8b5cf6] to-[#10B981]"></div>
         <div class="text-center space-y-3">
-            <div class="mx-auto h-14 w-14 rounded-2xl bg-[#ECFDF5] flex items-center justify-center text-[#10B981] font-semibold text-lg shadow-sm">
+            <div class="mx-auto h-16 w-16 rounded-2xl bg-gradient-to-br from-[#ede9fe] via-white to-[#ecfdf5] flex items-center justify-center text-[#10B981] font-semibold text-xl shadow-md ring-1 ring-[#dcd7fe]/70">
                 VT
             </div>
             <div class="space-y-1">
@@ -13,7 +14,7 @@
             </div>
         </div>
 
-        <form method="POST" action="{{ route('signin.store') }}" class="space-y-6">
+        <form method="POST" action="{{ route('signin.store') }}" class="space-y-7">
             @csrf
             <div class="space-y-2">
                 <label for="email" class="block text-sm font-medium text-[#111827]">Correo</label>
@@ -24,7 +25,7 @@
                     value="{{ old('email') }}"
                     required
                     autocomplete="email"
-                    class="w-full rounded-xl border border-[#E5E7EB] bg-white px-4 py-3 text-[#111827] placeholder:text-[#9CA3AF] focus:border-[#10B981] focus:ring-2 focus:ring-[#10B981] focus:outline-none transition"
+                    class="w-full rounded-xl border border-[#E5E7EB] bg-white px-4 py-3 text-[#111827] placeholder:text-[#9CA3AF] focus:border-[#8b5cf6] focus:ring-2 focus:ring-[#8b5cf6] focus:outline-none transition"
                     placeholder="correo@ejemplo.com"
                 >
                 @error('email')
@@ -37,7 +38,7 @@
                     <label for="password" class="block text-sm font-medium text-[#111827]">Contraseña</label>
                     <button
                         type="button"
-                        class="text-xs font-medium text-[#10B981] hover:text-[#0f9a70] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#10B981] rounded-lg px-2 py-1"
+                        class="text-xs font-medium text-[#8b5cf6] hover:text-[#7c3aed] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#8b5cf6] rounded-lg px-2 py-1"
                         data-toggle-password
                         data-target="password"
                         data-show-text="Ver contraseña"
@@ -53,7 +54,7 @@
                     name="password"
                     required
                     autocomplete="current-password"
-                    class="w-full rounded-xl border border-[#E5E7EB] bg-white px-4 py-3 text-[#111827] placeholder:text-[#9CA3AF] focus:border-[#10B981] focus:ring-2 focus:ring-[#10B981] focus:outline-none transition"
+                    class="w-full rounded-xl border border-[#E5E7EB] bg-white px-4 py-3 text-[#111827] placeholder:text-[#9CA3AF] focus:border-[#8b5cf6] focus:ring-2 focus:ring-[#8b5cf6] focus:outline-none transition"
                     placeholder="••••••••"
                 >
                 @error('password')
@@ -68,23 +69,23 @@
                         type="checkbox"
                         name="remember"
                         {{ old('remember') ? 'checked' : '' }}
-                        class="h-4 w-4 rounded border-[#E5E7EB] text-[#10B981] focus:ring-[#10B981]"
+                        class="h-4 w-4 rounded border-[#E5E7EB] text-[#10B981] focus:ring-[#8b5cf6]"
                     >
                     <span>Recuérdame</span>
                 </label>
-                <a href="#" class="text-[#10B981] font-medium hover:text-[#0f9a70]">Olvidé mi contraseña</a>
+                <a href="#" class="text-[#8b5cf6] font-medium hover:text-[#7c3aed]">Olvidé mi contraseña</a>
             </div>
 
             <div class="space-y-3">
                 <button
                     type="submit"
-                    class="w-full rounded-xl bg-[#10B981] px-4 py-3 text-white font-semibold shadow-sm hover:bg-[#0f9a70] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#10B981] transition"
+                    class="w-full rounded-xl bg-gradient-to-r from-[#8b5cf6] to-[#10B981] px-4 py-3 text-white font-semibold shadow-lg shadow-[#8b5cf6]/20 hover:from-[#7c3aed] hover:to-[#0f9a70] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#8b5cf6] transition"
                 >
                     Iniciar sesión
                 </button>
                 <p class="text-center text-sm text-[#374151]">
                     ¿Aún no tienes cuenta?
-                    <a href="/signup" class="font-semibold text-[#10B981] hover:text-[#0f9a70]">Crear cuenta</a>
+                    <a href="/signup" class="font-semibold text-[#8b5cf6] hover:text-[#7c3aed]">Crear cuenta</a>
                 </p>
             </div>
         </form>
