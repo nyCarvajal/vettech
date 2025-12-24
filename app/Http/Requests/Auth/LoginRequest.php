@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Auth;
 
+use App\Models\User;
 use Illuminate\Auth\Events\Lockout;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
@@ -43,7 +44,9 @@ class LoginRequest extends FormRequest
     {
         $this->ensureIsNotRateLimited();
 
-        if (!Auth::attempt($this->only('email', 'password'), $this->filled('remember'))) {
+        $user = User::where('email', $this->input('email'))->first();
+
+        if (!$user || !$this->verifyPassword($user, $this->input('password'))) {
             RateLimiter::hit($this->throttleKey());
 
             throw ValidationException::withMessages([
@@ -52,6 +55,24 @@ class LoginRequest extends FormRequest
         }
 
         RateLimiter::clear($this->throttleKey());
+
+        Auth::login($user, $this->boolean('remember'));
+    }
+
+    protected function verifyPassword(User $user, string $plain): bool
+    {
+        $hashed = (string) $user->password;
+
+        $verified = password_verify($plain, $hashed)
+            || hash_equals($hashed, $plain);
+
+        $hashInfo = password_get_info($hashed);
+
+        if ($verified && $hashInfo['algo'] !== 0 && password_needs_rehash($hashed, PASSWORD_BCRYPT)) {
+            $user->forceFill(['password' => $plain])->save();
+        }
+
+        return $verified;
     }
 
     /**
