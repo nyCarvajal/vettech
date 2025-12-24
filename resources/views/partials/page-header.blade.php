@@ -11,6 +11,6 @@
         @endif
     </div>
     @if(isset($actions))
-        <div class="flex flex-wrap gap-2">{{ $actions }}</div>
+        <div class="flex flex-wrap gap-2">{!! $actions !!}</div>
     @endif
 </div>
