@@ -28,6 +28,7 @@ class Paciente extends BaseModel
         'acompanante',
         'acompanante_contacto',
         'observaciones',
+        'proximo_control_at',
     ];
 
     public function historiasClinicas(): HasMany
