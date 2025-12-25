@@ -24,7 +24,7 @@
                     <select id="medicoFilter" class="form-select">
                         <option value="">Todos</option>
                         @foreach($medicos as $medico)
-                            <option value="{{ $medico->id }}">{{ $medico->name }}</option>
+                            <option value="{{ $medico->id }}">{{ $medico->nombres }}</option>
                         @endforeach
                     </select>
                 </div>
@@ -154,7 +154,7 @@
                             <select class="form-select" id="entrenador" name="entrenador_id" required>
                                 <option value="">Selecciona un médico</option>
                                 @foreach($medicos as $medico)
-                                    <option value="{{ $medico->id }}">{{ $medico->name }}</option>
+                                    <option value="{{ $medico->id }}">{{ $medico->nombres }}</option>
                                 @endforeach
                             </select>
                         </div>
