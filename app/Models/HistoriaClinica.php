@@ -15,6 +15,8 @@ class HistoriaClinica extends Model
 
     protected $connection = 'tenant';
 
+    protected $table = 'historias_clinicas';
+
     public function resolveRouteBinding($value, $field = null)
     {
         $dbName = optional(optional(Auth::user())->peluqueria)->db;
