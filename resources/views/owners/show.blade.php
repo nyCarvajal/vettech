@@ -36,6 +36,14 @@
                         <div>{{ $owner->document ?: 'No registrado' }}</div>
                         <div class="small text-muted mt-2">Dirección</div>
                         <div>{{ $owner->address ?: 'Sin dirección' }}</div>
+                        <div class="small text-muted mt-2">Ubicación</div>
+                        @php
+                            $location = array_filter([
+                                optional($owner->municipio)->nombre,
+                                optional($owner->departamento)->nombre,
+                            ]);
+                        @endphp
+                        <div>{{ $location ? implode(', ', $location) : 'Sin ubicación' }}</div>
                     </div>
                 </div>
             </div>

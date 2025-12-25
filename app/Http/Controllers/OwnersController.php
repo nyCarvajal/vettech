@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\OwnerRequest;
+use App\Models\Departamentos;
+use App\Models\Municipios;
 use App\Models\Owner;
 use App\Models\TipoIdentificacion;
 use App\Services\TimelineService;
@@ -38,6 +40,8 @@ class OwnersController extends Controller
         return view('owners.form', [
             'owner' => new Owner(),
             'documentTypes' => TipoIdentificacion::all(),
+            'departamentos' => Departamentos::all(),
+            'municipios' => Municipios::all(),
         ]);
     }
 
@@ -62,7 +66,7 @@ class OwnersController extends Controller
         });
 
         return view('owners.show', [
-            'owner' => $owner,
+            'owner' => $owner->load(['departamento', 'municipio']),
             'timelines' => $timelines,
         ]);
     }
@@ -72,6 +76,8 @@ class OwnersController extends Controller
         return view('owners.form', [
             'owner' => $owner,
             'documentTypes' => TipoIdentificacion::all(),
+            'departamentos' => Departamentos::all(),
+            'municipios' => Municipios::all(),
         ]);
     }
 
