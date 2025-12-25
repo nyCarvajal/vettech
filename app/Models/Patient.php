@@ -96,6 +96,12 @@ class Patient extends BaseModel
             return asset('storage/' . $this->photo_path);
         }
 
-        return 'https://via.placeholder.com/400x300?text=Paciente';
+        $species = strtolower(optional($this->species)->name ?? '');
+
+        return match ($species) {
+            'perro' => asset('images/users/perro.png'),
+            'gato' => asset('images/users/gato.png'),
+            default => asset('images/users/otro.png'),
+        };
     }
 }
