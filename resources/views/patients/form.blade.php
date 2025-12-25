@@ -32,7 +32,7 @@
                             <div class="mb-2">
                                 <label class="form-label text-muted">Buscar por nombre o cédula</label>
                                 <div class="input-group">
-                                    <span class="input-group-text text-purple">
+                                <span class="input-group-text input-icon-mint">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M11 6a5 5 0 1 1-10 0 5 5 0 0 1 10 0Z"/><path d="M15.854 15.146 11.5 10.793" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
                                     </span>
                                     <input type="search" id="ownerSearch" class="form-control" placeholder="Ej: Laura Gómez o 123456" aria-label="Buscar tutor">
@@ -62,7 +62,7 @@
                                 <div class="col-md-6">
                                     <label class="form-label">Nombre</label>
                                     <div class="input-group">
-                                        <span class="input-group-text text-purple">
+                                        <span class="input-group-text input-icon-purple">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"/><path d="M2 14s1.5-4 6-4 6 4 6 4H2Z"/></svg>
                                         </span>
                                         <input type="text" name="nombres" value="{{ old('nombres', $patient->nombres) }}" class="form-control" placeholder="Nombre de la mascota" required>
@@ -71,7 +71,7 @@
                                 <div class="col-md-6">
                                     <label class="form-label">Especie</label>
                                     <div class="input-group">
-                                        <span class="input-group-text text-purple">
+                                        <span class="input-group-text input-icon-mint">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M8 2c1.5 0 2 .5 2 1s-.5 1-2 1-2-.5-2-1 .5-1 2-1Z"/><path d="M3 5c0 3 2 6 5 6s5-3 5-6"/></svg>
                                         </span>
                                         <select name="species_id" class="form-select fancy-select" required>
@@ -85,7 +85,7 @@
                                 <div class="col-md-6">
                                     <label class="form-label">Raza</label>
                                     <div class="input-group">
-                                        <span class="input-group-text text-purple">
+                                        <span class="input-group-text input-icon-purple">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M4 4a4 4 0 0 1 8 0c0 2-2 5-4 5S4 6 4 4Z"/><path d="M6 11c0 1 1 3 2 3s2-2 2-3"/></svg>
                                         </span>
                                         <select name="breed_id" class="form-select fancy-select">
@@ -99,7 +99,7 @@
                                 <div class="col-md-6">
                                     <label class="form-label">Carácter</label>
                                     <div class="input-group">
-                                        <span class="input-group-text text-purple">
+                                        <span class="input-group-text input-icon-mint">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M5 3.5a3 3 0 1 1 6 0A3 3 0 0 1 5 3.5Z"/><path d="M2.5 14c1-2 3-3 5.5-3s4.5 1 5.5 3"/></svg>
                                         </span>
                                         <select name="temperamento" class="form-select fancy-select">
@@ -113,7 +113,7 @@
                                 <div class="col-md-6">
                                     <label class="form-label">Alergias</label>
                                     <div class="input-group">
-                                        <span class="input-group-text text-purple">
+                                        <span class="input-group-text input-icon-purple">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M8 1 1 6l7 9 7-9-7-5Z"/></svg>
                                         </span>
                                         <textarea name="alergias" class="form-control" rows="2" placeholder="Describe alergias conocidas">{{ old('alergias', $patient->alergias) }}</textarea>
@@ -122,7 +122,7 @@
                                 <div class="col-md-6">
                                     <label class="form-label">Sexo</label>
                                     <div class="input-group">
-                                        <span class="input-group-text text-purple">
+                                        <span class="input-group-text input-icon-mint">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M6 3a3 3 0 1 1-2 5.236V12H2V9.5H.5V8H2V6.236A3 3 0 0 1 6 3Z"/><path d="M10 5a3 3 0 1 1 2.5 4.764V16H11v-6.236A3 3 0 0 1 10 5Z"/></svg>
                                         </span>
                                         <select name="sexo" class="form-select fancy-select">
@@ -136,7 +136,7 @@
                                 <div class="col-12">
                                     <label class="form-label">Observaciones</label>
                                     <div class="input-group">
-                                        <span class="input-group-text text-purple">
+                                        <span class="input-group-text input-icon-purple">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M2 2h12v10H5l-3 3V2Z"/></svg>
                                         </span>
                                         <textarea name="observaciones" class="form-control" rows="3" placeholder="Notas clínicas, comportamiento, cuidados especiales">{{ old('observaciones', $patient->observaciones) }}</textarea>
@@ -172,7 +172,9 @@
         .patient-form .btn-outline-purple:hover { background: #6f42c1; color: #fff; }
         .patient-form .btn-gradient { background: linear-gradient(135deg, #6f42c1, #2ac9a5); border: none; color: #fff; }
         .patient-form .glass-card { background: linear-gradient(145deg, #faf7ff 0%, #f1fffa 100%); border-radius: 14px; border: 1px solid #ede7ff; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
-        .patient-form .input-group-text { background: #f7f2ff; border-color: #ede7ff; }
+        .patient-form .input-group-text { border-width: 1.5px; }
+        .patient-form .input-icon-purple { color: #6f42c1; background: linear-gradient(135deg, #f4e9ff, #ece0ff); border-color: #d8c4f7; }
+        .patient-form .input-icon-mint { color: #1ba885; background: linear-gradient(135deg, #e6fbf5, #d5f6ed); border-color: #b9eddf; }
         .patient-form .fancy-select { border-color: #ede7ff; }
         .patient-form .fancy-select:focus, .patient-form .form-control:focus { border-color: #6f42c1; box-shadow: 0 0 0 0.2rem rgba(111, 66, 193, 0.15); }
         .patient-form .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
