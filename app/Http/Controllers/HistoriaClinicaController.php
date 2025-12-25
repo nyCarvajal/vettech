@@ -88,7 +88,9 @@ class HistoriaClinicaController extends Controller
 
     private function formData(HistoriaClinica $historiaClinica): array
     {
-        $pacientes = Paciente::orderBy('nombres')->orderBy('apellidos')->get(['id', 'nombres', 'apellidos', 'numero_documento']);
+        $pacientes = Paciente::orderBy('nombres')
+            ->orderBy('apellidos')
+            ->get();
 
         return [
             'historia' => $historiaClinica,
