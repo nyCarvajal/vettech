@@ -162,6 +162,22 @@ Route::get('clinica/perfil', [ClinicaController::class,'showOwn'])
   Route::resource('items', ItemController::class);
   Route::post('historias-clinicas/autoguardado', [HistoriaClinicaController::class, 'autoSave'])
        ->name('historias-clinicas.autosave');
+  Route::get('historias-clinicas/{historiaClinica}/pdf', [HistoriaClinicaController::class, 'pdf'])
+        ->name('historias-clinicas.pdf');
+  Route::get('historias-clinicas/{historiaClinica}/recetario', [HistoriaClinicaController::class, 'createRecetario'])
+        ->name('historias-clinicas.recetarios.create');
+  Route::post('historias-clinicas/{historiaClinica}/recetario', [HistoriaClinicaController::class, 'storeRecetario'])
+        ->name('historias-clinicas.recetarios.store');
+  Route::post('recetarios/{prescription}/facturar', [HistoriaClinicaController::class, 'facturarRecetario'])
+        ->name('historias-clinicas.recetarios.facturar');
+  Route::get('recetarios/{prescription}/imprimir', [HistoriaClinicaController::class, 'imprimirRecetario'])
+        ->name('historias-clinicas.recetarios.print');
+  Route::get('historias-clinicas/{historiaClinica}/remision', [HistoriaClinicaController::class, 'createRemision'])
+        ->name('historias-clinicas.remisiones.create');
+  Route::post('historias-clinicas/{historiaClinica}/remision', [HistoriaClinicaController::class, 'storeRemision'])
+        ->name('historias-clinicas.remisiones.store');
+  Route::get('remisiones/{examReferral}/imprimir', [HistoriaClinicaController::class, 'imprimirRemision'])
+        ->name('historias-clinicas.remisiones.print');
   Route::resource('historias-clinicas', HistoriaClinicaController::class, [
       'parameters' => ['historias-clinicas' => 'historiaClinica'],
   ]);

@@ -9,7 +9,7 @@ class Prescription extends BaseModel
     use HasFactory;
 
     protected $fillable = [
-        'encounter_id', 'patient_id', 'professional_id', 'status',
+        'encounter_id', 'historia_clinica_id', 'patient_id', 'professional_id', 'status',
     ];
 
     public function items()
@@ -25,5 +25,10 @@ class Prescription extends BaseModel
     public function dispensations()
     {
         return $this->hasMany(Dispensation::class);
+    }
+
+    public function historiaClinica()
+    {
+        return $this->belongsTo(HistoriaClinica::class, 'historia_clinica_id');
     }
 }

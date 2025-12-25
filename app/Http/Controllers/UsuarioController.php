@@ -158,7 +158,7 @@ class UsuarioController extends Controller
 
     protected function validateUser(Request $request, ?User $user = null): array
     {
-        $emailRule = 'required|email|unique:usuarios,email';
+        $emailRule = 'required|email|unique:users,email';
 
         if ($user) {
             $emailRule .= ',' . $user->id;
