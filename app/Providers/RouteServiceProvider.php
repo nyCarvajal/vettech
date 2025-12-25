@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use App\Models\Clinica;
 use App\Models\Paciente;
+use App\Models\Patient;
 
 class RouteServiceProvider extends ServiceProvider
 {
@@ -62,6 +63,22 @@ class RouteServiceProvider extends ServiceProvider
             }
 
             return Paciente::on('tenant')->findOrFail($value);
+        });
+
+        Route::bind('patient', function ($value) {
+            if ($user = Auth::user()) {
+                $clinica = Clinica::resolveForUser($user);
+                $database = $clinica->db ?? $user->db;
+
+                if ($database) {
+                    config(['database.connections.tenant.database' => $database]);
+                    DB::purge('tenant');
+                    DB::reconnect('tenant');
+                    DB::setDefaultConnection('tenant');
+                }
+            }
+
+            return Patient::on('tenant')->findOrFail($value);
         });
     }
 }
