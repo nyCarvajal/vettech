@@ -158,12 +158,20 @@
 </div>
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        const departamentos = @json($departamentos->map(fn ($dep) => ['id' => $dep->id, 'nombre' => $dep->nombre]));
-        const municipios = @json($municipios->map(fn ($mun) => [
-            'id' => $mun->id,
-            'nombre' => $mun->nombre,
-            'departamento_id' => $mun->departamento_id,
-        ]));
+        const departamentos = @json($departamentos->map(function ($dep) {
+            return [
+                'id' => $dep->id,
+                'nombre' => $dep->nombre,
+            ];
+        }));
+
+        const municipios = @json($municipios->map(function ($mun) {
+            return [
+                'id' => $mun->id,
+                'nombre' => $mun->nombre,
+                'departamento_id' => $mun->departamento_id,
+            ];
+        }));
 
         const departamentoSelect = document.getElementById('departamento_id');
         const municipioSelect = document.getElementById('municipio_id');
