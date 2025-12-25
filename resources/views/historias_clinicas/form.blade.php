@@ -2,6 +2,11 @@
     $paraclinicosIniciales = $historia->relationLoaded('paraclinicos') ? $historia->paraclinicos : $historia->paraclinicos()->get();
     $diagnosticosIniciales = $historia->relationLoaded('diagnosticos') ? $historia->diagnosticos : $historia->diagnosticos()->get();
     $selectedPaciente = $pacientes->firstWhere('id', old('paciente_id', $historia->paciente_id));
+    $owner = $selectedPaciente?->owner;
+    $ownerName = $owner->name ?? $selectedPaciente?->acompanante;
+    $ownerPhone = $owner->phone ?? $selectedPaciente?->acompanante_contacto;
+    $ownerWhatsapp = $owner->whatsapp ?? $selectedPaciente?->whatsapp;
+    $ownerEmail = $owner->email ?? $selectedPaciente?->email;
     $pacienteIniciales = $selectedPaciente
         ? collect([$selectedPaciente->nombres, $selectedPaciente->apellidos])
             ->filter()
@@ -184,12 +189,12 @@
                         <span class="icon-circle"><i class="ri-user-3-line"></i></span>
                         <div>
                             <p class="mb-0 text-muted small">Propietario / Responsable</p>
-                            <h6 class="mb-0">{{ $selectedPaciente?->acompanante ?? 'No registrado' }}</h6>
+                            <h6 class="mb-0">{{ $ownerName ?? 'No registrado' }}</h6>
                         </div>
                     </div>
-                    <p class="mb-1 small"><strong>Contacto:</strong> {{ $selectedPaciente?->acompanante_contacto ?? 'Sin número' }}</p>
-                    <p class="mb-1 small"><strong>WhatsApp:</strong> {{ $selectedPaciente?->whatsapp ?? 'No configurado' }}</p>
-                    <p class="mb-0 small"><strong>Correo:</strong> {{ $selectedPaciente?->email ?? 'Sin correo' }}</p>
+                    <p class="mb-1 small"><strong>Contacto:</strong> {{ $ownerPhone ?? 'Sin número' }}</p>
+                    <p class="mb-1 small"><strong>WhatsApp:</strong> {{ $ownerWhatsapp ?? 'No configurado' }}</p>
+                    <p class="mb-0 small"><strong>Correo:</strong> {{ $ownerEmail ?? 'Sin correo' }}</p>
                 </div>
             </div>
             <div class="col-lg-4">

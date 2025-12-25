@@ -41,7 +41,7 @@ class HistoriaClinicaController extends Controller
 
     public function edit(HistoriaClinica $historiaClinica)
     {
-        $historiaClinica->load(['paraclinicos', 'diagnosticos', 'paciente']);
+        $historiaClinica->load(['paraclinicos', 'diagnosticos', 'paciente.owner']);
 
         return view('historias_clinicas.edit', $this->formData($historiaClinica));
     }
