@@ -1,181 +1,508 @@
 @extends('layouts.app')
 
+@push('styles')
+<style>
+    :root {
+        --lavender-600: #7c6ff2;
+        --lavender-100: #f1edff;
+        --mint-600: #3fc6b8;
+        --mint-100: #e6f8f5;
+        --ink-900: #0f172a;
+        --ink-600: #475569;
+        --surface: #ffffff;
+    }
+
+    .patient-dashboard {
+        display: flex;
+        flex-direction: column;
+        gap: 1.25rem;
+    }
+
+    .dashboard-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .dashboard-title {
+        color: var(--ink-900);
+        margin: 0;
+        font-weight: 700;
+    }
+
+    .dashboard-subtitle {
+        color: var(--ink-600);
+        margin: 0.1rem 0 0;
+    }
+
+    .pill-action {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.55rem 1rem;
+        border-radius: 9999px;
+        border: 1px solid rgba(124, 111, 242, 0.25);
+        color: var(--lavender-600);
+        background: linear-gradient(135deg, #f8f7ff, #eef3ff);
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.2s ease;
+    }
+
+    .pill-action:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 10px 30px rgba(124, 111, 242, 0.18);
+    }
+
+    .grid-panels {
+        display: grid;
+        grid-template-columns: 1.65fr 1fr;
+        gap: 1rem;
+    }
+
+    .panel-card {
+        background: var(--surface);
+        border: 1px solid #edf0f7;
+        border-radius: 18px;
+        box-shadow: 0 15px 40px rgba(15, 23, 42, 0.05);
+        overflow: hidden;
+    }
+
+    .panel-body {
+        padding: 1.25rem 1.5rem;
+    }
+
+    .hero-card {
+        position: relative;
+        overflow: hidden;
+        background: linear-gradient(135deg, #f4f1ff, #e7f8f4);
+    }
+
+    .hero-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.35rem 0.7rem;
+        border-radius: 9999px;
+        background: rgba(255, 255, 255, 0.65);
+        color: var(--ink-600);
+        font-weight: 600;
+        border: 1px solid rgba(63, 198, 184, 0.2);
+    }
+
+    .hero-layout {
+        display: grid;
+        grid-template-columns: auto 1fr;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .avatar-lg {
+        width: 130px;
+        height: 130px;
+        border-radius: 20px;
+        object-fit: cover;
+        border: 6px solid rgba(255, 255, 255, 0.8);
+        box-shadow: 0 12px 30px rgba(124, 111, 242, 0.15);
+    }
+
+    .tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        padding: 0.35rem 0.65rem;
+        border-radius: 10px;
+        background: rgba(124, 111, 242, 0.08);
+        color: var(--lavender-600);
+        font-weight: 600;
+        margin-right: 0.4rem;
+        margin-bottom: 0.4rem;
+    }
+
+    .tag.mint {
+        background: rgba(63, 198, 184, 0.1);
+        color: var(--mint-600);
+    }
+
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 0.75rem;
+        margin-top: 1rem;
+    }
+
+    .info-tile {
+        padding: 0.75rem 1rem;
+        border-radius: 12px;
+        border: 1px solid #edf0f7;
+        background: rgba(255, 255, 255, 0.8);
+    }
+
+    .info-label {
+        font-size: 0.85rem;
+        color: var(--ink-600);
+        margin: 0;
+    }
+
+    .info-value {
+        font-weight: 700;
+        color: var(--ink-900);
+        margin: 0.15rem 0 0;
+    }
+
+    .section-title {
+        font-weight: 700;
+        margin: 0;
+        color: var(--ink-900);
+    }
+
+    .section-subtitle {
+        color: var(--ink-600);
+        margin: 0.2rem 0 0;
+    }
+
+    .owner-card {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 0.8rem;
+    }
+
+    .contact-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        padding: 0.45rem 0.7rem;
+        background: rgba(63, 198, 184, 0.12);
+        color: var(--ink-900);
+        border-radius: 10px;
+        font-weight: 600;
+        text-decoration: none;
+    }
+
+    .last-visit-card {
+        background: linear-gradient(135deg, #6f62f6, #43ccb8);
+        color: #fff;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .last-visit-card::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.15), transparent 40%);
+    }
+
+    .last-visit-content {
+        position: relative;
+        z-index: 1;
+    }
+
+    .last-visit-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 1rem;
+    }
+
+    .history-list {
+        display: flex;
+        flex-direction: column;
+        gap: 0.85rem;
+        margin-top: 1rem;
+    }
+
+    .history-item {
+        display: grid;
+        grid-template-columns: 140px 1fr auto;
+        gap: 0.75rem;
+        align-items: center;
+        padding: 0.9rem 1rem;
+        border-radius: 14px;
+        border: 1px solid #edf0f7;
+        background: #fff;
+    }
+
+    .history-date {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+        color: var(--ink-600);
+        font-weight: 600;
+    }
+
+    .history-title {
+        font-weight: 700;
+        margin: 0;
+        color: var(--ink-900);
+    }
+
+    .history-meta {
+        color: var(--ink-600);
+        margin: 0.25rem 0 0;
+    }
+
+    .history-actions a {
+        color: var(--lavender-600);
+        text-decoration: none;
+        font-weight: 600;
+    }
+
+    .badge-soft {
+        padding: 0.3rem 0.65rem;
+        border-radius: 12px;
+        background: rgba(124, 111, 242, 0.12);
+        color: var(--lavender-600);
+        font-weight: 700;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+    }
+
+    @media (max-width: 1100px) {
+        .grid-panels {
+            grid-template-columns: 1fr;
+        }
+        .history-item {
+            grid-template-columns: 1fr;
+            align-items: flex-start;
+        }
+    }
+</style>
+@endpush
+
 @section('content')
-<div class="container">
-    <div class="d-flex justify-content-between align-items-center mb-4">
+<div class="patient-dashboard">
+    <div class="dashboard-header">
         <div>
-            <h1 class="h3 mb-1">Perfil del paciente</h1>
-            <p class="text-muted mb-0">Vista clínica rápida e intuitiva</p>
+            <p class="dashboard-subtitle mb-1">Paciente / {{ $patient->display_name ?: 'Sin nombre' }}</p>
+            <h1 class="dashboard-title">Panel clínico del paciente</h1>
         </div>
-        <div class="d-flex gap-2">
-            <a href="{{ route('patients.edit', $patient) }}" class="btn btn-outline-secondary">Editar</a>
-            <a href="{{ route('patients.index') }}" class="btn btn-light">Volver</a>
+        <div class="flex gap-2">
+            <a href="{{ route('patients.edit', $patient) }}" class="pill-action">Editar ficha</a>
+            <a href="{{ route('patients.index') }}" class="pill-action">Volver al listado</a>
         </div>
     </div>
 
-    <div class="row g-4">
-        <div class="col-lg-4">
-            <div class="position-sticky" style="top: 1rem;">
-                <div class="card shadow-sm border-0 mb-3">
-                    <div class="card-body text-center">
-                        <img src="{{ $patient->photo_url }}" alt="Foto" class="rounded mb-3" style="width: 150px; height: 150px; object-fit: cover;">
-                        <h3 class="h5 mb-1">{{ $patient->display_name ?: 'Paciente sin nombre' }}</h3>
-                        <div class="text-muted mb-2">{{ optional($patient->species)->name }} · {{ optional($patient->breed)->name }}</div>
-                        <div class="d-flex justify-content-center gap-2 flex-wrap">
-                            @if($patient->sexo)
-                                <span class="badge bg-light text-dark">Sexo: {{ $patient->sexo }}</span>
-                            @endif
-                            @if($patient->edad)
-                                <span class="badge bg-soft-primary text-primary">{{ $patient->edad }}</span>
-                            @endif
+    <div class="grid-panels">
+        <div class="panel-card hero-card">
+            <div class="panel-body">
+                <div class="hero-layout">
+                    <img src="{{ $patient->photo_url }}" alt="Foto" class="avatar-lg">
+                    <div>
+                        <div class="d-flex flex-wrap gap-2 align-items-center mb-2">
+                            <span class="hero-badge">Paciente</span>
                             @if($activeStay)
-                                <span class="badge bg-danger">Hospitalizado</span>
+                                <span class="tag">Hospitalizado</span>
                             @endif
                         </div>
-                    </div>
-                </div>
+                        <h2 class="h4 mb-1">{{ $patient->display_name ?: 'Paciente sin nombre' }}</h2>
+                        <p class="text-muted mb-2">{{ optional($patient->species)->name }} · {{ optional($patient->breed)->name }}</p>
+                        <div class="d-flex flex-wrap gap-2">
+                            @if($patient->edad)
+                                <span class="tag mint">{{ $patient->edad }}</span>
+                            @endif
+                            @if($patient->sexo)
+                                <span class="tag">Sexo: {{ $patient->sexo }}</span>
+                            @endif
+                            <span class="tag mint">Peso: {{ $patient->peso_actual ? $patient->peso_actual . ' kg' : 'N/D' }}</span>
+                        </div>
 
-                <div class="card shadow-sm border-0 mb-3">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <h6 class="text-uppercase text-muted mb-0">Tutor</h6>
-                            <a href="{{ route('owners.show', $patient->owner) }}" class="small">Ver ficha</a>
-                        </div>
-                        <div class="fw-semibold">{{ optional($patient->owner)->name }}</div>
-                        <div class="text-muted">{{ optional($patient->owner)->address }}</div>
-                        <div class="d-flex flex-wrap gap-2 mt-2">
-                            @if(optional($patient->owner)->whatsapp)
-                            <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $patient->owner->whatsapp) }}" class="btn btn-success btn-sm">WhatsApp</a>
-                            @endif
-                            @if(optional($patient->owner)->phone)
-                            <a href="tel:{{ $patient->owner->phone }}" class="btn btn-outline-primary btn-sm">Llamar</a>
-                            @endif
-                            @if(optional($patient->owner)->email)
-                            <a href="mailto:{{ $patient->owner->email }}" class="btn btn-outline-secondary btn-sm">Correo</a>
-                            @endif
-                        </div>
-                    </div>
-                </div>
-
-                <div class="card shadow-sm border-0">
-                    <div class="card-body">
-                        <h6 class="text-uppercase text-muted">Datos clínicos</h6>
-                        <div class="d-flex align-items-center justify-content-between py-2 border-bottom">
-                            <span class="text-muted">Peso actual</span>
-                            <span class="fw-semibold">{{ $patient->peso_actual ? $patient->peso_actual . ' kg' : 'N/D' }}</span>
-                        </div>
-                        <div class="d-flex align-items-center justify-content-between py-2 border-bottom">
-                            <span class="text-muted">Alergias</span>
-                            <span class="fw-semibold text-danger">{{ $patient->alergias ?: 'Sin registrar' }}</span>
-                        </div>
-                        <div class="d-flex align-items-center justify-content-between py-2 border-bottom">
-                            <span class="text-muted">Temperamento</span>
-                            <span class="fw-semibold">{{ $patient->temperamento ?: 'N/D' }}</span>
-                        </div>
-                        <div class="d-flex align-items-center justify-content-between py-2 border-bottom">
-                            <span class="text-muted">Microchip</span>
-                            <span class="fw-semibold">{{ $patient->microchip ?: 'N/A' }}</span>
-                        </div>
-                        <div class="pt-2">
-                            <div class="small text-muted">Notas importantes</div>
-                            <div class="fw-semibold">{{ $patient->observaciones ?: 'Sin notas adicionales.' }}</div>
+                        <div class="info-grid">
+                            <div class="info-tile">
+                                <p class="info-label">Estado</p>
+                                <p class="info-value">{{ $patient->estado ?? 'N/D' }}</p>
+                            </div>
+                            <div class="info-tile">
+                                <p class="info-label">Microchip</p>
+                                <p class="info-value">{{ $patient->microchip ?: 'N/A' }}</p>
+                            </div>
+                            <div class="info-tile">
+                                <p class="info-label">Temperamento</p>
+                                <p class="info-value">{{ $patient->temperamento ?: 'Sin registrar' }}</p>
+                            </div>
+                            <div class="info-tile">
+                                <p class="info-label">Alergias</p>
+                                <p class="info-value">{{ $patient->alergias ?: 'Sin alergias registradas' }}</p>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="col-lg-8">
-            <div class="card shadow-sm border-0 mb-4">
-                <div class="card-body d-flex flex-wrap justify-content-between align-items-start">
+        <div class="panel-card">
+            <div class="panel-body">
+                <div class="d-flex justify-content-between align-items-start">
                     <div>
-                        <p class="text-uppercase text-muted small mb-1">Última consulta (clínico)</p>
-                        @if($patient->lastEncounter)
-                            <h4 class="h5 mb-1">{{ optional($patient->lastEncounter->occurred_at)->format('d M Y') }}</h4>
-                            <p class="mb-2">{{ $patient->lastEncounter->motivo ?? 'Sin motivo registrado' }}</p>
-                            <div class="text-muted">Diagnóstico: {{ $patient->lastEncounter->diagnostico ?? 'N/D' }}</div>
-                            <div class="text-muted">Plan: {{ $patient->lastEncounter->plan ?? 'Sin plan' }}</div>
-                            <div class="text-muted">Peso/Temp: {{ $patient->lastEncounter->peso ? $patient->lastEncounter->peso.' kg' : 'N/D' }} / {{ $patient->lastEncounter->temperatura ? $patient->lastEncounter->temperatura.'°C' : 'N/D' }}</div>
-                        @else
-                            <p class="mb-0 text-muted">Aún no hay consultas registradas.</p>
-                        @endif
+                        <p class="text-uppercase text-muted small mb-1">Tutor responsable</p>
+                        <h3 class="section-title">{{ optional($patient->owner)->name ?: 'Sin tutor asignado' }}</h3>
+                        <p class="section-subtitle">{{ optional($patient->owner)->address }}</p>
                     </div>
-                    <div class="d-flex flex-column gap-2 align-items-end">
-                        <a href="#" class="btn btn-outline-primary">Ver historia completa</a>
-                        <a href="#" class="btn btn-primary">Crear nueva consulta</a>
+                    <a href="{{ $patient->owner ? route('owners.show', $patient->owner) : '#' }}" class="pill-action" @if(!$patient->owner) aria-disabled="true" @endif>Ver ficha</a>
+                </div>
+                <div class="owner-card mt-3">
+                    <div class="info-grid">
+                        <div class="info-tile">
+                            <p class="info-label">Teléfono</p>
+                            <p class="info-value">{{ optional($patient->owner)->phone ?: 'N/D' }}</p>
+                        </div>
+                        <div class="info-tile">
+                            <p class="info-label">WhatsApp</p>
+                            <p class="info-value">{{ optional($patient->owner)->whatsapp ?: 'N/D' }}</p>
+                        </div>
+                        <div class="info-tile">
+                            <p class="info-label">Correo</p>
+                            <p class="info-value">{{ optional($patient->owner)->email ?: 'N/D' }}</p>
+                        </div>
+                        <div class="info-tile">
+                            <p class="info-label">Relación</p>
+                            <p class="info-value">{{ optional($patient->owner)->relationship ?: 'Tutor principal' }}</p>
+                        </div>
+                    </div>
+                    <div class="d-flex flex-wrap gap-2 mt-1">
+                        @if(optional($patient->owner)->whatsapp)
+                            <a class="contact-chip" href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $patient->owner->whatsapp) }}">WhatsApp</a>
+                        @endif
+                        @if(optional($patient->owner)->phone)
+                            <a class="contact-chip" href="tel:{{ $patient->owner->phone }}">Llamar</a>
+                        @endif
+                        @if(optional($patient->owner)->email)
+                            <a class="contact-chip" href="mailto:{{ $patient->owner->email }}">Correo</a>
+                        @endif
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
 
-            <div class="card shadow-sm border-0">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <div>
-                            <h5 class="mb-1">Timeline clínico</h5>
-                            <p class="text-muted mb-0">Eventos de consultas, baños, hospitalización y ventas.</p>
-                        </div>
-                        <div class="btn-group" role="group">
-                            @php
-                                $tabs = [
-                                    'timeline' => 'Timeline',
-                                    'consulta' => 'Consultas',
-                                    'banio' => 'Peluquería',
-                                    'hospital' => 'Hospitalización',
-                                    'dispensacion' => 'Dispensación',
-                                    'venta' => 'Ventas',
-                                ];
-                            @endphp
-                            @foreach($tabs as $key => $label)
-                                <a href="{{ request()->fullUrlWithQuery(['tipo' => $key === 'timeline' ? null : $key, 'page' => null]) }}" class="btn btn-sm {{ request('tipo') === $key ? 'btn-primary' : 'btn-outline-secondary' }}">{{ $label }}</a>
-                            @endforeach
-                        </div>
+    <div class="grid-panels">
+        <div class="panel-card last-visit-card">
+            <div class="panel-body last-visit-content">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                    <div>
+                        <p class="text-uppercase small mb-1" style="letter-spacing: 0.08em; opacity: 0.9;">Última consulta</p>
+                        <h3 class="h4 mb-2">{{ $patient->lastEncounter ? optional($patient->lastEncounter->occurred_at)->format('d M Y') : 'Sin consultas' }}</h3>
+                        <p class="mb-0" style="opacity: 0.9;">{{ $patient->lastEncounter->motivo ?? 'Aún no hay motivo registrado' }}</p>
                     </div>
-
-                    <form method="get" class="row g-2 mb-3">
-                        <input type="hidden" name="tipo" value="{{ request('tipo') }}">
-                        <div class="col-md-3">
-                            <label class="form-label">Desde</label>
-                            <input type="date" name="desde" value="{{ request('desde') }}" class="form-control">
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label">Hasta</label>
-                            <input type="date" name="hasta" value="{{ request('hasta') }}" class="form-control">
-                        </div>
-                        <div class="col-auto align-self-end">
-                            <button class="btn btn-outline-secondary" type="submit">Filtrar</button>
-                        </div>
-                    </form>
-
-                    <div class="list-group list-group-flush">
-                        @forelse($timeline as $event)
-                            <div class="list-group-item px-0">
-                                <div class="d-flex justify-content-between align-items-start">
-                                    <div class="d-flex align-items-start gap-3">
-                                        <span class="badge bg-light text-dark text-uppercase">{{ $event['type'] }}</span>
-                                        <div>
-                                            <div class="fw-semibold">{{ $event['title'] }}</div>
-                                            <div class="text-muted small">{{ optional($event['occurred_at'])->format('d/m/Y H:i') }}</div>
-                                            <div class="text-muted">{{ $event['summary'] }}</div>
-                                            @if(!empty($event['meta']))
-                                                <div class="small text-muted">{{ collect($event['meta'])->filter()->map(fn($v, $k) => ucfirst($k).': '.$v)->join(' · ') }}</div>
-                                            @endif
-                                        </div>
-                                    </div>
-                                    @if($event['url'])
-                                        <a href="{{ $event['url'] }}" class="btn btn-sm btn-outline-primary">Ver</a>
-                                    @endif
-                                </div>
-                            </div>
-                        @empty
-                            <div class="text-muted">No hay eventos para mostrar.</div>
-                        @endforelse
+                    <div class="d-flex flex-column gap-2">
+                        <a href="#" class="pill-action" style="border-color: rgba(255,255,255,0.5); color: #fff; background: rgba(255,255,255,0.12);">Ver historia</a>
+                        <a href="#" class="pill-action" style="border-color: rgba(255,255,255,0.5); color: #fff; background: rgba(255,255,255,0.12);">Nueva consulta</a>
                     </div>
                 </div>
-                @if($timeline instanceof \Illuminate\Pagination\LengthAwarePaginator)
-                    <div class="card-footer bg-white">{{ $timeline->withQueryString()->links() }}</div>
+                @if($patient->lastEncounter)
+                    <div class="last-visit-grid mt-3">
+                        <div>
+                            <p class="mb-1 fw-semibold">Diagnóstico</p>
+                            <p class="mb-0">{{ $patient->lastEncounter->diagnostico ?? 'N/D' }}</p>
+                        </div>
+                        <div>
+                            <p class="mb-1 fw-semibold">Plan</p>
+                            <p class="mb-0">{{ $patient->lastEncounter->plan ?? 'Sin plan' }}</p>
+                        </div>
+                        <div>
+                            <p class="mb-1 fw-semibold">Peso / Temp</p>
+                            <p class="mb-0">{{ $patient->lastEncounter->peso ? $patient->lastEncounter->peso.' kg' : 'N/D' }} · {{ $patient->lastEncounter->temperatura ? $patient->lastEncounter->temperatura.'°C' : 'N/D' }}</p>
+                        </div>
+                    </div>
+                @else
+                    <p class="mb-0" style="opacity: 0.8;">Aún no hay consultas registradas para este paciente.</p>
                 @endif
             </div>
         </div>
+
+        <div class="panel-card">
+            <div class="panel-body">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <div>
+                        <p class="text-uppercase text-muted small mb-1">Notas rápidas</p>
+                        <h3 class="section-title">Observaciones clínicas</h3>
+                    </div>
+                </div>
+                <p class="section-subtitle mb-3">Información clave para el equipo médico.</p>
+                <div class="info-grid">
+                    <div class="info-tile">
+                        <p class="info-label">Observaciones</p>
+                        <p class="info-value">{{ $patient->observaciones ?: 'Sin notas adicionales.' }}</p>
+                    </div>
+                    <div class="info-tile">
+                        <p class="info-label">Última actualización</p>
+                        <p class="info-value">{{ $patient->updated_at ? $patient->updated_at->format('d M Y') : 'N/D' }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel-card">
+        <div class="panel-body">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h3 class="section-title mb-1">Historial de visitas</h3>
+                    <p class="section-subtitle">Consultas, peluquería, hospitalización y ventas recientes.</p>
+                </div>
+                <div class="d-flex flex-wrap gap-2">
+                    @php
+                        $tabs = [
+                            'timeline' => 'Todo',
+                            'consulta' => 'Consultas',
+                            'banio' => 'Peluquería',
+                            'hospital' => 'Hospital',
+                            'dispensacion' => 'Dispensación',
+                            'venta' => 'Ventas',
+                        ];
+                    @endphp
+                    @foreach($tabs as $key => $label)
+                        <a href="{{ request()->fullUrlWithQuery(['tipo' => $key === 'timeline' ? null : $key, 'page' => null]) }}" class="badge-soft {{ request('tipo') === $key ? 'active' : '' }}">{{ $label }}</a>
+                    @endforeach
+                </div>
+            </div>
+
+            <form method="get" class="row g-2 mt-3">
+                <input type="hidden" name="tipo" value="{{ request('tipo') }}">
+                <div class="col-md-3">
+                    <label class="form-label text-muted">Desde</label>
+                    <input type="date" name="desde" value="{{ request('desde') }}" class="form-control">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label text-muted">Hasta</label>
+                    <input type="date" name="hasta" value="{{ request('hasta') }}" class="form-control">
+                </div>
+                <div class="col-auto align-self-end">
+                    <button class="pill-action" type="submit">Filtrar</button>
+                </div>
+            </form>
+
+            <div class="history-list">
+                @forelse($timeline as $event)
+                    <div class="history-item">
+                        <div class="history-date">
+                            <span>{{ optional($event['occurred_at'])->format('d/m/Y') }}</span>
+                            <span class="text-muted small">{{ optional($event['occurred_at'])->format('H:i') }}</span>
+                        </div>
+                        <div>
+                            <div class="d-flex align-items-center gap-2 mb-1">
+                                <span class="badge-soft">{{ strtoupper($event['type']) }}</span>
+                                <h5 class="history-title mb-0">{{ $event['title'] }}</h5>
+                            </div>
+                            <p class="history-meta mb-0">{{ $event['summary'] }}</p>
+                            @if(!empty($event['meta']))
+                                <p class="history-meta mb-0">{{ collect($event['meta'])->filter()->map(fn($v, $k) => ucfirst($k).': '.$v)->join(' · ') }}</p>
+                            @endif
+                        </div>
+                        <div class="history-actions">
+                            @if($event['url'])
+                                <a href="{{ $event['url'] }}">Ver detalle</a>
+                            @endif
+                        </div>
+                    </div>
+                @empty
+                    <p class="text-muted mb-0">No hay eventos para mostrar.</p>
+                @endforelse
+            </div>
+        </div>
+        @if($timeline instanceof \Illuminate\Pagination\LengthAwarePaginator)
+            <div class="card-footer bg-white">{{ $timeline->withQueryString()->links() }}</div>
+        @endif
     </div>
 </div>
 @endsection
