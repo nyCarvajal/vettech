@@ -7,7 +7,9 @@ use App\Models\User;
 use App\Support\RoleLabelResolver;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 
 class UsuarioController extends Controller
@@ -182,18 +184,20 @@ class UsuarioController extends Controller
 
     protected function createUser(array $data): void
     {
-        User::create([
-            'nombre' => $data['nombre'],
-            'apellidos' => $data['apellidos'],
-            'email' => $data['email'],
-            'tipo_identificacion' => $data['tipo_identificacion'],
-            'numero_identificacion' => $data['numero_identificacion'],
-            'direccion' => $data['direccion'],
-            'whatsapp' => $data['whatsapp'],
-            'password' => Hash::make($data['password']),
-            'peluqueria_id' => Auth::user()->peluqueria_id,
-            'role' => $data['role'],
-            'color' => $data['color'] ?? null,
-        ]);
+        $nombres = trim($data['nombre'] . ' ' . $data['apellidos']);
+
+        DB::connection('mysql')
+            ->table('users')
+            ->insert([
+                'nombres' => $nombres,
+                'email' => $data['email'],
+                'clinica_id' => Auth::user()->peluqueria_id,
+                'password' => Hash::make($data['password']),
+                'email_verified_at' => now(),
+                'role' => $data['role'],
+                'remember_token' => Str::random(60),
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
     }
 }
