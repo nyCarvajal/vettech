@@ -1,4 +1,4 @@
-@extends('layouts.vertical', ['subtitle' => 'Informes administrativos'])
+@extends('layouts.app', ['subtitle' => 'Informes administrativos'])
 
 @section('content')
 <div class="row align-items-center mb-3">

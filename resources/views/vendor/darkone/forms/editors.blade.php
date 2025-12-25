@@ -1,4 +1,4 @@
-@extends('layouts.vertical', ['subtitle' => 'Editors'])
+@extends('layouts.app', ['subtitle' => 'Editors'])
 
 @section('css')
 @vite(['node_modules/quill/dist/quill.snow.css','node_modules/quill/dist/quill.bubble.css'])

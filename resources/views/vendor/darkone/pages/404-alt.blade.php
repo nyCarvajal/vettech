@@ -1,4 +1,4 @@
-@extends('layouts.vertical', ['subtitle' => '404'])
+@extends('layouts.app', ['subtitle' => '404'])
 
 @section('content')
 

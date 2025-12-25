@@ -1,4 +1,4 @@
-@extends('layouts.vertical', ['subtitle' => 'Citas pendientes'])
+@extends('layouts.app', ['subtitle' => 'Citas pendientes'])
 
 @section('content')
 <div class="container-xxl">

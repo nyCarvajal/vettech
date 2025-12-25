@@ -1,4 +1,4 @@
-@extends('layouts.vertical', ['subtitle' => 'Alerts'])
+@extends('layouts.app', ['subtitle' => 'Alerts'])
 
 @section('content')
 @include('layouts.partials/page-title', ['title' => 'Base UI', 'subtitle' => 'Alerts'])

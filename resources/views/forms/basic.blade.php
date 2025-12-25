@@ -1,4 +1,4 @@
-@extends('layouts.vertical', ['subtitle' => 'Form Basics'])
+@extends('layouts.app', ['subtitle' => 'Form Basics'])
 
 @section('content')
 

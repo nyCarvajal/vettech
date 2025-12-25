@@ -1,4 +1,4 @@
-@extends('layouts.vertical', ['subtitle' => 'Vector Maps'])
+@extends('layouts.app', ['subtitle' => 'Vector Maps'])
 
 @section('content')
 

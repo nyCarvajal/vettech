@@ -1,4 +1,4 @@
-@extends('layouts.vertical', ['subtitle' => 'Inicio'])
+@extends('layouts.app', ['subtitle' => 'Inicio'])
 
 @section('content')
 

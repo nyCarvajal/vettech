@@ -1,4 +1,4 @@
-@extends('layouts.vertical', ['subtitle' => 'Historia clínica'])
+@extends('layouts.app', ['subtitle' => 'Historia clínica'])
 
 @section('content')
 <div class="container">

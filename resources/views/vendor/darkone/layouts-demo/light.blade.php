@@ -1,4 +1,4 @@
-@extends('layouts.vertical', ['subtitle' => 'Light Mode Layout'])
+@extends('layouts.app', ['subtitle' => 'Light Mode Layout'])
 
 @section('html-attribute')
 data-bs-theme="light"

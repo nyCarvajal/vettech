@@ -1,4 +1,4 @@
-@extends('layouts.vertical', ['subtitle' => 'File Uploads'])
+@extends('layouts.app', ['subtitle' => 'File Uploads'])
 
 @section('content')
 

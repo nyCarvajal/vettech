@@ -1,4 +1,4 @@
-@extends('layouts.vertical', ['subtitle' => 'Basic Tables'])
+@extends('layouts.app', ['subtitle' => 'Basic Tables'])
 
 @section('content')
 @include('layouts.partials/page-title', ['title' => 'Tables', 'subtitle' => 'Basic Tables'])

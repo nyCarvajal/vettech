@@ -1,4 +1,4 @@
-@extends('layouts.vertical', ['subtitle' => 'Google Maps'])
+@extends('layouts.app', ['subtitle' => 'Google Maps'])
 
 @section('content')
 @include('layouts.partials/page-title', ['title' => 'Maps', 'subtitle' => 'Google Maps'])

@@ -1,4 +1,4 @@
-@extends('layouts.vertical', ['subtitle' => 'Popovers'])
+@extends('layouts.app', ['subtitle' => 'Popovers'])
 
 @section('content')
 

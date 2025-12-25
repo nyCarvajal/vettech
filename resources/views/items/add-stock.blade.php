@@ -1,4 +1,4 @@
-@extends('layouts.vertical', ['subtitle' => 'Agregar Unidades'])
+@extends('layouts.app', ['subtitle' => 'Agregar Unidades'])
 
 @section('content')
 <div class="container">

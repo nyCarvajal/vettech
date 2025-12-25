@@ -1,4 +1,4 @@
-@extends('layouts.vertical', ['subtitle' => 'Pagos'])
+@extends('layouts.app', ['subtitle' => 'Pagos'])
 
 @section('content')
 <div class="row">

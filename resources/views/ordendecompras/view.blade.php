@@ -1,5 +1,5 @@
 
-@extends('layouts.vertical', ['subtitle' => 'Detalle de Orden de Compra'])
+@extends('layouts.app', ['subtitle' => 'Detalle de Orden de Compra'])
 
 @section('content')
 <div class="container py-3">

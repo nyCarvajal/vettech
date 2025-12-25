@@ -1,4 +1,4 @@
-@extends('layouts.vertical', ['subtitle' => 'Calendario de citas'])
+@extends('layouts.app', ['subtitle' => 'Calendario de citas'])
 
 @section('content')
 <div class="container-xxl">
