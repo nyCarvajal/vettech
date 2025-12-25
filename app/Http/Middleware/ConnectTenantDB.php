@@ -23,16 +23,31 @@ class ConnectTenantDB
             config(['database.connections.tenant.database' => $database]);
             config(['database.default' => 'tenant']); // si quieres que 'tenant' sea default
 
-            // 2) Purga y reconecta
+            // 2) Purga y reconecta sobre la DB correcta
             DB::purge('tenant');
-            DB::reconnect('tenant');
 
-            // 3) FORZAR el USE explícito
-          DB::setDefaultConnection('tenant');
-			
-			    $current = DB::connection('tenant')->getDatabaseName();
-       // dd("Auth user: {$user->id}", "Inyecté: {$database}", "Conexión tenant usa: {$current}");
-  
+            $connection = DB::connection('tenant');
+            $connection->setDatabaseName($database);
+            $connection->reconnect();
+
+            // Asegura que la sesión SQL quedó apuntando a la DB correcta.
+            // Algunos hosts no respetan el nombre configurado hasta ejecutar "USE <db>".
+            $connection->getPdo()->exec("use `{$database}`");
+
+            // Valida que el motor realmente seleccionó la base de datos.
+            $selected = optional($connection->selectOne('select database() as db'))->db;
+            if ($selected !== $database) {
+                abort(500, 'No se pudo seleccionar la base de datos del tenant.');
+            }
+
+            // 3) Forzar "USE <db>" y dejar el default en tenant
+            DB::setDefaultConnection('tenant');
+
+            // 4) Valida que la DB quedó seleccionada; si no, aborta temprano
+            if ($connection->getDatabaseName() !== $database) {
+                abort(500, 'No se pudo seleccionar la base de datos del tenant.');
+            }
+
         }
 
         return $next($request);
