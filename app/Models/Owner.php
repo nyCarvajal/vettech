@@ -13,6 +13,7 @@ class Owner extends BaseModel
         'phone',
         'whatsapp',
         'email',
+        'document_type',
         'document',
         'address',
         'notes',

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\OwnerRequest;
 use App\Models\Owner;
+use App\Models\TipoIdentificacion;
 use App\Services\TimelineService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -34,12 +35,20 @@ class OwnersController extends Controller
 
     public function create(): View
     {
-        return view('owners.form', ['owner' => new Owner()]);
+        return view('owners.form', [
+            'owner' => new Owner(),
+            'documentTypes' => TipoIdentificacion::all(),
+        ]);
     }
 
     public function store(OwnerRequest $request): RedirectResponse
     {
-        $owner = Owner::create($request->validated());
+        $data = $request->validated();
+        $data['document_type'] = optional(TipoIdentificacion::find($request->integer('document_type_id')))->tipo;
+
+        unset($data['document_type_id'], $data['whatsapp_prefix'], $data['whatsapp_number']);
+
+        $owner = Owner::create($data);
 
         return redirect()->route('owners.show', $owner)->with('status', 'Tutor creado correctamente');
     }
@@ -60,12 +69,20 @@ class OwnersController extends Controller
 
     public function edit(Owner $owner): View
     {
-        return view('owners.form', compact('owner'));
+        return view('owners.form', [
+            'owner' => $owner,
+            'documentTypes' => TipoIdentificacion::all(),
+        ]);
     }
 
     public function update(OwnerRequest $request, Owner $owner): RedirectResponse
     {
-        $owner->update($request->validated());
+        $data = $request->validated();
+        $data['document_type'] = optional(TipoIdentificacion::find($request->integer('document_type_id')))->tipo;
+
+        unset($data['document_type_id'], $data['whatsapp_prefix'], $data['whatsapp_number']);
+
+        $owner->update($data);
 
         return redirect()->route('owners.show', $owner)->with('status', 'Tutor actualizado');
     }
