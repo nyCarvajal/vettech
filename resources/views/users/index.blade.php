@@ -18,12 +18,12 @@
   <div class="d-flex justify-content-between align-items-center mb-4">
     <h1>Usuarios</h1>
     <div>
-      <a href="{{ route('users.trainers.create') }}" class="btn btn-primary me-2">
-        + Nuevo {{ $trainerLabelSingular }}
-      </a>
-      @if(auth()->user()->role == 18)
+      @php
+        $isAdmin = in_array(strtolower(auth()->user()->role ?? ''), ['admin', 'administrator'], true);
+      @endphp
+      @if($isAdmin)
         <a href="{{ route('users.admins.create') }}" class="btn btn-success">
-          + Nuevo Administrador
+          + Crear usuario
         </a>
       @endif
     </div>
@@ -54,13 +54,11 @@
           <td>{{ $user->email }}</td>
           <td>
 		  
-            @if($user->role == 11)
-              {{ $trainerLabelSingular }}
-            @elseif($user->role == 18)
-              Administrador
-            @else
-              {{ $user->role }}
-            @endif
+            @php
+              $normalizedRole = strtolower($user->role ?? '');
+              $roleLabelsLower = collect($roleLabels ?? [])->mapWithKeys(fn ($label, $value) => [strtolower($value) => $label]);
+            @endphp
+            {{ $roleLabelsLower[$normalizedRole] ?? $user->role ?? '—' }}
           </td>
           <td>{{ optional($user->clinica)->nombre ?? '—' }}</td>
           <td class="text-end">

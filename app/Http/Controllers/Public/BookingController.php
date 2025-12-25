@@ -506,7 +506,7 @@ class BookingController extends Controller
         foreach ($this->connectionsFor($clinica) as $connection) {
             $connectionStylists = User::on($connection)
                 ->where('clinica_id', $clinica->id)
-                ->whereIn('role', [11, '11'])
+                ->whereIn('role', [11, '11', 'groomer'])
                 ->orderBy('nombre')
                 ->orderBy('apellidos')
                 ->get();
