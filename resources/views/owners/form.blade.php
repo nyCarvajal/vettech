@@ -19,6 +19,25 @@
 
     $departamentos = $departamentos ?? collect();
     $municipios = $municipios ?? collect();
+
+    $departamentosJson = $departamentos
+        ->map(function ($dep) {
+            return [
+                'id' => $dep->id,
+                'nombre' => $dep->nombre,
+            ];
+        })
+        ->values();
+
+    $municipiosJson = $municipios
+        ->map(function ($mun) {
+            return [
+                'id' => $mun->id,
+                'nombre' => $mun->nombre,
+                'departamento_id' => $mun->departamento_id,
+            ];
+        })
+        ->values();
     $selectedDepartamentoId = old('departamento_id', $owner->departamento_id ?: optional($owner->municipio)->departamento_id);
     $selectedMunicipioId = old('municipio_id', $owner->municipio_id);
 @endphp
@@ -158,20 +177,9 @@
 </div>
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        const departamentos = @json($departamentos->map(function ($dep) {
-            return [
-                'id' => $dep->id,
-                'nombre' => $dep->nombre,
-            ];
-        }));
+        const departamentos = @json($departamentosJson);
 
-        const municipios = @json($municipios->map(function ($mun) {
-            return [
-                'id' => $mun->id,
-                'nombre' => $mun->nombre,
-                'departamento_id' => $mun->departamento_id,
-            ];
-        }));
+        const municipios = @json($municipiosJson);
 
         const departamentoSelect = document.getElementById('departamento_id');
         const municipioSelect = document.getElementById('municipio_id');
