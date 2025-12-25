@@ -11,6 +11,17 @@
         <a href="{{ route('patients.index') }}" class="btn btn-outline-purple">Volver</a>
     </div>
 
+    @php
+        $selectedWeightUnit = old('weight_unit', $patient->weight_unit ?? 'kg');
+        $displayWeight = old('peso_actual');
+
+        if ($displayWeight === null && $patient->peso_actual !== null) {
+            $displayWeight = $selectedWeightUnit === 'g'
+                ? $patient->peso_actual * 1000
+                : $patient->peso_actual;
+        }
+    @endphp
+
     <div class="card shadow-sm border-0 overflow-hidden">
         <div class="card-body p-4">
             <form method="post" action="{{ $patient->exists ? route('patients.update', $patient) : route('patients.store') }}" enctype="multipart/form-data" id="visible-patient-form">
@@ -59,6 +70,13 @@
                                 </div>
                             </div>
                             <div class="row g-3">
+                                <div class="col-12">
+                                    <label class="form-label">Foto del paciente</label>
+                                    <div class="d-flex align-items-center gap-3">
+                                        <img src="{{ $patient->photo_url }}" alt="Foto actual" class="rounded" style="width:72px;height:72px;object-fit:cover;">
+                                        <input type="file" name="photo" class="form-control" accept="image/*">
+                                    </div>
+                                </div>
                                 <div class="col-md-6">
                                     <label class="form-label">Nombre</label>
                                     <div class="input-group">
@@ -93,6 +111,33 @@
                                             @foreach($breeds as $breed)
                                                 <option value="{{ $breed->id }}" @selected(old('breed_id', $patient->breed_id) == $breed->id)>{{ $breed->name }}</option>
                                             @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Edad</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text input-icon-mint">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1Z"/><path d="M8 4.5v3l2 2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                                        </span>
+                                        <input type="number" name="age_value" min="0" value="{{ old('age_value', $patient->age_value) }}" class="form-control" placeholder="Edad">
+                                        <select name="age_unit" class="form-select fancy-select">
+                                            <option value="">Unidad</option>
+                                            <option value="years" @selected(old('age_unit', $patient->age_unit) === 'years')>Años</option>
+                                            <option value="months" @selected(old('age_unit', $patient->age_unit) === 'months')>Meses</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Peso</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text input-icon-purple">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M3 4a5 5 0 0 1 10 0v7H3V4Z"/><path d="M5 11h6v2H5z"/></svg>
+                                        </span>
+                                        <input type="number" name="peso_actual" min="0" step="0.01" value="{{ $displayWeight }}" class="form-control" placeholder="Peso">
+                                        <select name="weight_unit" class="form-select fancy-select">
+                                            <option value="kg" @selected($selectedWeightUnit === 'kg')>Kilogramos</option>
+                                            <option value="g" @selected($selectedWeightUnit === 'g')>Gramos</option>
                                         </select>
                                     </div>
                                 </div>

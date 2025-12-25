@@ -309,7 +309,7 @@
                             @if($patient->sexo)
                                 <span class="tag">Sexo: {{ $patient->sexo }}</span>
                             @endif
-                            <span class="tag mint">Peso: {{ $patient->peso_actual ? $patient->peso_actual . ' kg' : 'N/D' }}</span>
+                            <span class="tag mint">Peso: {{ $patient->peso_formateado ?? 'N/D' }}</span>
                         </div>
 
                         <div class="info-grid">
