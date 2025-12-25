@@ -2,9 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Paciente;
+use App\Models\ExamReferral;
 use App\Models\HistoriaClinica;
+use App\Models\Paciente;
+use App\Models\Prescription;
+use App\Models\PrescriptionItem;
+use App\Models\Product;
+use App\Services\BillingService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\PDF;
 
 class HistoriaClinicaController extends Controller
 {
@@ -35,7 +42,7 @@ class HistoriaClinicaController extends Controller
         $this->syncParaclinicos($historia, $validated['paraclinicos']);
         $this->syncDiagnosticos($historia, $validated['diagnosticos']);
 
-        return redirect()->route('historias-clinicas.edit', $historia)
+        return redirect()->route('historias-clinicas.show', $historia)
             ->with('success', 'Historia clínica guardada correctamente.');
     }
 
@@ -46,6 +53,26 @@ class HistoriaClinicaController extends Controller
         return view('historias_clinicas.edit', $this->formData($historiaClinica));
     }
 
+    public function show(HistoriaClinica $historiaClinica)
+    {
+        $historiaClinica->load(['paraclinicos', 'diagnosticos', 'paciente.owner']);
+
+        $prescriptions = Prescription::with(['items.product', 'professional'])
+            ->where('historia_clinica_id', $historiaClinica->id)
+            ->latest()
+            ->get();
+
+        $referrals = ExamReferral::where('historia_clinica_id', $historiaClinica->id)
+            ->latest()
+            ->get();
+
+        return view('historias_clinicas.show', [
+            'historia' => $historiaClinica,
+            'prescriptions' => $prescriptions,
+            'referrals' => $referrals,
+        ]);
+    }
+
     public function update(Request $request, HistoriaClinica $historiaClinica)
     {
         $validated = $this->validatedData($request);
@@ -54,7 +81,7 @@ class HistoriaClinicaController extends Controller
         $this->syncParaclinicos($historiaClinica, $validated['paraclinicos']);
         $this->syncDiagnosticos($historiaClinica, $validated['diagnosticos']);
 
-        return redirect()->route('historias-clinicas.edit', $historiaClinica)
+        return redirect()->route('historias-clinicas.show', $historiaClinica)
             ->with('success', 'Historia clínica actualizada.');
     }
 
@@ -84,6 +111,106 @@ class HistoriaClinicaController extends Controller
             'saved' => true,
             'updated_at' => $historia->updated_at?->format('Y-m-d H:i:s'),
         ]);
+    }
+
+    public function pdf(HistoriaClinica $historiaClinica)
+    {
+        $historiaClinica->load(['paraclinicos', 'diagnosticos', 'paciente.owner']);
+
+        $pdf = PDF::loadView('historias_clinicas.pdf', compact('historiaClinica'))
+            ->setPaper('letter');
+
+        return $pdf->stream('historia-clinica-' . $historiaClinica->id . '.pdf');
+    }
+
+    public function createRecetario(HistoriaClinica $historiaClinica)
+    {
+        $products = Product::orderBy('name')->get();
+
+        return view('historias_clinicas.recetario', [
+            'historia' => $historiaClinica,
+            'products' => $products,
+        ]);
+    }
+
+    public function storeRecetario(Request $request, HistoriaClinica $historiaClinica)
+    {
+        $data = $request->validate([
+            'items' => ['required', 'array', 'min:1'],
+            'items.*.product_id' => ['required', 'exists:products,id'],
+            'items.*.dose' => ['nullable', 'string'],
+            'items.*.frequency' => ['nullable', 'string'],
+            'items.*.duration_days' => ['nullable', 'integer', 'min:1'],
+            'items.*.instructions' => ['nullable', 'string'],
+            'items.*.qty_requested' => ['required', 'numeric', 'min:1'],
+        ]);
+
+        $prescription = Prescription::create([
+            'historia_clinica_id' => $historiaClinica->id,
+            'patient_id' => $historiaClinica->paciente_id,
+            'professional_id' => Auth::id(),
+            'status' => 'draft',
+        ]);
+
+        foreach ($data['items'] as $item) {
+            PrescriptionItem::create($item + ['prescription_id' => $prescription->id]);
+        }
+
+        return redirect()->route('historias-clinicas.show', $historiaClinica)
+            ->with('success', 'Recetario creado correctamente.');
+    }
+
+    public function facturarRecetario(Prescription $prescription, BillingService $billingService)
+    {
+        $prescription->load(['items.product']);
+        $sale = $billingService->billPrescription($prescription);
+
+        return redirect()->route('sales.show', $sale)->with('success', 'Recetario enviado a ventas.');
+    }
+
+    public function imprimirRecetario(Prescription $prescription)
+    {
+        $prescription->load(['items.product', 'historiaClinica.paciente.owner', 'professional']);
+
+        $pdf = PDF::loadView('historias_clinicas.recetario_pdf', compact('prescription'))
+            ->setPaper([0, 0, 396, 612]);
+
+        return $pdf->stream('recetario-' . $prescription->id . '.pdf');
+    }
+
+    public function createRemision(HistoriaClinica $historiaClinica)
+    {
+        return view('historias_clinicas.remision', [
+            'historia' => $historiaClinica,
+        ]);
+    }
+
+    public function storeRemision(Request $request, HistoriaClinica $historiaClinica)
+    {
+        $data = $request->validate([
+            'doctor_name' => ['nullable', 'string', 'max:150'],
+            'tests' => ['required', 'string'],
+            'notes' => ['nullable', 'string'],
+        ]);
+
+        ExamReferral::create($data + [
+            'historia_clinica_id' => $historiaClinica->id,
+            'patient_id' => $historiaClinica->paciente_id,
+            'created_by' => Auth::id(),
+        ]);
+
+        return redirect()->route('historias-clinicas.show', $historiaClinica)
+            ->with('success', 'Remisión de exámenes creada.');
+    }
+
+    public function imprimirRemision(ExamReferral $examReferral)
+    {
+        $examReferral->load(['historiaClinica.paciente', 'author']);
+
+        $pdf = PDF::loadView('historias_clinicas.remision_pdf', compact('examReferral'))
+            ->setPaper([0, 0, 396, 612]);
+
+        return $pdf->stream('remision-' . $examReferral->id . '.pdf');
     }
 
     private function formData(HistoriaClinica $historiaClinica): array

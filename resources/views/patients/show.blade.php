@@ -455,6 +455,7 @@
                     @php
                         $tabs = [
                             'timeline' => 'Todo',
+                            'historia' => 'Historias clínicas',
                             'consulta' => 'Consultas',
                             'banio' => 'Peluquería',
                             'hospital' => 'Hospital',

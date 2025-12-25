@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Dispensation;
 use App\Models\Encounter;
+use App\Models\HistoriaClinica;
 use App\Models\HospitalStay;
 use App\Models\Patient;
 use App\Models\Reserva;
@@ -45,6 +46,28 @@ class TimelineService
                         'peso' => $encounter->peso,
                         'temperatura' => $encounter->temperatura,
                         'profesional' => $encounter->professional,
+                    ],
+                ];
+            }));
+        }
+
+        if (! $typeFilter || $typeFilter === 'historia') {
+            $historias = HistoriaClinica::where('paciente_id', $patient->id)
+                ->when($from, fn ($q) => $q->whereDate('created_at', '>=', $from))
+                ->when($to, fn ($q) => $q->whereDate('created_at', '<=', $to))
+                ->orderByDesc('created_at')
+                ->get();
+
+            $events = $events->merge($historias->map(function (HistoriaClinica $historia) {
+                return [
+                    'type' => 'historia',
+                    'occurred_at' => $historia->updated_at ?? $historia->created_at,
+                    'title' => 'Historia clínica',
+                    'summary' => $historia->motivo_consulta ?: 'Consulta clínica',
+                    'url' => route('historias-clinicas.show', $historia),
+                    'meta' => [
+                        'antecedentes' => $historia->enfermedad_actual,
+                        'plan' => $historia->plan_medicamentos,
                     ],
                 ];
             }));
