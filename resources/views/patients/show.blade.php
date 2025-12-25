@@ -73,6 +73,11 @@
         padding: 1.25rem 1.5rem;
     }
 
+    .hero-card .panel-body,
+    .owner-panel .panel-body {
+        padding: 0.9rem 1rem;
+    }
+
     .hero-card {
         position: relative;
         overflow: hidden;
@@ -95,15 +100,15 @@
         display: grid;
         grid-template-columns: auto 1fr;
         align-items: center;
-        gap: 1rem;
+        gap: 0.75rem;
     }
 
     .avatar-lg {
-        width: 130px;
-        height: 130px;
+        width: 90px;
+        height: 90px;
         border-radius: 20px;
         object-fit: cover;
-        border: 6px solid rgba(255, 255, 255, 0.8);
+        border: 5px solid rgba(255, 255, 255, 0.8);
         box-shadow: 0 12px 30px rgba(124, 111, 242, 0.15);
     }
 
@@ -128,12 +133,12 @@
     .info-grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-        gap: 0.75rem;
-        margin-top: 1rem;
+        gap: 0.6rem;
+        margin-top: 0.75rem;
     }
 
     .info-tile {
-        padding: 0.75rem 1rem;
+        padding: 0.6rem 0.85rem;
         border-radius: 12px;
         border: 1px solid #edf0f7;
         background: rgba(255, 255, 255, 0.8);
@@ -165,7 +170,7 @@
     .owner-card {
         display: grid;
         grid-template-columns: 1fr;
-        gap: 0.8rem;
+        gap: 0.65rem;
     }
 
     .contact-chip {
@@ -330,7 +335,7 @@
             </div>
         </div>
 
-        <div class="panel-card">
+        <div class="panel-card owner-panel">
             <div class="panel-body">
                 <div class="d-flex justify-content-between align-items-start">
                     <div>
