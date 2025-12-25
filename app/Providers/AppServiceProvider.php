@@ -6,14 +6,13 @@ use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvi
 
 use Illuminate\Routing\Events\RouteMatched;
 use Illuminate\Support\Facades\Event;
-use Illuminate\Support\Facades\Config;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Schema;
 use App\Models\Reserva;
 use App\Models\Paciente;
 use App\Models\Clinica;
+use App\Support\TenantDatabase;
 use Carbon\Carbon;
 
 class AppServiceProvider extends ServiceProvider
@@ -30,10 +29,7 @@ class AppServiceProvider extends ServiceProvider
                     return;
                 }
 
-                Config::set('database.connections.tenant.database', $database);
-                DB::purge('tenant');
-                DB::reconnect('tenant');
-                DB::setDefaultConnection('tenant');
+                TenantDatabase::connect($database);
             }
         });
 
@@ -50,10 +46,7 @@ class AppServiceProvider extends ServiceProvider
                     $database = $peluqueria->db ?? $user->db;
 
                     if ($database) {
-                        Config::set('database.connections.tenant.database', $database);
-                        DB::purge('tenant');
-                        DB::reconnect('tenant');
-                        DB::setDefaultConnection('tenant');
+                        TenantDatabase::connect($database);
 
                         if (Schema::connection('tenant')->hasTable('reservas')) {
                             $count = Reserva::where('estado', 'Pendiente')->count();
@@ -71,10 +64,7 @@ class AppServiceProvider extends ServiceProvider
                     $database = $peluqueria->db ?? $user->db;
 
                     if ($database) {
-                        Config::set('database.connections.tenant.database', $database);
-                        DB::purge('tenant');
-                        DB::reconnect('tenant');
-                        DB::setDefaultConnection('tenant');
+                        TenantDatabase::connect($database);
 
                         $today = Carbon::today();
 
