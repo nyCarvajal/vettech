@@ -11,9 +11,27 @@
     @endphp
     @if($hasViteAssets)
         @vite(['resources/css/app.css', 'resources/js/app.js', 'resources/scss/icons.scss', 'resources/scss/style.scss', 'resources/sass/app.scss'])
-    @else
-        <link rel="stylesheet" href="{{ asset('css/app-fallback.css') }}">
     @endif
+
+    <!-- Fallback CSS para cuando Vite no está disponible o el bundle no carga -->
+    <link rel="stylesheet" href="{{ asset('css/app-fallback.css') }}">
+    <noscript>
+        <link rel="stylesheet" href="{{ asset('css/app-fallback.css') }}">
+    </noscript>
+    <script>
+        window.addEventListener('load', function () {
+            const mint600 = getComputedStyle(document.documentElement).getPropertyValue('--mint-600');
+            const hasMint = mint600 && mint600.trim().length > 0;
+            if (!hasMint) {
+                const fallbackLink = document.createElement('link');
+                fallbackLink.rel = 'stylesheet';
+                fallbackLink.href = '{{ asset('css/app-fallback.css') }}';
+                document.head.appendChild(fallbackLink);
+            }
+        });
+    </script>
+
+    @stack('styles')
 </head>
 <body class="bg-gray-50">
     <div id="app" class="min-h-screen flex flex-col">
@@ -56,7 +74,7 @@
                     $navItems = [
                         ['label' => 'Dashboard', 'route' => 'dashboard'],
                         ['label' => 'Tutores', 'route' => 'owners.index'],
-                        ['label' => 'Pacientes', 'route' => 'pacientes.index'],
+                        ['label' => 'Pacientes', 'route' => 'patients.index'],
                         ['label' => 'Agenda', 'route' => 'reservas.index'],
                         ['label' => 'Hospitalización 24/7', 'route' => 'hospital.board'],
                         ['label' => 'Dispensación', 'route' => 'dispensations.index'],
@@ -99,5 +117,7 @@
             </main>
         </div>
     </div>
+
+    @stack('scripts')
 </body>
 </html>

@@ -30,7 +30,7 @@
                     @forelse($reservas as $reserva)
                         <tr>
                             <td>{{ $reserva->paciente?->nombres ?? 'Paciente' }}</td>
-                            <td>{{ $reserva->entrenador?->name ?? 'Sin asignar' }}</td>
+                            <td>{{ $reserva->entrenador?->nombres ?? 'Sin asignar' }}</td>
                             <td>{{ optional($reserva->fecha)->format('d/m/Y H:i') }}</td>
                             <td><span class="badge bg-warning text-dark">{{ $reserva->estado }}</span></td>
                             <td class="text-end">
