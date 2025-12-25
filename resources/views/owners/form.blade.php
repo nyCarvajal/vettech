@@ -16,6 +16,30 @@
     if (! $selectedDocumentTypeId && $owner->document_type) {
         $selectedDocumentTypeId = optional($documentTypes->firstWhere('tipo', $owner->document_type))->id;
     }
+
+    $departamentos = $departamentos ?? collect();
+    $municipios = $municipios ?? collect();
+
+    $departamentosJson = $departamentos
+        ->map(function ($dep) {
+            return [
+                'id' => $dep->id,
+                'nombre' => $dep->nombre,
+            ];
+        })
+        ->values();
+
+    $municipiosJson = $municipios
+        ->map(function ($mun) {
+            return [
+                'id' => $mun->id,
+                'nombre' => $mun->nombre,
+                'departamento_id' => $mun->departamento_id,
+            ];
+        })
+        ->values();
+    $selectedDepartamentoId = old('departamento_id', $owner->departamento_id ?: optional($owner->municipio)->departamento_id);
+    $selectedMunicipioId = old('municipio_id', $owner->municipio_id);
 @endphp
 
 <style>
@@ -119,6 +143,26 @@
                         <input type="text" name="address" value="{{ old('address', $owner->address) }}" class="form-control" placeholder="Calle, número y ciudad">
                     </div>
 
+                    <div class="col-md-3">
+                        <label class="form-label">Departamento</label>
+                        <select name="departamento_id" id="departamento_id" class="form-select">
+                            <option value="">Selecciona</option>
+                            @foreach($departamentos as $departamento)
+                                <option value="{{ $departamento->id }}" {{ (int) $selectedDepartamentoId === (int) $departamento->id ? 'selected' : '' }}>
+                                    {{ $departamento->nombre }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="form-label">Municipio</label>
+                        <select name="municipio_id" id="municipio_id" class="form-select">
+                            <option value="">Selecciona un departamento</option>
+                        </select>
+                        <div class="form-text">Opcional, se ajusta según el departamento.</div>
+                    </div>
+
                     <div class="col-12">
                         <label class="form-label">Notas</label>
                         <textarea name="notes" class="form-control" rows="3" placeholder="Preferencias, recordatorios, etc.">{{ old('notes', $owner->notes) }}</textarea>
@@ -131,4 +175,52 @@
         </div>
     </div>
 </div>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const departamentos = @json($departamentosJson);
+
+        const municipios = @json($municipiosJson);
+
+        const departamentoSelect = document.getElementById('departamento_id');
+        const municipioSelect = document.getElementById('municipio_id');
+        let selectedMunicipioId = '{{ $selectedMunicipioId }}';
+
+        function renderMunicipios() {
+            const departamentoId = departamentoSelect.value;
+            municipioSelect.innerHTML = '';
+
+            const placeholder = document.createElement('option');
+            placeholder.value = '';
+            placeholder.textContent = departamentoId ? 'Selecciona un municipio' : 'Selecciona un departamento';
+            municipioSelect.appendChild(placeholder);
+
+            if (!departamentoId) {
+                return;
+            }
+
+            municipios
+                .filter((mun) => String(mun.departamento_id) === departamentoId)
+                .forEach((mun) => {
+                    const option = document.createElement('option');
+                    option.value = mun.id;
+                    option.textContent = mun.nombre;
+                    if (String(mun.id) === selectedMunicipioId) {
+                        option.selected = true;
+                    }
+                    municipioSelect.appendChild(option);
+                });
+        }
+
+        departamentoSelect.addEventListener('change', () => {
+            selectedMunicipioId = '';
+            renderMunicipios();
+        });
+
+        municipioSelect.addEventListener('change', () => {
+            selectedMunicipioId = municipioSelect.value;
+        });
+
+        renderMunicipios();
+    });
+</script>
 @endsection
