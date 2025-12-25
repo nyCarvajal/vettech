@@ -34,6 +34,12 @@ class ConnectTenantDB
             // Algunos hosts no respetan el nombre configurado hasta ejecutar "USE <db>".
             $connection->getPdo()->exec("use `{$database}`");
 
+            // Valida que el motor realmente seleccionó la base de datos.
+            $selected = optional($connection->selectOne('select database() as db'))->db;
+            if ($selected !== $database) {
+                abort(500, 'No se pudo seleccionar la base de datos del tenant.');
+            }
+
             // 3) Forzar "USE <db>" y dejar el default en tenant
             DB::setDefaultConnection('tenant');
 
