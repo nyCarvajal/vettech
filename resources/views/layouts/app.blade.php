@@ -30,6 +30,8 @@
             }
         });
     </script>
+
+    @stack('styles')
 </head>
 <body class="bg-gray-50">
     <div id="app" class="min-h-screen flex flex-col">
@@ -115,5 +117,7 @@
             </main>
         </div>
     </div>
+
+    @stack('scripts')
 </body>
 </html>
