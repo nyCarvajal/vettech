@@ -68,10 +68,14 @@ class Kernel extends HttpKernel
      * Prioridad de ejecución de middleware.
      */
     protected $middlewarePriority = [
+        // Inicia la sesión para poder resolver al usuario autenticado.
         \Illuminate\Session\Middleware\StartSession::class,
-        \Illuminate\View\Middleware\ShareErrorsFromSession::class,
+        // Autentica al usuario antes de resolver la conexión tenant.
         \Illuminate\Auth\Middleware\Authenticate::class,
+        // Conecta la base de datos del tenant antes de cualquier renderizado/vinculación.
         \App\Http\Middleware\ConnectTenantDB::class,
+        // Comparte errores y realiza el route model binding una vez la BD está lista.
+        \Illuminate\View\Middleware\ShareErrorsFromSession::class,
         \Illuminate\Routing\Middleware\SubstituteBindings::class,
     ];
 }
