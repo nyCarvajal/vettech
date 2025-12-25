@@ -6,7 +6,7 @@
         <div class="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-[#8b5cf6] via-[#8b5cf6] to-[#10B981]"></div>
         <div class="text-center space-y-3">
             <div class="mx-auto h-16 w-16 rounded-2xl bg-gradient-to-br from-[#ede9fe] via-white to-[#ecfdf5] flex items-center justify-center text-[#10B981] font-semibold text-xl shadow-md ring-1 ring-[#dcd7fe]/70">
-                VT
+                <img src="{{ asset('images/logo-dark.png') }}" alt="VetTech" class="max-h-full max-w-full object-contain">
             </div>
             <div class="space-y-1">
                 <h1 class="text-2xl font-semibold text-[#111827]">{{ config('app.name', 'VetTech') }}</h1>
