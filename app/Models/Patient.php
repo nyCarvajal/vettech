@@ -22,6 +22,7 @@ class Patient extends BaseModel
         'color',
         'microchip',
         'peso_actual',
+        'weight_unit',
         'temperamento',
         'alergias',
         'photo_path',
@@ -32,11 +33,14 @@ class Patient extends BaseModel
         'ciudad',
         'tipo_documento',
         'numero_documento',
+        'age_value',
+        'age_unit',
     ];
 
     protected $casts = [
         'fecha_nacimiento' => 'date',
         'peso_actual' => 'decimal:2',
+        'age_value' => 'integer',
     ];
 
     protected $appends = ['display_name', 'edad'];
@@ -83,6 +87,13 @@ class Patient extends BaseModel
 
     public function getEdadAttribute(): ?string
     {
+        if ($this->age_value !== null) {
+            $unit = $this->age_unit === 'months' ? 'mes' : 'año';
+            $suffix = $this->age_value === 1 ? '' : 's';
+
+            return $this->age_value . ' ' . $unit . $suffix;
+        }
+
         if (! $this->fecha_nacimiento) {
             return null;
         }
@@ -103,5 +114,23 @@ class Patient extends BaseModel
             'gato' => asset('images/users/gato.png'),
             default => asset('images/users/otro.png'),
         };
+    }
+
+    public function getPesoFormateadoAttribute(): ?string
+    {
+        if ($this->peso_actual === null) {
+            return null;
+        }
+
+        $unit = $this->weight_unit ?? 'kg';
+        $value = $unit === 'g'
+            ? $this->peso_actual * 1000
+            : (float) $this->peso_actual;
+
+        $formatted = number_format($value, $unit === 'g' ? 0 : 2, '.', '');
+
+        $formatted = rtrim(rtrim($formatted, '0'), '.');
+
+        return $formatted . ' ' . $unit;
     }
 }

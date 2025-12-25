@@ -63,6 +63,14 @@ class PatientsController extends Controller
     public function store(PatientRequest $request): RedirectResponse
     {
         $data = $request->validated();
+
+        if (isset($data['peso_actual'])) {
+            $data['weight_unit'] = $data['weight_unit'] ?? 'kg';
+            $data['peso_actual'] = $data['weight_unit'] === 'g'
+                ? $data['peso_actual'] / 1000
+                : $data['peso_actual'];
+        }
+
         if ($request->hasFile('photo')) {
             $data['photo_path'] = $request->file('photo')->store('patients', 'public');
         }
@@ -119,6 +127,14 @@ class PatientsController extends Controller
     public function update(PatientRequest $request, Patient $patient): RedirectResponse
     {
         $data = $request->validated();
+
+        if (isset($data['peso_actual'])) {
+            $data['weight_unit'] = $data['weight_unit'] ?? 'kg';
+            $data['peso_actual'] = $data['weight_unit'] === 'g'
+                ? $data['peso_actual'] / 1000
+                : $data['peso_actual'];
+        }
+
         if ($request->hasFile('photo')) {
             $data['photo_path'] = $request->file('photo')->store('patients', 'public');
         }

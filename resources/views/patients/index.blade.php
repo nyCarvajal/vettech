@@ -70,7 +70,7 @@
                         <td class="fw-semibold">{{ $patient->display_name }}</td>
                         <td class="text-muted">{{ optional($patient->species)->name }} · {{ optional($patient->breed)->name }}</td>
                         <td>{{ optional($patient->owner)->name }}</td>
-                        <td>{{ $patient->peso_actual ? $patient->peso_actual . ' kg' : 'N/D' }}</td>
+                        <td>{{ $patient->peso_formateado ?? 'N/D' }}</td>
                         <td class="text-end"><a href="{{ route('patients.show', $patient) }}" class="btn btn-sm btn-outline-primary">Ver perfil</a></td>
                     </tr>
                 @empty
