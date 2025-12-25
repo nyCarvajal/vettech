@@ -10,20 +10,24 @@
 
 @section('content')
   <div class="container">
-    <h1>Crear {{ $trainerLabelSingular }}</h1>
+    <h1>Crear usuario</h1>
 
     @if(session('success'))
       <div class="alert alert-success">{{ session('success') }}</div>
     @endif
-<div class="card card-body">
+<div class="card card-body" style="background: linear-gradient(135deg, #ede7ff 0%, #d0f5e6 100%); border: none;">
     <form method="POST" action="{{ route('users.trainers.store') }}">
       @csrf
 
-      @include('users.partials.form-fields')
+      @include('users.partials.form-fields', [
+          'roles' => $roles ?? [],
+          'defaultRole' => $defaultRole ?? 'groomer',
+          'tipoIdentificaciones' => $tipoIdentificaciones ?? collect(),
+      ])
 
-      <button type="submit" class="btn btn-primary">Crear {{ $trainerLabelSingular }}</button>
+      <button type="submit" class="btn btn-primary">Crear usuario</button>
     </form>
-	</div>
+        </div>
   </div>
 @endsection
 

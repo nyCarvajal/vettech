@@ -1,3 +1,10 @@
+@php
+    $roleOptions = $roles ?? [];
+    $selectedRole = old('role', $user->role ?? $defaultRole ?? '');
+    $tiposIdentificacion = collect($tipoIdentificaciones ?? []);
+    $selectedTipoIdentificacion = old('tipo_identificacion', $user->tipo_identificacion ?? '');
+@endphp
+
 {{-- Nombre --}}
 <div class="mb-3">
   <label for="nombre" class="form-label">Nombre</label>
@@ -33,30 +40,33 @@
          required>
   @error('email') <div class="invalid-feedback">{{ $message }}</div> @enderror
 </div>
-<?php
-/*
-{{-- Nivel --}}
+
+{{-- Rol --}}
 <div class="mb-3">
-  <label for="nivel" class="form-label">Nivel</label>
-  <input id="nivel"
-         name="nivel"
-         type="text"
-         class="form-control @error('nivel') is-invalid @enderror"
-         value="{{ old('nivel') }}"
-         required>
-  @error('nivel') <div class="invalid-feedback">{{ $message }}</div> @enderror
+  <label for="role" class="form-label">Rol</label>
+  <select id="role" name="role" class="form-select @error('role') is-invalid @enderror" required>
+    <option value="">Selecciona un rol</option>
+    @foreach($roleOptions as $value => $label)
+      <option value="{{ $value }}" {{ strtolower($selectedRole) === strtolower($value) ? 'selected' : '' }}>{{ $label }}</option>
+    @endforeach
+  </select>
+  @error('role') <div class="invalid-feedback">{{ $message }}</div> @enderror
 </div>
-**/ ?>
 
 {{-- Tipo de identificación --}}
 <div class="mb-3">
   <label for="tipo_identificacion" class="form-label">Tipo de identificación</label>
-  <input id="tipo_identificacion"
-         name="tipo_identificacion"
-         type="text"
-         class="form-control @error('tipo_identificacion') is-invalid @enderror"
-         value="{{ old('tipo_identificacion', $user->tipo_identificacion ?? '') }}"
-         required>
+  <select id="tipo_identificacion"
+          name="tipo_identificacion"
+          class="form-select @error('tipo_identificacion') is-invalid @enderror"
+          required>
+    <option value="">Selecciona una opción</option>
+    @forelse($tiposIdentificacion as $tipo)
+      <option value="{{ $tipo->tipo }}" {{ $selectedTipoIdentificacion === $tipo->tipo ? 'selected' : '' }}>{{ $tipo->tipo }}</option>
+    @empty
+      <option value="" disabled>No hay tipos de identificación configurados</option>
+    @endforelse
+  </select>
   @error('tipo_identificacion') <div class="invalid-feedback">{{ $message }}</div> @enderror
 </div>
 
@@ -97,7 +107,6 @@
   @error('whatsapp') <div class="invalid-feedback">{{ $message }}</div> @enderror
 </div>
 
-
 {{-- Color --}}
 <div class="mb-3">
   <label for="color" class="form-label">Color</label>
@@ -105,7 +114,7 @@
          name="color"
          type="color"
          class="form-control form-control-color"
-         value="{{ old('color', $user->color ?? '#6042F5') }}">
+         value="{{ old('color', $user->color ?? '#c7b7ff') }}">
 </div>
 
 {{-- Password --}}
