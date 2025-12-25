@@ -21,7 +21,7 @@ class ReservaController extends Controller
     public function calendar(Request $request)
     {
         $pacientes = Paciente::orderBy('nombres')->get();
-        $medicos = User::orderBy('name')->get();
+        $medicos = User::orderBy('nombres')->get();
         $tipos = Tipocita::orderBy('nombre')->get();
 
         $selectedDate = Carbon::parse($request->input('fecha', now()->toDateString()))->startOfDay();
@@ -59,7 +59,7 @@ class ReservaController extends Controller
             $end = $reserva->fin ?? ($start?->copy()->addMinutes($reserva->duracion ?? 60));
             $tipo = $reserva->tipocita?->nombre ?? $reserva->tipo ?? 'Cita';
             $paciente = $reserva->paciente?->nombres ?? 'Paciente sin nombre';
-            $medico = $reserva->entrenador?->name;
+            $medico = $reserva->entrenador?->nombres;
 
             $title = $paciente;
             if ($tipo) {
