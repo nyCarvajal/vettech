@@ -1,4 +1,4 @@
-@extends('layouts.vertical', ['subtitle' => 'Editar tipo de identificación'])
+@extends('layouts.app', ['subtitle' => 'Editar tipo de identificación'])
 
 @section('content')
 <div class="container">

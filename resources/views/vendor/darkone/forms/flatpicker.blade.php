@@ -1,4 +1,4 @@
-@extends('layouts.vertical', ['subtitle' => 'Flatpicker'])
+@extends('layouts.app', ['subtitle' => 'Flatpicker'])
 
 @section('css')
 @vite(['node_modules/flatpickr/dist/flatpickr.min.css', 'node_modules/flatpickr/dist/themes/dark.css'])

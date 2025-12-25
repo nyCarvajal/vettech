@@ -1,4 +1,4 @@
-@extends('layouts.vertical', ['subtitle' => 'Dark Sidenav Menu'])
+@extends('layouts.app', ['subtitle' => 'Dark Sidenav Menu'])
 
 @section('html-attribute')
 data-sidebar-color="dark" data-bs-theme="light"

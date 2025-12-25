@@ -1,4 +1,4 @@
-@extends('layouts.vertical', ['subtitle' => 'Boxicons'])
+@extends('layouts.app', ['subtitle' => 'Boxicons'])
 
 @section('content')
 @include('layouts.partials/page-title', ['title' => 'Icons', 'subtitle' => 'Boxicons'])

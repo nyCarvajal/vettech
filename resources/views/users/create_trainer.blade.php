@@ -3,7 +3,7 @@
     $trainerLabelPlural = $trainerLabelPlural ?? \App\Models\Peluqueria::defaultRoleLabel(\App\Models\Peluqueria::ROLE_STYLIST, true);
 @endphp
 
-@extends('layouts.vertical', ['subtitle' => 'Crear ' . $trainerLabelSingular])
+@extends('layouts.app', ['subtitle' => 'Crear ' . $trainerLabelSingular])
 
 
 

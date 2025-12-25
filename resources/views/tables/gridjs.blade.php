@@ -1,4 +1,4 @@
-@extends('layouts.vertical', ['subtitle' => 'Grid JS'])
+@extends('layouts.app', ['subtitle' => 'Grid JS'])
 
 @section('css')
 @vite(['node_modules/gridjs/dist/theme/mermaid.min.css'])

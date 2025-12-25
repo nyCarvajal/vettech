@@ -1,4 +1,4 @@
-@extends('layouts.vertical', ['subtitle' => 'Cajas'])
+@extends('layouts.app', ['subtitle' => 'Cajas'])
 
 @section('content')
 <div class="container-fluid">

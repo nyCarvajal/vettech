@@ -1,4 +1,4 @@
-@extends('layouts.vertical', ['subtitle' => 'Carousel'])
+@extends('layouts.app', ['subtitle' => 'Carousel'])
 
 @section('content')
 

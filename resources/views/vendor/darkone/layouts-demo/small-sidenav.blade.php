@@ -1,4 +1,4 @@
-@extends('layouts.vertical', ['subtitle' => 'Small Sidenav Menu'])
+@extends('layouts.app', ['subtitle' => 'Small Sidenav Menu'])
 
 @section('html-attribute')
 data-sidebar-size="condensed"

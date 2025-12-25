@@ -1,4 +1,4 @@
-@extends('layouts.vertical', ['subtitle' => 'iconify Icons'])
+@extends('layouts.app', ['subtitle' => 'iconify Icons'])
 
 @section('content')
 @include('layouts.partials/page-title', ['title' => 'Icons', 'subtitle' => 'iconify Icons'])

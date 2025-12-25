@@ -1,6 +1,6 @@
 {{-- resources/views/ventas/index.blade.php --}}
 
-@extends('layouts.vertical', ['subtitle' => 'Calendario de Reservas'])
+@extends('layouts.app', ['subtitle' => 'Calendario de Reservas'])
 
 
 @section('content')

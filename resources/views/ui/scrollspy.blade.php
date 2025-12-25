@@ -1,4 +1,4 @@
-@extends('layouts.vertical', ['subtitle' => 'Scrollspy'])
+@extends('layouts.app', ['subtitle' => 'Scrollspy'])
 
 @section('content')
 

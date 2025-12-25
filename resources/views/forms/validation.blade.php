@@ -1,4 +1,4 @@
-@extends('layouts.vertical', ['subtitle' => 'Form Validation'])
+@extends('layouts.app', ['subtitle' => 'Form Validation'])
 
 @section('content')
 @include('layouts.partials/page-title', ['title' => 'Form', 'subtitle' => 'Form Validation'])

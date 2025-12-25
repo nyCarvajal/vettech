@@ -1,4 +1,4 @@
-@extends('layouts.vertical', ['subtitle' => 'Hidden Sidenav Menu'])
+@extends('layouts.app', ['subtitle' => 'Hidden Sidenav Menu'])
 
 @section('html-attribute')
 data-sidebar-size="hidden"

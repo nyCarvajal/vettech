@@ -1,4 +1,4 @@
-@extends('layouts.vertical', ['subtitle' => 'Listado de Áreas'])
+@extends('layouts.app', ['subtitle' => 'Listado de Áreas'])
 
 @section('content')
 <div class="container">
