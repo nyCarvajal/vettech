@@ -15,6 +15,8 @@ class Owner extends BaseModel
         'email',
         'document_type',
         'document',
+        'departamento_id',
+        'municipio_id',
         'address',
         'notes',
     ];
@@ -22,5 +24,15 @@ class Owner extends BaseModel
     public function patients()
     {
         return $this->hasMany(Patient::class, 'owner_id');
+    }
+
+    public function departamento()
+    {
+        return $this->belongsTo(Departamentos::class, 'departamento_id');
+    }
+
+    public function municipio()
+    {
+        return $this->belongsTo(Municipios::class, 'municipio_id');
     }
 }
