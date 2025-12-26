@@ -33,6 +33,8 @@ class OwnerRequest extends FormRequest
             'whatsapp_number' => ['nullable', 'string', 'max:50', 'regex:/^[0-9\-\+\s\(\)]+$/'],
             'document_type_id' => ['nullable', 'exists:tipo_identificacions,id'],
             'document' => ['nullable', 'string', 'max:100'],
+            'departamento_id' => ['nullable', 'exists:departamentos,id'],
+            'municipio_id' => ['nullable', 'exists:municipios,id'],
             'address' => ['nullable', 'string', 'max:255'],
             'notes' => ['nullable', 'string'],
         ];

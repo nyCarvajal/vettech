@@ -36,6 +36,14 @@
                         <div>{{ $owner->document ?: 'No registrado' }}</div>
                         <div class="small text-muted mt-2">Dirección</div>
                         <div>{{ $owner->address ?: 'Sin dirección' }}</div>
+                        <div class="small text-muted mt-2">Ubicación</div>
+                        @php
+                            $location = array_filter([
+                                optional($owner->municipio)->nombre,
+                                optional($owner->departamento)->nombre,
+                            ]);
+                        @endphp
+                        <div>{{ $location ? implode(', ', $location) : 'Sin ubicación' }}</div>
                     </div>
                 </div>
             </div>
@@ -68,8 +76,8 @@
                                 </div>
                                 <div class="mt-2">
                                     <span class="badge bg-soft-primary text-primary">{{ $patient->edad ?? 'Edad N/D' }}</span>
-                                    @if($patient->peso_actual)
-                                        <span class="badge bg-soft-secondary text-secondary">{{ $patient->peso_actual }} kg</span>
+                                    @if($patient->peso_formateado)
+                                        <span class="badge bg-soft-secondary text-secondary">{{ $patient->peso_formateado }}</span>
                                     @endif
                                 </div>
                                 <a href="{{ route('patients.show', $patient) }}" class="btn btn-sm btn-outline-primary mt-3">Abrir perfil</a>

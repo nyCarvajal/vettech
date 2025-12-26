@@ -23,13 +23,16 @@ class PatientRequest extends FormRequest
             'fecha_nacimiento' => ['nullable', 'date', 'before:tomorrow'],
             'color' => ['nullable', 'string', 'max:100'],
             'microchip' => ['nullable', 'string', 'max:100'],
-            'peso_actual' => ['nullable', 'numeric', 'between:0,999.99'],
+            'peso_actual' => ['nullable', 'numeric', 'between:0,200000'],
+            'weight_unit' => ['nullable', 'in:kg,g', 'required_with:peso_actual'],
             'temperamento' => ['nullable', 'in:tranquilo,nervioso,agresivo,miedoso,otro'],
             'alergias' => ['nullable', 'string'],
             'observaciones' => ['nullable', 'string'],
             'whatsapp' => ['nullable', 'string', 'max:50', 'regex:/^[0-9\-\+\s\(\)]+$/'],
             'email' => ['nullable', 'email', 'max:255'],
             'photo' => ['nullable', 'image', 'max:2048'],
+            'age_value' => ['nullable', 'integer', 'min:0', 'required_with:age_unit'],
+            'age_unit' => ['nullable', 'in:years,months', 'required_with:age_value'],
         ];
     }
 }

@@ -309,7 +309,7 @@
                             @if($patient->sexo)
                                 <span class="tag">Sexo: {{ $patient->sexo }}</span>
                             @endif
-                            <span class="tag mint">Peso: {{ $patient->peso_actual ? $patient->peso_actual . ' kg' : 'N/D' }}</span>
+                            <span class="tag mint">Peso: {{ $patient->peso_formateado ?? 'N/D' }}</span>
                         </div>
 
                         <div class="info-grid">
@@ -391,7 +391,13 @@
                     </div>
                     <div class="d-flex flex-column gap-2">
                         <a href="#" class="pill-action" style="border-color: rgba(255,255,255,0.5); color: #fff; background: rgba(255,255,255,0.12);">Ver historia</a>
-                        <a href="#" class="pill-action" style="border-color: rgba(255,255,255,0.5); color: #fff; background: rgba(255,255,255,0.12);">Nueva consulta</a>
+                        <a
+                            href="{{ route('historias-clinicas.create', ['paciente_id' => $patient->id]) }}"
+                            class="pill-action"
+                            style="border-color: rgba(255,255,255,0.5); color: #fff; background: rgba(255,255,255,0.12);"
+                        >
+                            Nueva consulta
+                        </a>
                     </div>
                 </div>
                 @if($patient->lastEncounter)

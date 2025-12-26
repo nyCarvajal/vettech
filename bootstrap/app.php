@@ -1,10 +1,12 @@
 <?php
 use App\Http\Middleware\ConnectTenantDB;
 use App\Http\Middleware\EnsureRole;
-
-use Illuminate\Foundation\Configuration\Middleware as MiddlewareConfigurator;
+use Illuminate\Auth\Middleware\Authenticate;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
+use Illuminate\Foundation\Configuration\Middleware as MiddlewareConfigurator;
+use Illuminate\Routing\Middleware\SubstituteBindings;
+use Illuminate\Session\Middleware\StartSession;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -15,6 +17,15 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (MiddlewareConfigurator $middleware) {
         // Esto añade tu middleware al final del stack global
         $middleware->append(ConnectTenantDB::class);
+
+        // Garantiza que la sesión y la autenticación sucedan antes de conectar la BD
+        // del tenant, y que la conexión esté lista antes del route model binding.
+        $middleware->priority([
+            StartSession::class,
+            Authenticate::class,
+            ConnectTenantDB::class,
+            SubstituteBindings::class,
+        ]);
 
         $middleware->alias([
             'ensureRole' => EnsureRole::class,
