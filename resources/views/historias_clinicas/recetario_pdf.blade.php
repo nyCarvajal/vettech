@@ -22,13 +22,18 @@
         <strong>Medicamentos / productos</strong>
         <ul>
             @foreach($prescription->items as $item)
-                <li><strong>{{ optional($item->product)->name }}</strong> — Cantidad: {{ $item->qty_requested }}<br>
+                <li>
+                    <strong>{{ $item->is_manual ? $item->manual_name : optional($item->product)->name }}</strong>
+                    @if($item->is_manual)
+                        <span class="muted">(no facturable)</span>
+                    @endif
+                    — Cantidad: {{ $item->qty_requested }}<br>
                     <span class="muted">Dosis: {{ $item->dose ?: 'N/D' }} | Freq: {{ $item->frequency ?: 'N/D' }} | Días: {{ $item->duration_days ?: 'N/D' }}</span><br>
                     <span>{{ $item->instructions }}</span>
                 </li>
             @endforeach
         </ul>
     </div>
-    <p class="muted">Formato media carta listo para impresión y facturación posterior.</p>
+    <p class="muted">Formato media carta listo para impresión. Los medicamentos ingresados manualmente no se envían a facturación.</p>
 </body>
 </html>

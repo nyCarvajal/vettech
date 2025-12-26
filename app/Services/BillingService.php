@@ -53,6 +53,10 @@ class BillingService
             ]);
 
             foreach ($prescription->items as $item) {
+                if (! $item->billable || ! $item->product_id) {
+                    continue;
+                }
+
                 $sale->items()->create([
                     'product_id' => $item->product_id,
                     'qty' => $item->qty_requested,

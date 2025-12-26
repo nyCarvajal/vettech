@@ -107,7 +107,12 @@
                             </div>
                             <ul class="mb-0 small text-muted">
                                 @foreach($prescription->items as $item)
-                                    <li>{{ optional($item->product)->name }} ({{ $item->qty_requested }})</li>
+                                    <li>
+                                        {{ $item->is_manual ? $item->manual_name : optional($item->product)->name }} ({{ $item->qty_requested }})
+                                        @if($item->is_manual)
+                                            <span class="badge text-bg-light ms-1">No facturable</span>
+                                        @endif
+                                    </li>
                                 @endforeach
                             </ul>
                         </div>

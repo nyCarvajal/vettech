@@ -9,7 +9,7 @@
             <div class="card-body">
                 <div class="mb-3">
                     <label class="form-label">Médico remitente</label>
-                    <input type="text" name="doctor_name" class="form-control" value="{{ old('doctor_name') }}">
+                    <input type="text" name="doctor_name" class="form-control" value="{{ old('doctor_name', auth()->user()->name ?? '') }}" readonly>
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Exámenes solicitados</label>

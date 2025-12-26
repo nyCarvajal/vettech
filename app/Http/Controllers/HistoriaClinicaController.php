@@ -137,7 +137,9 @@ class HistoriaClinicaController extends Controller
     {
         $data = $request->validate([
             'items' => ['required', 'array', 'min:1'],
-            'items.*.product_id' => ['required', 'exists:products,id'],
+            'items.*.is_manual' => ['boolean'],
+            'items.*.product_id' => ['required_without:items.*.manual_name', 'nullable', 'exists:products,id'],
+            'items.*.manual_name' => ['required_without:items.*.product_id', 'nullable', 'string', 'max:255'],
             'items.*.dose' => ['nullable', 'string'],
             'items.*.frequency' => ['nullable', 'string'],
             'items.*.duration_days' => ['nullable', 'integer', 'min:1'],
@@ -153,7 +155,20 @@ class HistoriaClinicaController extends Controller
         ]);
 
         foreach ($data['items'] as $item) {
-            PrescriptionItem::create($item + ['prescription_id' => $prescription->id]);
+            $isManual = (bool) ($item['is_manual'] ?? false);
+
+            PrescriptionItem::create([
+                'prescription_id' => $prescription->id,
+                'product_id' => $isManual ? null : ($item['product_id'] ?? null),
+                'manual_name' => $item['manual_name'] ?? null,
+                'is_manual' => $isManual,
+                'billable' => ! $isManual,
+                'dose' => $item['dose'] ?? '',
+                'frequency' => $item['frequency'] ?? '',
+                'duration_days' => $item['duration_days'] ?? 0,
+                'instructions' => $item['instructions'] ?? null,
+                'qty_requested' => $item['qty_requested'],
+            ]);
         }
 
         return redirect()->route('historias-clinicas.show', $historiaClinica)
@@ -192,6 +207,8 @@ class HistoriaClinicaController extends Controller
             'tests' => ['required', 'string'],
             'notes' => ['nullable', 'string'],
         ]);
+
+        $data['doctor_name'] = optional(Auth::user())->name ?: ($data['doctor_name'] ?? null);
 
         ExamReferral::create($data + [
             'historia_clinica_id' => $historiaClinica->id,

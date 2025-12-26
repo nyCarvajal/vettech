@@ -9,7 +9,16 @@ class PrescriptionItem extends BaseModel
     use HasFactory;
 
     protected $fillable = [
-        'prescription_id', 'product_id', 'dose', 'frequency', 'duration_days', 'instructions', 'qty_requested',
+        'prescription_id',
+        'product_id',
+        'manual_name',
+        'is_manual',
+        'billable',
+        'dose',
+        'frequency',
+        'duration_days',
+        'instructions',
+        'qty_requested',
     ];
 
     public function prescription()

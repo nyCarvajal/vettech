@@ -26,3 +26,14 @@ CREATE TABLE `exam_referrals` (
     CONSTRAINT `exam_referrals_created_by_foreign`
         FOREIGN KEY (`created_by`) REFERENCES `users`(`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Allow manual, non-billable prescription items
+ALTER TABLE `prescription_items` DROP FOREIGN KEY `prescription_items_product_id_foreign`;
+ALTER TABLE `prescription_items`
+    MODIFY `product_id` BIGINT UNSIGNED NULL,
+    ADD `manual_name` VARCHAR(255) NULL AFTER `product_id`,
+    ADD `is_manual` TINYINT(1) NOT NULL DEFAULT 0 AFTER `manual_name`,
+    ADD `billable` TINYINT(1) NOT NULL DEFAULT 1 AFTER `is_manual`;
+ALTER TABLE `prescription_items`
+    ADD CONSTRAINT `prescription_items_product_id_foreign`
+        FOREIGN KEY (`product_id`) REFERENCES `products`(`id`) ON DELETE SET NULL;
