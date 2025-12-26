@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Dispensation;
+use App\Models\Prescription;
 use App\Models\Sale;
 use App\Models\SaleItem;
 use App\Models\HospitalStay;
@@ -30,6 +31,39 @@ class BillingService
                     'discount' => 0,
                     'ref_entity' => 'dispensation',
                     'ref_id' => $dispensation->id,
+                ]);
+            }
+
+            $sale->total = $sale->items()->sum(DB::raw('qty * unit_price - discount'));
+            $sale->save();
+
+            return $sale;
+        });
+    }
+
+    public function billPrescription(Prescription $prescription): Sale
+    {
+        return DB::transaction(function () use ($prescription) {
+            $sale = Sale::create([
+                'owner_id' => null,
+                'patient_id' => $prescription->patient_id,
+                'created_by' => $prescription->professional_id,
+                'status' => 'open',
+                'total' => 0,
+            ]);
+
+            foreach ($prescription->items as $item) {
+                if (! $item->billable || ! $item->product_id) {
+                    continue;
+                }
+
+                $sale->items()->create([
+                    'product_id' => $item->product_id,
+                    'qty' => $item->qty_requested,
+                    'unit_price' => optional($item->product)->sale_price ?? 0,
+                    'discount' => 0,
+                    'ref_entity' => 'prescription',
+                    'ref_id' => $prescription->id,
                 ]);
             }
 

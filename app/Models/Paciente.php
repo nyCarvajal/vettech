@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use App\Models\HistoriaClinica;
+use App\Models\Owner;
 
 class Paciente extends BaseModel
 {
@@ -34,5 +35,10 @@ class Paciente extends BaseModel
     public function historiasClinicas(): HasMany
     {
         return $this->hasMany(HistoriaClinica::class);
+    }
+
+    public function owner()
+    {
+        return $this->belongsTo(Owner::class, 'owner_id');
     }
 }
