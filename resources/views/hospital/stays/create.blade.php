@@ -4,7 +4,7 @@
     <h1 class="text-xl font-bold mb-4">Admitir paciente</h1>
     <form method="post" action="{{ route('hospital.stays.store') }}" class="space-y-2">
         @csrf
-        <input name="patient_id" placeholder="Paciente ID" class="border p-2 w-full" required>
+        <input name="patient_id" value="{{ old('patient_id', request('patient_id')) }}" placeholder="Paciente ID" class="border p-2 w-full" required>
         <select name="cage_id" class="border p-2 w-full">
             @foreach($cages as $cage)
                 <option value="{{ $cage->id }}">{{ $cage->name }}</option>
