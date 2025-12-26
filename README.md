@@ -56,18 +56,3 @@ Menta se usa solo como acento: borde superior de KPIs, resaltado de sidebar acti
    - Tabs por día con órdenes médicas, aplicaciones, signos vitales y notas de evolución.
    - Registro de cargos y generación de factura integrando la tabla `sales`.
 4. Suposiciones: se usa la tabla `products` para inventario cuando está disponible y se mantienen órdenes manuales sin depender de stock.
-
-## Módulo de Peluquería Veterinaria
-
-1. Ejecuta migraciones y seeders demo:
-   ```bash
-   php artisan migrate
-   php artisan db:seed --class=GroomingDemoSeeder
-   ```
-2. Rutas clave:
-   - `/peluqueria`: tablero kanban (agendado / en proceso / finalizado).
-   - `/peluqueria/crear`: agendamiento con domicilio, desparasitación y servicio opcional.
-   - `/peluqueria/{id}`: detalle con acciones de iniciar, cancelar, informe y cobro opcional.
-3. Flujo de estados: Agendado → En proceso → Finalizado (guardar informe finaliza automáticamente). Cancelación disponible hasta antes del cierre.
-4. Informe de baño con flags (pulgas, garrapatas, piel, oído) y observaciones/recomendaciones.
-5. Cobro opcional: si hay módulo de ventas y un producto de servicio asociado, el botón “Cobrar” crea el ítem con `ref_entity=grooming`.
