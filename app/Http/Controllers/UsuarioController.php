@@ -81,7 +81,7 @@ class UsuarioController extends Controller
 
         $users = User::with('peluqueria')
             ->where('clinica_id', $clinicaId)
-            ->orderBy('nombre')
+            ->orderBy('nombres')
             ->paginate(15);
 
         $labels = $this->stylistLabels();
