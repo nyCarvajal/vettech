@@ -15,6 +15,7 @@ class DatabaseSeeder extends Seeder
             SpeciesSeeder::class,
             ClinicaImportSeeder::class,
             VettechSeeder::class,
+            GroomingDemoSeeder::class,
         ]);
     }
 }
