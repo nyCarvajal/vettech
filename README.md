@@ -42,3 +42,17 @@ Componentes Blade reutilizables en `resources/views/components`:
 
 ## Captura mental del diseño
 Menta se usa solo como acento: borde superior de KPIs, resaltado de sidebar activo, fondos muy claros en badges/botones primarios y contenedores de iconos. El fondo general permanece blanco/gris para mantener el espacio en blanco y la sensación clínica.
+
+## Módulo de Hospitalización
+
+1. Ejecuta migraciones y seeders de demo:
+   ```bash
+   php artisan migrate
+   php artisan db:seed --class=HospitalDemoSeeder
+   ```
+2. Navega a `/vet/hospital` para ver el tablero de hospitalización.
+3. Funcionalidades clave:
+   - Admisión rápida de pacientes con generación automática de Day 1.
+   - Tabs por día con órdenes médicas, aplicaciones, signos vitales y notas de evolución.
+   - Registro de cargos y generación de factura integrando la tabla `sales`.
+4. Suposiciones: se usa la tabla `products` para inventario cuando está disponible y se mantienen órdenes manuales sin depender de stock.
