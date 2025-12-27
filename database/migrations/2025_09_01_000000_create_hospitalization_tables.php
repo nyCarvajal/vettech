@@ -6,6 +6,11 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
+    /**
+     * Ensure hospitalization tables use the tenant connection.
+     */
+    protected $connection = 'tenant';
+
     public function up(): void
     {
         if (!Schema::hasTable('cages')) {
