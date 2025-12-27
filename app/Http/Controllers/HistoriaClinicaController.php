@@ -185,7 +185,13 @@ class HistoriaClinicaController extends Controller
 
     public function imprimirRecetario(Prescription $prescription)
     {
-        $prescription->load(['items.product', 'historiaClinica.paciente.owner', 'professional']);
+        $prescription->load([
+            'items.product',
+            'historiaClinica.paciente.owner',
+            'historiaClinica.paciente.species',
+            'historiaClinica.paciente.breed',
+            'professional',
+        ]);
 
         $pdf = Pdf::loadView('historias_clinicas.recetario_pdf', compact('prescription'))
             ->setPaper([0, 0, 396, 612]);
