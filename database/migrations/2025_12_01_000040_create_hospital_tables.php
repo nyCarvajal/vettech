@@ -6,6 +6,11 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
+    /**
+     * Run this migration on the tenant connection.
+     */
+    protected $connection = 'tenant';
+
     public function up(): void
     {
         Schema::create('cages', function (Blueprint $table) {

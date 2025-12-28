@@ -283,6 +283,18 @@
             <h1 class="dashboard-title">Panel clínico del paciente</h1>
         </div>
         <div class="flex gap-2">
+            <a
+                href="{{ route('hospital.stays.create', ['patient_id' => $patient->id]) }}"
+                class="pill-action"
+            >
+                Hospitalizar
+            </a>
+            <a
+                href="{{ route('groomings.create', ['patient_id' => $patient->id]) }}"
+                class="pill-action"
+            >
+                Enviar a peluquería
+            </a>
             <a href="{{ route('patients.edit', $patient) }}" class="pill-action">Editar ficha</a>
             <a href="{{ route('patients.index') }}" class="pill-action">Volver al listado</a>
         </div>
