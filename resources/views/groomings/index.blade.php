@@ -70,7 +70,7 @@
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
         @foreach($columns as $key => $label)
             <div class="bg-white border border-purple-100 rounded-xl shadow-soft">
-                <div class="px-4 py-3 border-b border-purple-50 flex items-center justify-between bg-gradient-to-r from-purple-50 to-white rounded-t-xl">
+                <div class="px-4 py-3 border-b border-purple-50 flex items-center justify-between bg-gradient-to-r from-purple-50 to-mint-50 rounded-t-xl border-l-4 border-l-purple-200">
                     <div>
                         <p class="text-sm font-semibold text-gray-800">{{ $label }}</p>
                         <p class="text-xs text-gray-500">{{ ($groomings[$key] ?? collect())->count() }} casos</p>
@@ -79,7 +79,7 @@
                 </div>
                 <div class="p-4 space-y-3">
                     @forelse($groomings[$key] ?? [] as $item)
-                        <div class="border border-purple-100 rounded-lg p-4 bg-purple-50/60">
+                        <div class="border border-purple-100 rounded-lg p-4 bg-purple-50/60 border-l-4 border-l-mint-200">
                             <div class="flex items-center justify-between">
                                 <div>
                                     <p class="text-sm font-semibold text-gray-900">{{ optional($item->patient)->display_name ?? 'Paciente' }}</p>
@@ -101,14 +101,14 @@
                                 @endif
                             </div>
                             <div class="flex items-center gap-2 mt-3">
-                                <a href="{{ route('groomings.show', $item) }}" class="text-sm text-mint-700 hover:underline">Abrir</a>
+                                <a href="{{ route('groomings.show', $item) }}" class="text-sm px-3 py-1.5 rounded-md bg-mint-500 text-white shadow hover:bg-mint-400 transition">Abrir</a>
                                 @if($item->status === 'agendado')
                                     <form method="POST" action="{{ route('groomings.start', $item) }}">
                                         @csrf
-                                        <button class="text-sm text-gray-700 hover:underline">Iniciar</button>
+                                        <button class="text-sm px-3 py-1.5 rounded-md bg-purple-500 text-white shadow hover:bg-purple-400 transition">Iniciar</button>
                                     </form>
                                 @elseif($item->status === 'en_proceso')
-                                    <a href="{{ route('groomings.report.create', $item) }}" class="text-sm text-gray-700 hover:underline">Informe</a>
+                                    <a href="{{ route('groomings.report.create', $item) }}" class="text-sm px-3 py-1.5 rounded-md bg-purple-500 text-white shadow hover:bg-purple-400 transition">Informe</a>
                                 @endif
                             </div>
                         </div>
