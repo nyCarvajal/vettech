@@ -265,7 +265,11 @@ Route::middleware(['auth'])
         Route::post('dispensations/{prescription}', [\App\Http\Controllers\DispensationsController::class, 'store'])->name('dispensations.store');
 
         Route::get('hospital/board', \App\Http\Controllers\HospitalBoardController::class)->name('hospital.board');
-        Route::resource('hospital/stays', \App\Http\Controllers\HospitalStaysController::class)->only(['index', 'create', 'store']);
+        Route::prefix('hospital/stays')->name('hospital.stays.')->group(function () {
+            Route::get('/', [\App\Http\Controllers\HospitalStaysController::class, 'index'])->name('index');
+            Route::get('/create', [\App\Http\Controllers\HospitalStaysController::class, 'create'])->name('create');
+            Route::post('/', [\App\Http\Controllers\HospitalStaysController::class, 'store'])->name('store');
+        });
         Route::post('hospital/stays/{stay}/discharge', [\App\Http\Controllers\HospitalStaysController::class, 'discharge'])->name('hospital.stays.discharge');
         Route::resource('hospital/tasks', \App\Http\Controllers\HospitalTasksController::class)->only(['create', 'store']);
         Route::post('hospital/handoff', [\App\Http\Controllers\HandoffController::class, 'store'])->name('hospital.handoff.store');
