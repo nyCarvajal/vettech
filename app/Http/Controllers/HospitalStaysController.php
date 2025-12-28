@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Middleware\ConnectTenantDB;
 use App\Http\Requests\HospitalStayRequest;
 use App\Models\Cage;
 use App\Models\HospitalStay;
@@ -13,6 +14,7 @@ class HospitalStaysController extends Controller
 {
     public function __construct(private HospitalService $hospitalService)
     {
+        $this->middleware(ConnectTenantDB::class);
     }
 
     public function index(): View
