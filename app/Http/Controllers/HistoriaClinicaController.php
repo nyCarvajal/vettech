@@ -11,7 +11,7 @@ use App\Models\Product;
 use App\Services\BillingService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\PDF;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class HistoriaClinicaController extends Controller
 {
@@ -117,7 +117,7 @@ class HistoriaClinicaController extends Controller
     {
         $historiaClinica->load(['paraclinicos', 'diagnosticos', 'paciente.owner']);
 
-        $pdf = PDF::loadView('historias_clinicas.pdf', compact('historiaClinica'))
+        $pdf = Pdf::loadView('historias_clinicas.pdf', compact('historiaClinica'))
             ->setPaper('letter');
 
         return $pdf->stream('historia-clinica-' . $historiaClinica->id . '.pdf');
@@ -185,9 +185,15 @@ class HistoriaClinicaController extends Controller
 
     public function imprimirRecetario(Prescription $prescription)
     {
-        $prescription->load(['items.product', 'historiaClinica.paciente.owner', 'professional']);
+        $prescription->load([
+            'items.product',
+            'historiaClinica.paciente.owner',
+            'historiaClinica.paciente.species',
+            'historiaClinica.paciente.breed',
+            'professional',
+        ]);
 
-        $pdf = PDF::loadView('historias_clinicas.recetario_pdf', compact('prescription'))
+        $pdf = Pdf::loadView('historias_clinicas.recetario_pdf', compact('prescription'))
             ->setPaper([0, 0, 396, 612]);
 
         return $pdf->stream('recetario-' . $prescription->id . '.pdf');
@@ -224,7 +230,7 @@ class HistoriaClinicaController extends Controller
     {
         $examReferral->load(['historiaClinica.paciente', 'author']);
 
-        $pdf = PDF::loadView('historias_clinicas.remision_pdf', compact('examReferral'))
+        $pdf = Pdf::loadView('historias_clinicas.remision_pdf', compact('examReferral'))
             ->setPaper([0, 0, 396, 612]);
 
         return $pdf->stream('remision-' . $examReferral->id . '.pdf');

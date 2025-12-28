@@ -39,7 +39,7 @@ class User extends Authenticatable
         'whatsapp',
         'ciudad',
         'password',
-        'peluqueria_id',
+        'clinica_id',
         'role',
         'color',
     ];
@@ -70,11 +70,11 @@ class User extends Authenticatable
     public function peluqueria()
     {
         // 'producto' es la FK en 'ventas' que apunta a 'id' de 'items'
-        return $this->belongsTo(Clinica::class, 'peluqueria_id', 'id');
+        return $this->belongsTo(Clinica::class, 'clinica_id', 'id');
     }
 
     public function clinica()
     {
-        return $this->belongsTo(Clinica::class, 'peluqueria_id', 'id');
+        return $this->belongsTo(Clinica::class, 'clinica_id', 'id');
     }
 }
