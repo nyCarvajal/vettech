@@ -25,6 +25,10 @@ use App\Http\Controllers\HistoriaClinicaController;
 use App\Http\Controllers\OwnersController;
 use App\Http\Controllers\PatientsController;
 use App\Http\Controllers\BreedsController;
+use App\Http\Controllers\GroomingBillingController;
+use App\Http\Controllers\GroomingController;
+use App\Http\Controllers\GroomingReportController;
+use App\Http\Controllers\GroomingStatusController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\AdministrativeReportController;
@@ -95,6 +99,20 @@ Route::middleware([
 Route::resource('owners', OwnersController::class);
 Route::resource('patients', PatientsController::class);
 Route::get('/breeds', BreedsController::class)->name('breeds.index');
+
+Route::prefix('peluqueria')
+    ->name('groomings.')
+    ->group(function () {
+        Route::get('/', [GroomingController::class, 'index'])->name('index');
+        Route::get('/crear', [GroomingController::class, 'create'])->name('create');
+        Route::post('/', [GroomingController::class, 'store'])->name('store');
+        Route::get('/{grooming}', [GroomingController::class, 'show'])->name('show');
+        Route::post('/{grooming}/iniciar', [GroomingStatusController::class, 'start'])->name('start');
+        Route::post('/{grooming}/cancelar', [GroomingStatusController::class, 'cancel'])->name('cancel');
+        Route::get('/{grooming}/informe', [GroomingReportController::class, 'create'])->name('report.create');
+        Route::post('/{grooming}/informe', [GroomingReportController::class, 'store'])->name('report.store');
+        Route::post('/{grooming}/cobrar', [GroomingBillingController::class, 'charge'])->name('charge');
+    });
 		 
 		 
 Route::get('/ordenes/{orden}/pdf', [OrdendecompraController::class, 'pdf'])->name('ordenes.pdf');
