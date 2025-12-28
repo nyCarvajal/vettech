@@ -35,16 +35,16 @@
             </div>
             <div class="mt-4">
                 <label class="block text-sm font-medium text-gray-700 mb-1">Observaciones</label>
-                <textarea name="observations" rows="3" class="w-full rounded-lg border-gray-200 focus:ring-mint-500 focus:border-mint-500">{{ old('observations') }}</textarea>
+                <textarea name="observations" rows="3" class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 shadow-sm focus:ring-mint-500 focus:border-mint-500">{{ old('observations') }}</textarea>
             </div>
             <div class="mt-4">
                 <label class="block text-sm font-medium text-gray-700 mb-1">Recomendaciones</label>
-                <textarea name="recommendations" rows="2" class="w-full rounded-lg border-gray-200 focus:ring-mint-500 focus:border-mint-500">{{ old('recommendations') }}</textarea>
+                <textarea name="recommendations" rows="2" class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 shadow-sm focus:ring-mint-500 focus:border-mint-500">{{ old('recommendations') }}</textarea>
             </div>
         </x-card>
 
         <div class="flex justify-end">
-            <button type="submit" class="inline-flex items-center bg-mint-600 text-white px-5 py-2 rounded-lg shadow-sm hover:bg-mint-500">Guardar informe</button>
+            <button type="submit" class="inline-flex items-center bg-mint-600 text-white px-5 py-2 rounded-lg shadow-sm hover:bg-mint-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-mint-500">Guardar informe</button>
         </div>
     </form>
 @endsection
