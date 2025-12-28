@@ -77,11 +77,11 @@ class UsuarioController extends Controller
 
     public function index()
     {
-        $peluqueriaId = Auth::user()->peluqueria_id;
+        $clinicaId = Auth::user()->clinica_id;
 
         $users = User::with('peluqueria')
-            ->where('peluqueria_id', $peluqueriaId)
-            ->orderBy('nombre')
+            ->where('clinica_id', $clinicaId)
+            ->orderBy('nombres')
             ->paginate(15);
 
         $labels = $this->stylistLabels();
@@ -191,7 +191,7 @@ class UsuarioController extends Controller
             ->insert([
                 'nombres' => $nombres,
                 'email' => $data['email'],
-                'clinica_id' => Auth::user()->peluqueria_id,
+                'clinica_id' => Auth::user()->clinica_id,
                 'password' => Hash::make($data['password']),
                 'email_verified_at' => now(),
                 'role' => $data['role'],
