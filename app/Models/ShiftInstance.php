@@ -3,9 +3,8 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 
-class ShiftInstance extends Model
+class ShiftInstance extends BaseModel
 {
     use HasFactory;
 
