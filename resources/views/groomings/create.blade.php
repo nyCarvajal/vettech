@@ -1,5 +1,7 @@
 @extends('layouts.app')
 
+@include('groomings.partials.styles')
+
 @section('breadcrumbs')
     <a href="{{ route('groomings.index') }}" class="text-gray-400 hover:text-gray-600">Peluquería</a>
     <span class="mx-2">/</span>
@@ -7,7 +9,7 @@
 @endsection
 
 @section('content')
-    <div class="rounded-2xl bg-gradient-to-r from-purple-50 via-white to-mint-50 border border-purple-100 p-5 shadow-sm">
+    <div class="rounded-2xl grooming-surface p-5 shadow-sm">
         <div class="flex items-center justify-between">
             <div>
                 <h1 class="text-2xl font-semibold text-gray-900">Registrar peluquería</h1>
@@ -17,7 +19,7 @@
         </div>
     </div>
 
-    <form method="POST" action="{{ route('groomings.store') }}" class="mt-6 space-y-6">
+    <form method="POST" action="{{ route('groomings.store') }}" class="mt-6 space-y-6 grooming-card rounded-2xl p-1">
         @csrf
         <x-card class="border-purple-100 shadow-soft">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -107,7 +109,7 @@
         </x-card>
 
         <div class="flex justify-end">
-            <button type="submit" class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-purple-500 to-mint-500 text-white shadow-lg hover:from-purple-400 hover:to-mint-400 transition">
+            <button type="submit" class="grooming-btn-primary inline-flex items-center gap-2">
                 Guardar y agendar
             </button>
         </div>

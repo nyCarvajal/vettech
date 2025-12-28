@@ -1,5 +1,7 @@
 @extends('layouts.app')
 
+@include('groomings.partials.styles')
+
 @section('breadcrumbs')
     <span class="text-gray-400">Inicio</span>
     <span class="mx-2">/</span>
@@ -7,19 +9,19 @@
 @endsection
 
 @section('content')
-    <div class="rounded-2xl bg-gradient-to-r from-purple-50 via-white to-mint-50 border border-purple-100 p-5 shadow-sm">
+    <div class="rounded-2xl grooming-surface p-5 shadow-sm">
         <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
                 <h1 class="text-2xl font-semibold text-gray-900">Tablero de peluquería</h1>
                 <p class="text-sm text-gray-600">Agenda diaria y control de estados.</p>
             </div>
-            <a href="{{ route('groomings.create') }}" class="inline-flex items-center gap-2 bg-purple-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-purple-400 transition">
+            <a href="{{ route('groomings.create') }}" class="inline-flex items-center gap-2 grooming-btn-primary text-white">
                 + Nueva orden
             </a>
         </div>
     </div>
 
-    <x-card class="mt-4 bg-white border-purple-100 shadow-soft">
+    <x-card class="mt-4 bg-white border-purple-100 shadow-soft grooming-card">
         <div class="grid grid-cols-1 lg:grid-cols-5 gap-4 items-end">
             <form method="GET" class="grid grid-cols-1 md:grid-cols-4 gap-4 lg:col-span-4">
                 <div>
@@ -41,7 +43,7 @@
                     </select>
                 </div>
                 <div class="flex items-end">
-                    <button type="submit" class="w-full inline-flex justify-center bg-purple-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-purple-400 transition">Filtrar</button>
+                    <button type="submit" class="w-full inline-flex justify-center grooming-btn-primary">Filtrar</button>
                 </div>
             </form>
             <form method="GET" action="{{ route('groomings.create') }}" class="grid grid-cols-1 gap-2 bg-purple-50 border border-purple-100 rounded-xl p-3 shadow-inner">
@@ -52,7 +54,7 @@
                         <option value="{{ $pet->id }}">{{ $pet->display_name }} ({{ optional($pet->owner)->name }})</option>
                     @endforeach
                 </select>
-                <button class="inline-flex justify-center items-center bg-mint-500 text-white px-3 py-2 rounded-lg shadow-md hover:bg-mint-400 transition">
+                <button class="inline-flex justify-center items-center grooming-btn-secondary">
                     Enviar a peluquería
                 </button>
             </form>
@@ -69,8 +71,8 @@
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
         @foreach($columns as $key => $label)
-            <div class="bg-white border border-purple-100 rounded-xl shadow-soft">
-                <div class="px-4 py-3 border-b border-purple-50 flex items-center justify-between bg-gradient-to-r from-purple-50 to-mint-50 rounded-t-xl border-l-4 border-l-purple-200">
+            <div class="bg-white border border-purple-100 rounded-xl shadow-soft grooming-card">
+                <div class="px-4 py-3 border-b border-purple-50 flex items-center justify-between bg-gradient-to-r from-purple-50 to-mint-50 rounded-t-xl border-l-4 border-l-purple-200 grooming-card-accent">
                     <div>
                         <p class="text-sm font-semibold text-gray-800">{{ $label }}</p>
                         <p class="text-xs text-gray-500">{{ ($groomings[$key] ?? collect())->count() }} casos</p>
@@ -79,7 +81,7 @@
                 </div>
                 <div class="p-4 space-y-3">
                     @forelse($groomings[$key] ?? [] as $item)
-                        <div class="border border-purple-100 rounded-lg p-4 bg-purple-50/60 border-l-4 border-l-mint-200">
+                        <div class="border border-purple-100 rounded-lg p-4 bg-purple-50/60 border-l-4 border-l-mint-200 grooming-card-accent">
                             <div class="flex items-center justify-between">
                                 <div>
                                     <p class="text-sm font-semibold text-gray-900">{{ optional($item->patient)->display_name ?? 'Paciente' }}</p>
@@ -101,14 +103,14 @@
                                 @endif
                             </div>
                             <div class="flex items-center gap-2 mt-3">
-                                <a href="{{ route('groomings.show', $item) }}" class="text-sm px-3 py-1.5 rounded-md bg-mint-500 text-white shadow hover:bg-mint-400 transition">Abrir</a>
+                                <a href="{{ route('groomings.show', $item) }}" class="text-sm px-3 py-1.5 rounded-md grooming-btn-secondary">Abrir</a>
                                 @if($item->status === 'agendado')
                                     <form method="POST" action="{{ route('groomings.start', $item) }}">
                                         @csrf
-                                        <button class="text-sm px-3 py-1.5 rounded-md bg-purple-500 text-white shadow hover:bg-purple-400 transition">Iniciar</button>
+                                        <button class="text-sm px-3 py-1.5 rounded-md grooming-btn-primary">Iniciar</button>
                                     </form>
                                 @elseif($item->status === 'en_proceso')
-                                    <a href="{{ route('groomings.report.create', $item) }}" class="text-sm px-3 py-1.5 rounded-md bg-purple-500 text-white shadow hover:bg-purple-400 transition">Informe</a>
+                                    <a href="{{ route('groomings.report.create', $item) }}" class="text-sm px-3 py-1.5 rounded-md grooming-btn-primary">Informe</a>
                                 @endif
                             </div>
                         </div>
