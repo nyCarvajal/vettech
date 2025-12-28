@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\GroomingRequest;
 use App\Models\Grooming;
-use App\Models\GroomingService;
 use App\Models\Owner;
 use App\Models\Patient;
 use App\Models\Product;
@@ -34,11 +33,14 @@ class GroomingController extends Controller
             ->get()
             ->groupBy('status');
 
+        $patients = Patient::with('owner')->orderBy('nombres')->get();
+
         return view('groomings.index', [
             'groomings' => $groomings,
             'startDate' => $startDate->toDateString(),
             'endDate' => $endDate->toDateString(),
             'status' => $status,
+            'patients' => $patients,
         ]);
     }
 
@@ -51,17 +53,18 @@ class GroomingController extends Controller
         $owners = Owner::orderBy('name')->get();
         $patients = Patient::with('owner')->orderBy('nombres')->get();
 
-        $serviceProducts = Product::where('type', 'servicio')->orderBy('name')->get();
+        $serviceProducts = Product::where('type', 'servicio')
+            ->where('inventariable', 0)
+            ->orderBy('name')
+            ->get();
         $inventoryProducts = Product::whereIn('type', ['med', 'insumo'])->orderBy('name')->get();
-        $groomingServices = GroomingService::where('active', true)->orderBy('name')->get();
 
         return view('groomings.create', compact(
             'patient',
             'owners',
             'patients',
             'serviceProducts',
-            'inventoryProducts',
-            'groomingServices'
+            'inventoryProducts'
         ));
     }
 

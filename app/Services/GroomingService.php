@@ -25,10 +25,6 @@ class GroomingService
                 $grooming->service_price = optional(Product::find($grooming->product_service_id))->sale_price;
             }
 
-            if ($grooming->service_source === 'grooming_service' && $grooming->service_id && empty($grooming->service_price)) {
-                $grooming->service_price = optional($grooming->groomingService)->default_price;
-            }
-
             $grooming->save();
 
             return $grooming;
