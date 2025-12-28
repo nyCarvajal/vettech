@@ -86,33 +86,28 @@
             </div>
         </x-card>
 
-        <x-card title="Servicio opcional" class="border-purple-100 shadow-soft">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <x-card title="Servicio opcional" class="border-purple-100 shadow-soft bg-purple-50/50">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-1">Definición</label>
-                    <select name="service_source" class="w-full rounded-lg border-purple-200 focus:ring-purple-400 focus:border-purple-400">
-                        <option value="none" @selected(old('service_source','none')==='none')>Sin cobro por ahora</option>
-                        <option value="product" @selected(old('service_source','product')==='product')>Servicio desde inventario (no inventariable)</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-1">Servicio / producto</label>
-                    <select name="product_service_id" class="w-full rounded-lg border-purple-200 focus:ring-purple-400 focus:border-purple-400">
-                        <option value="">Selecciona un servicio (inventariable = 0)</option>
+                    <p class="text-sm text-gray-600 mb-2">Selecciona un servicio de inventario (no inventariable). El precio se toma automáticamente.</p>
+                    <select name="product_service_id" class="w-full rounded-lg border-purple-200 focus:ring-purple-400 focus:border-purple-400 bg-white">
+                        <option value="">Sin servicio por ahora</option>
                         @foreach($serviceProducts as $product)
                             <option value="{{ $product->id }}" @selected(old('product_service_id')==$product->id)>{{ $product->name }} ({{ number_format($product->sale_price,0) }})</option>
                         @endforeach
                     </select>
                 </div>
-                <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-1">Precio</label>
-                    <input type="number" step="0.01" name="service_price" value="{{ old('service_price') }}" placeholder="Opcional" class="w-full rounded-lg border-purple-200 focus:ring-purple-400 focus:border-purple-400">
+                <div class="flex items-center">
+                    <div class="bg-gradient-to-r from-purple-100 to-mint-100 text-purple-800 border border-purple-200 rounded-xl p-4 w-full">
+                        <p class="text-sm font-semibold">Recuerda</p>
+                        <p class="text-sm text-gray-700">El cobro se puede hacer después. Solo elegimos el servicio para dejarlo listo.</p>
+                    </div>
                 </div>
             </div>
         </x-card>
 
         <div class="flex justify-end">
-            <button type="submit" class="inline-flex items-center gap-2 bg-purple-500 text-white px-5 py-2 rounded-lg shadow-md hover:bg-purple-400 transition">
+            <button type="submit" class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-purple-500 to-mint-500 text-white shadow-lg hover:from-purple-400 hover:to-mint-400 transition">
                 Guardar y agendar
             </button>
         </div>

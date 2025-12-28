@@ -21,8 +21,12 @@ class GroomingService
                 $grooming->owner_id = $grooming->patient->owner_id;
             }
 
-            if ($grooming->service_source === 'product' && $grooming->product_service_id && empty($grooming->service_price)) {
+            if ($grooming->product_service_id) {
+                $grooming->service_source = 'product';
                 $grooming->service_price = optional(Product::find($grooming->product_service_id))->sale_price;
+            } else {
+                $grooming->service_source = 'none';
+                $grooming->service_price = null;
             }
 
             $grooming->save();
