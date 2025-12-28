@@ -75,6 +75,7 @@
                         ['label' => 'Dashboard', 'route' => 'dashboard'],
                         ['label' => 'Tutores', 'route' => 'owners.index'],
                         ['label' => 'Pacientes', 'route' => 'patients.index'],
+                        ['label' => 'Sala de belleza', 'route' => 'groomings.index'],
                         ['label' => 'Agenda', 'route' => 'reservas.index'],
                         ['label' => 'Hospitalización 24/7', 'route' => 'hospital.board'],
                         ['label' => 'Dispensación', 'route' => 'dispensations.index'],
