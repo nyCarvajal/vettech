@@ -12,6 +12,32 @@
     <h1 class="text-2xl font-semibold text-gray-900 mb-1">Informe de baño</h1>
     <p class="text-sm text-gray-500 mb-4">Al guardar, el estado pasa automáticamente a finalizado.</p>
 
+    <x-card title="Paciente">
+        <p class="text-sm font-semibold text-gray-900">{{ $grooming->patient->display_name }}</p>
+        <p class="text-sm text-gray-500">Tutor: {{ $grooming->owner->name }}</p>
+
+        <dl class="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2 text-sm">
+            <div>
+                <dt class="text-gray-500">Especie</dt>
+                <dd class="font-medium text-gray-900">{{ optional($grooming->patient->species)->name ?? 'Sin registro' }}</dd>
+            </div>
+            <div>
+                <dt class="text-gray-500">Raza</dt>
+                <dd class="font-medium text-gray-900">{{ optional($grooming->patient->breed)->name ?? 'Sin registro' }}</dd>
+            </div>
+            <div>
+                <dt class="text-gray-500">Identificación del tutor</dt>
+                <dd class="font-medium text-gray-900">
+                    {{ trim(($grooming->owner->document_type ? $grooming->owner->document_type . ' ' : '') . ($grooming->owner->document ?? '')) ?: 'Sin registro' }}
+                </dd>
+            </div>
+            <div>
+                <dt class="text-gray-500">WhatsApp</dt>
+                <dd class="font-medium text-gray-900">{{ $grooming->owner->whatsapp ?: 'Sin registro' }}</dd>
+            </div>
+        </dl>
+    </x-card>
+
     <form method="POST" action="{{ route('groomings.report.store', $grooming) }}" class="space-y-4">
         @csrf
         <x-card>
