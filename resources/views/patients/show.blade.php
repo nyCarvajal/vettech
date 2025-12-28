@@ -284,6 +284,12 @@
         </div>
         <div class="flex gap-2">
             <a
+                href="{{ route('hospital.stays.create', ['patient_id' => $patient->id]) }}"
+                class="pill-action"
+            >
+                Hospitalizar
+            </a>
+            <a
                 href="{{ route('groomings.create', ['patient_id' => $patient->id]) }}"
                 class="pill-action"
             >
