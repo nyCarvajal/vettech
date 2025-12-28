@@ -24,8 +24,8 @@ class GroomingRequest extends FormRequest
             'deworming_source' => ['required_if:external_deworming,1', 'in:none,manual,inventory'],
             'deworming_product_id' => ['required_if:deworming_source,inventory', 'nullable', 'exists:products,id'],
             'deworming_product_name' => ['required_if:deworming_source,manual', 'nullable', 'string', 'max:255'],
-            'service_source' => ['nullable', 'in:none,product,grooming_service'],
-            'service_id' => ['required_if:service_source,grooming_service', 'nullable', 'exists:grooming_services,id'],
+            'service_source' => ['nullable', 'in:none,product'],
+            'service_id' => ['nullable'],
             'product_service_id' => ['required_if:service_source,product', 'nullable', 'exists:products,id'],
             'service_price' => ['nullable', 'numeric'],
         ];

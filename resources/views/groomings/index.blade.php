@@ -7,40 +7,56 @@
 @endsection
 
 @section('content')
-    <div class="flex items-center justify-between">
-        <div>
-            <h1 class="text-2xl font-semibold text-gray-900">Tablero de peluquería</h1>
-            <p class="text-sm text-gray-500">Agenda diaria y control de estados.</p>
+    <div class="rounded-2xl bg-gradient-to-r from-purple-50 via-white to-mint-50 border border-purple-100 p-5 shadow-sm">
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div>
+                <h1 class="text-2xl font-semibold text-gray-900">Tablero de peluquería</h1>
+                <p class="text-sm text-gray-600">Agenda diaria y control de estados.</p>
+            </div>
+            <a href="{{ route('groomings.create') }}" class="inline-flex items-center gap-2 bg-purple-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-purple-400 transition">
+                + Nueva orden
+            </a>
         </div>
-        <a href="{{ route('groomings.create') }}" class="inline-flex items-center gap-2 bg-mint-600 text-white px-4 py-2 rounded-lg shadow-sm hover:bg-mint-500">
-            + Nueva orden
-        </a>
     </div>
 
-    <x-card class="mt-4">
-        <form method="GET" class="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Desde</label>
-                <input type="date" name="start_date" value="{{ $startDate }}" class="w-full rounded-lg border-gray-200 focus:ring-mint-500 focus:border-mint-500">
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Hasta</label>
-                <input type="date" name="end_date" value="{{ $endDate }}" class="w-full rounded-lg border-gray-200 focus:ring-mint-500 focus:border-mint-500">
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Estado</label>
-                <select name="status" class="w-full rounded-lg border-gray-200 focus:ring-mint-500 focus:border-mint-500">
-                    <option value="">Todos</option>
-                    <option value="agendado" @selected($status==='agendado')>Agendado</option>
-                    <option value="en_proceso" @selected($status==='en_proceso')>En proceso</option>
-                    <option value="finalizado" @selected($status==='finalizado')>Finalizado</option>
-                    <option value="cancelado" @selected($status==='cancelado')>Cancelado</option>
+    <x-card class="mt-4 bg-white border-purple-100 shadow-soft">
+        <div class="grid grid-cols-1 lg:grid-cols-5 gap-4 items-end">
+            <form method="GET" class="grid grid-cols-1 md:grid-cols-4 gap-4 lg:col-span-4">
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Desde</label>
+                    <input type="date" name="start_date" value="{{ $startDate }}" class="w-full rounded-lg border-purple-200 focus:ring-purple-400 focus:border-purple-400">
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Hasta</label>
+                    <input type="date" name="end_date" value="{{ $endDate }}" class="w-full rounded-lg border-purple-200 focus:ring-purple-400 focus:border-purple-400">
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Estado</label>
+                    <select name="status" class="w-full rounded-lg border-purple-200 focus:ring-purple-400 focus:border-purple-400">
+                        <option value="">Todos</option>
+                        <option value="agendado" @selected($status==='agendado')>Agendado</option>
+                        <option value="en_proceso" @selected($status==='en_proceso')>En proceso</option>
+                        <option value="finalizado" @selected($status==='finalizado')>Finalizado</option>
+                        <option value="cancelado" @selected($status==='cancelado')>Cancelado</option>
+                    </select>
+                </div>
+                <div class="flex items-end">
+                    <button type="submit" class="w-full inline-flex justify-center bg-purple-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-purple-400 transition">Filtrar</button>
+                </div>
+            </form>
+            <form method="GET" action="{{ route('groomings.create') }}" class="grid grid-cols-1 gap-2 bg-purple-50 border border-purple-100 rounded-xl p-3 shadow-inner">
+                <label class="text-sm font-semibold text-purple-800">Ingreso rápido</label>
+                <select name="patient_id" class="w-full rounded-lg border-purple-200 focus:ring-purple-400 focus:border-purple-400" required>
+                    <option value="">Selecciona paciente</option>
+                    @foreach($patients as $pet)
+                        <option value="{{ $pet->id }}">{{ $pet->display_name }} ({{ optional($pet->owner)->name }})</option>
+                    @endforeach
                 </select>
-            </div>
-            <div class="flex items-end">
-                <button type="submit" class="w-full inline-flex justify-center bg-mint-600 text-white px-4 py-2 rounded-lg shadow-sm hover:bg-mint-500">Filtrar</button>
-            </div>
-        </form>
+                <button class="inline-flex justify-center items-center bg-mint-500 text-white px-3 py-2 rounded-lg shadow-md hover:bg-mint-400 transition">
+                    Enviar a peluquería
+                </button>
+            </form>
+        </div>
     </x-card>
 
     @php
@@ -53,24 +69,24 @@
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
         @foreach($columns as $key => $label)
-            <div class="bg-white border border-gray-200 rounded-xl shadow-soft">
-                <div class="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
+            <div class="bg-white border border-purple-100 rounded-xl shadow-soft">
+                <div class="px-4 py-3 border-b border-purple-50 flex items-center justify-between bg-gradient-to-r from-purple-50 to-white rounded-t-xl">
                     <div>
                         <p class="text-sm font-semibold text-gray-800">{{ $label }}</p>
                         <p class="text-xs text-gray-500">{{ ($groomings[$key] ?? collect())->count() }} casos</p>
                     </div>
-                    <span class="px-3 py-1 text-xs rounded-full bg-mint-50 text-mint-700">{{ strtoupper($key) }}</span>
+                    <span class="px-3 py-1 text-xs rounded-full bg-purple-100 text-purple-800 font-semibold">{{ strtoupper($key) }}</span>
                 </div>
                 <div class="p-4 space-y-3">
                     @forelse($groomings[$key] ?? [] as $item)
-                        <div class="border border-gray-100 rounded-lg p-4 bg-gray-50">
+                        <div class="border border-purple-100 rounded-lg p-4 bg-purple-50/60">
                             <div class="flex items-center justify-between">
                                 <div>
                                     <p class="text-sm font-semibold text-gray-900">{{ optional($item->patient)->display_name ?? 'Paciente' }}</p>
                                     <p class="text-xs text-gray-500">Tutor: {{ optional($item->owner)->name }}</p>
                                 </div>
                                 <div class="text-right text-xs text-gray-500">
-                                    <p class="font-medium text-gray-700">{{ optional($item->scheduled_at)->format('H:i') }}</p>
+                                    <p class="font-medium text-purple-800">{{ optional($item->scheduled_at)->format('H:i') }}</p>
                                     @if($item->service_name)
                                         <p class="text-mint-700">{{ $item->service_name }}</p>
                                     @endif
