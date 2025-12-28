@@ -355,14 +355,10 @@
                         <h3 class="section-title">{{ optional($patient->owner)->name ?: 'Sin tutor asignado' }}</h3>
                         <p class="section-subtitle">{{ optional($patient->owner)->address }}</p>
                     </div>
-                    <a href="{{ $patient->owner ? route('owners.show', $patient->owner) : '#' }}" class="pill-action" @if(!$patient->owner) aria-disabled="true" @endif>Ver ficha</a>
+                    <a href="{{ $patient->owner ? route('owners.show', $patient->owner) : '#' }}" class="pill-action" @if(!$patient->owner) aria-disabled="true" @endif>Ver</a>
                 </div>
                 <div class="owner-card mt-3">
                     <div class="info-grid">
-                        <div class="info-tile">
-                            <p class="info-label">Teléfono</p>
-                            <p class="info-value">{{ optional($patient->owner)->phone ?: 'N/D' }}</p>
-                        </div>
                         <div class="info-tile">
                             <p class="info-label">WhatsApp</p>
                             <p class="info-value">{{ optional($patient->owner)->whatsapp ?: 'N/D' }}</p>
@@ -371,10 +367,7 @@
                             <p class="info-label">Correo</p>
                             <p class="info-value">{{ optional($patient->owner)->email ?: 'N/D' }}</p>
                         </div>
-                        <div class="info-tile">
-                            <p class="info-label">Relación</p>
-                            <p class="info-value">{{ optional($patient->owner)->relationship ?: 'Tutor principal' }}</p>
-                        </div>
+                        
                     </div>
                     <div class="d-flex flex-wrap gap-2 mt-1">
                         @if(optional($patient->owner)->whatsapp)

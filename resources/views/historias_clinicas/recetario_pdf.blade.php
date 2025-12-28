@@ -29,7 +29,7 @@
             display: flex;
             align-items: center;
             padding: 16px 18px;
-            background: linear-gradient(120deg, rgba(94, 76, 250, 0.96) 0%, rgba(68, 212, 183, 0.9) 90%);
+            background: rgba(94, 76, 250, 0.96);
             color: #fff;
         }
         .brand-mark {
@@ -147,34 +147,10 @@
         <div class="header">
             <div class="brand-mark"><span>❤</span></div>
             <div>
-                <h1>Recetario veterinario</h1>
+                <h1>Receta Mádica</h1>
                 <p>Rx #{{ $prescription->id }} · {{ $prescription->created_at?->format('d/m/Y') }}</p>
             </div>
-            <div style="margin-left:auto; text-align:right;">
-                <div style="font-weight:700; font-size:13px;">{{ optional($prescription->professional)->name ?? 'Profesional N/D' }}</div>
-                <div style="font-size:11px; color: rgba(255,255,255,0.78);">Profesional tratante</div>
-            </div>
-        </div>
-
-        <div class="meta-row">
-            <div class="meta-card">
-                <div class="meta-label">Tutor</div>
-                <div class="meta-value">{{ optional(optional($prescription->historiaClinica?->paciente)->owner)->name ?? 'N/D' }}</div>
-                <div class="tiny">{{ optional(optional($prescription->historiaClinica?->paciente)->owner)->address ?? 'Dirección N/D' }}</div>
-            </div>
-            <div class="meta-card">
-                <div class="meta-label">Paciente</div>
-                <div class="meta-value">{{ trim(optional($prescription->historiaClinica?->paciente)->nombres . ' ' . optional($prescription->historiaClinica?->paciente)->apellidos) ?: 'N/D' }}</div>
-                <div class="tiny">{{ optional($prescription->historiaClinica?->paciente?->species)->name ?? 'Especie N/D' }} · {{ optional($prescription->historiaClinica?->paciente?->breed)->name ?? 'Raza N/D' }}</div>
-            </div>
-            <div class="meta-card">
-                <div class="meta-label">Estado</div>
-                <div class="pill">
-                    <strong>Formato media carta</strong>
-                    <small>Impresión</small>
-                </div>
-                <div class="tiny">Los medicamentos manuales no son facturables.</div>
-            </div>
+           
         </div>
 
         <div class="section">
@@ -183,15 +159,12 @@
                     <h3>Datos del tutor</h3>
                     <table class="info-table">
                         <tr>
-                            <td class="label">Tipo de documento</td>
+                            <td class="label">Documento</td>
                             <td class="value">{{ optional(optional($prescription->historiaClinica?->paciente)->owner)->document_type ?? 'N/D' }}</td>
-                        </tr>
-                        <tr>
-                            <td class="label">Número</td>
                             <td class="value">{{ optional(optional($prescription->historiaClinica?->paciente)->owner)->document ?? 'N/D' }}</td>
                         </tr>
                         <tr>
-                            <td class="label">Nombres y apellidos</td>
+                            <td class="label">Nombre</td>
                             <td class="value">{{ optional(optional($prescription->historiaClinica?->paciente)->owner)->name ?? 'N/D' }}</td>
                         </tr>
                         <tr>
@@ -210,30 +183,27 @@
                         <tr>
                             <td class="label">Nombre</td>
                             <td class="value">{{ trim(optional($prescription->historiaClinica?->paciente)->nombres . ' ' . optional($prescription->historiaClinica?->paciente)->apellidos) ?: 'N/D' }}</td>
+                            <td class="label">Edad</td>
+                            <td class="value">{{ optional($prescription->historiaClinica?->paciente)->edad ?? 'N/D' }}</td>
                         </tr>
                         <tr>
                             <td class="label">Especie</td>
                             <td class="value">{{ optional($prescription->historiaClinica?->paciente?->species)->name ?? 'N/D' }}</td>
-                        </tr>
-                        <tr>
+                       
                             <td class="label">Raza</td>
                             <td class="value">{{ optional($prescription->historiaClinica?->paciente?->breed)->name ?? 'N/D' }}</td>
                         </tr>
                         <tr>
                             <td class="label">Pelaje / color</td>
                             <td class="value">{{ optional($prescription->historiaClinica?->paciente)->color ?? 'N/D' }}</td>
-                        </tr>
-                        <tr>
+                       
                             <td class="label">Peso</td>
                             <td class="value">
                                 @php($patient = optional($prescription->historiaClinica?->paciente))
                                 {{ $patient?->peso_formateado ?? 'N/D' }}
                             </td>
                         </tr>
-                        <tr>
-                            <td class="label">Edad</td>
-                            <td class="value">{{ optional($prescription->historiaClinica?->paciente)->edad ?? 'N/D' }}</td>
-                        </tr>
+                        
                     </table>
                 </div>
             </div>

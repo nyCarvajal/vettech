@@ -110,8 +110,8 @@ class Patient extends BaseModel
         $species = strtolower(optional($this->species)->name ?? '');
 
         return match ($species) {
-            'perro' => asset('images/users/perro.png'),
-            'gato' => asset('images/users/gato.png'),
+            'canino' => asset('images/users/perro.png'),
+            'felino' => asset('images/users/gato.png'),
             default => asset('images/users/otro.png'),
         };
     }
