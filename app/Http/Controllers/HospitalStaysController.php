@@ -29,7 +29,9 @@ class HospitalStaysController extends Controller
         $cages = Cage::where('active', true)->get();
 
         $patient = null;
-        if ($patientId = request('patient_id')) {
+        $patientId = request('patient_id') ?? session()->getOldInput('patient_id');
+
+        if ($patientId) {
             $patient = Patient::with(['owner', 'species'])->find($patientId);
         }
 
