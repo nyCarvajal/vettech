@@ -73,6 +73,7 @@
                 type="button"
                 id="open-attachment-modal"
                 class="inline-flex items-center gap-2 rounded-full bg-emerald-600 px-4 py-2 font-semibold text-white shadow-sm transition hover:bg-emerald-500"
+                style="background-color: #10b981"
             >
                 Subir adjunto
             </button>
