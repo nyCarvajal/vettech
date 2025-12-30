@@ -14,10 +14,10 @@
                 <p class="text-white/90">Tutor: {{ $tutor->name ?? 'Sin tutor' }}</p>
             </div>
             <div class="flex flex-wrap items-center gap-2 text-sm">
-                <a href="{{ route('historias-clinicas.edit', $historia) }}" class="inline-flex items-center gap-2 rounded-full border border-white/40 px-4 py-2 font-semibold text-white/90 backdrop-blur hover:bg-white/10 transition">Editar</a>
-                <a href="{{ route('historias-clinicas.recetarios.create', $historia) }}" class="inline-flex items-center gap-2 rounded-full bg-white/15 px-4 py-2 font-semibold text-white shadow-sm hover:bg-white/25 transition">Agregar recetario</a>
-                <a href="{{ route('historias-clinicas.remisiones.create', $historia) }}" class="inline-flex items-center gap-2 rounded-full bg-white text-mint-700 px-4 py-2 font-semibold shadow-sm hover:bg-gray-50 transition">Nueva remisión</a>
-                <a href="{{ route('historias-clinicas.pdf', $historia) }}" class="inline-flex items-center gap-2 rounded-full border border-white/40 px-4 py-2 font-semibold text-white/90 backdrop-blur hover:bg-white/10 transition">Imprimir PDF</a>
+                <a href="{{ route('historias-clinicas.edit', $historia) }}" class="inline-flex items-center gap-2 rounded-full bg-white/20 px-4 py-2 font-semibold text-white shadow-sm transition hover:bg-white/30 hover:text-white">Editar</a>
+                <a href="{{ route('historias-clinicas.recetarios.create', $historia) }}" class="inline-flex items-center gap-2 rounded-full bg-blue-100/80 px-4 py-2 font-semibold text-blue-900 shadow-sm transition hover:bg-blue-200">Agregar recetario</a>
+                <a href="{{ route('historias-clinicas.remisiones.create', $historia) }}" class="inline-flex items-center gap-2 rounded-full bg-amber-100 px-4 py-2 font-semibold text-amber-900 shadow-sm transition hover:bg-amber-200">Nueva remisión</a>
+                <a href="{{ route('historias-clinicas.pdf', $historia) }}" class="inline-flex items-center gap-2 rounded-full bg-emerald-100 px-4 py-2 font-semibold text-emerald-900 shadow-sm transition hover:bg-emerald-200">Imprimir PDF</a>
             </div>
         </div>
     </div>
@@ -39,10 +39,10 @@
         </div>
         <div class="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
             <p class="text-xs font-semibold uppercase tracking-wider text-mint-700">Actividad</p>
-            <div class="mt-1 flex items-center gap-3 text-sm text-gray-700">
-                <span class="rounded-full bg-mint-50 px-3 py-1 text-mint-700 font-semibold">{{ $historia->paraclinicos->count() }} paraclínicos</span>
-                <span class="rounded-full bg-amber-50 px-3 py-1 text-amber-700 font-semibold">{{ $historia->diagnosticos->count() }} diagnósticos</span>
-                <span class="rounded-full bg-blue-50 px-3 py-1 text-blue-700 font-semibold">{{ $prescriptions->count() }} recetarios</span>
+            <div class="mt-2 grid w-full grid-cols-1 gap-2 text-sm text-gray-700 sm:grid-cols-3">
+                <span class="rounded-full bg-mint-50 px-3 py-2 text-center font-semibold text-mint-700">{{ $historia->paraclinicos->count() }} paraclínicos</span>
+                <span class="rounded-full bg-amber-50 px-3 py-2 text-center font-semibold text-amber-700">{{ $historia->diagnosticos->count() }} diagnósticos</span>
+                <span class="rounded-full bg-blue-50 px-3 py-2 text-center font-semibold text-blue-700">{{ $prescriptions->count() }} recetarios</span>
             </div>
         </div>
     </div>
