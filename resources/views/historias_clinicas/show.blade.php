@@ -14,10 +14,26 @@
                 <p class="text-white/90">Tutor: {{ $tutor->name ?? 'Sin tutor' }}</p>
             </div>
             <div class="flex flex-wrap items-center gap-2 text-sm">
-                <a href="{{ route('historias-clinicas.edit', $historia) }}" class="inline-flex items-center gap-2 rounded-full bg-emerald-600 px-4 py-2 font-semibold text-white shadow-sm transition hover:bg-emerald-500">Editar</a>
-                <a href="{{ route('historias-clinicas.recetarios.create', $historia) }}" class="inline-flex items-center gap-2 rounded-full bg-blue-600 px-4 py-2 font-semibold text-white shadow-sm transition hover:bg-blue-500">Agregar recetario</a>
-                <a href="{{ route('historias-clinicas.remisiones.create', $historia) }}" class="inline-flex items-center gap-2 rounded-full bg-amber-500 px-4 py-2 font-semibold text-white shadow-sm transition hover:bg-amber-400">Nueva remisión</a>
-                <a href="{{ route('historias-clinicas.pdf', $historia) }}" class="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 font-semibold text-emerald-700 shadow-sm transition hover:bg-emerald-50">Imprimir PDF</a>
+                <a
+                    href="{{ route('historias-clinicas.edit', $historia) }}"
+                    class="inline-flex items-center gap-2 rounded-full bg-emerald-600 px-4 py-2 font-semibold text-white shadow-sm transition hover:bg-emerald-500"
+                    style="background-color: #059669"
+                >Editar</a>
+                <a
+                    href="{{ route('historias-clinicas.recetarios.create', $historia) }}"
+                    class="inline-flex items-center gap-2 rounded-full bg-blue-600 px-4 py-2 font-semibold text-white shadow-sm transition hover:bg-blue-500"
+                    style="background-color: #2563eb"
+                >Agregar recetario</a>
+                <a
+                    href="{{ route('historias-clinicas.remisiones.create', $historia) }}"
+                    class="inline-flex items-center gap-2 rounded-full bg-amber-500 px-4 py-2 font-semibold text-white shadow-sm transition hover:bg-amber-400"
+                    style="background-color: #f59e0b"
+                >Nueva remisión</a>
+                <a
+                    href="{{ route('historias-clinicas.pdf', $historia) }}"
+                    class="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 font-semibold text-emerald-700 shadow-sm transition hover:bg-emerald-50"
+                    style="background-color: #ffffff; color: #047857"
+                >Imprimir PDF</a>
             </div>
         </div>
     </div>
