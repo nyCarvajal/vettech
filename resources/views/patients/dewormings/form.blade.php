@@ -22,12 +22,12 @@
         <div class="grid md:grid-cols-2 gap-4">
             <div>
                 <label class="text-sm font-semibold text-slate-700">Fecha de aplicación</label>
-                <input type="date" name="applied_at" value="{{ old('applied_at', optional($deworming->applied_at)->toDateString()) }}" class="w-full rounded-xl border-slate-200">
+                <input type="date" name="applied_at" value="{{ old('applied_at', optional($deworming->applied_at)->toDateString()) }}" class="w-full rounded-xl border border-slate-200">
                 @error('applied_at')<p class="text-rose-600 text-sm">{{ $message }}</p>@enderror
             </div>
             <div>
                 <label class="text-sm font-semibold text-slate-700">Próxima dosis</label>
-                <input type="date" name="next_due_at" value="{{ old('next_due_at', optional($deworming->next_due_at)->toDateString()) }}" class="w-full rounded-xl border-slate-200">
+                <input type="date" name="next_due_at" value="{{ old('next_due_at', optional($deworming->next_due_at)->toDateString()) }}" class="w-full rounded-xl border border-slate-200">
                 @error('next_due_at')<p class="text-rose-600 text-sm">{{ $message }}</p>@enderror
             </div>
         </div>
@@ -35,7 +35,7 @@
         <div class="grid md:grid-cols-2 gap-4">
             <div>
                 <label class="text-sm font-semibold text-slate-700">Producto del inventario</label>
-                <select name="item_id" class="w-full rounded-xl border-slate-200">
+                <select name="item_id" class="w-full rounded-xl border border-slate-200">
                     <option value="">-- Seleccionar item --</option>
                     @foreach($items as $item)
                         <option value="{{ $item->id }}" @selected(old('item_id', $deworming->item_id)==$item->id)>{{ $item->nombre }}</option>
@@ -45,7 +45,7 @@
             </div>
             <div>
                 <label class="text-sm font-semibold text-slate-700">O escribir manual</label>
-                <input type="text" name="item_manual" value="{{ old('item_manual', $deworming->item_manual) }}" placeholder="Nombre comercial" class="w-full rounded-xl border-slate-200">
+                <input type="text" name="item_manual" value="{{ old('item_manual', $deworming->item_manual) }}" placeholder="Nombre comercial" class="w-full rounded-xl border border-slate-200">
                 @error('item_manual')<p class="text-rose-600 text-sm">{{ $message }}</p>@enderror
             </div>
         </div>
@@ -53,22 +53,22 @@
         <div class="grid md:grid-cols-3 gap-4">
             <div>
                 <label class="text-sm font-semibold text-slate-700">Dosis</label>
-                <input type="text" name="dose" value="{{ old('dose', $deworming->dose) }}" class="w-full rounded-xl border-slate-200">
+                <input type="text" name="dose" value="{{ old('dose', $deworming->dose) }}" class="w-full rounded-xl border border-slate-200">
             </div>
             <div>
                 <label class="text-sm font-semibold text-slate-700">Ruta</label>
-                <input type="text" name="route" value="{{ old('route', $deworming->route) }}" class="w-full rounded-xl border-slate-200">
+                <input type="text" name="route" value="{{ old('route', $deworming->route) }}" class="w-full rounded-xl border border-slate-200">
             </div>
             <div>
                 <label class="text-sm font-semibold text-slate-700">Duración (días)</label>
-                <input type="number" name="duration_days" value="{{ old('duration_days', $deworming->duration_days) }}" class="w-full rounded-xl border-slate-200">
+                <input type="number" name="duration_days" value="{{ old('duration_days', $deworming->duration_days) }}" class="w-full rounded-xl border border-slate-200">
             </div>
         </div>
 
         <div class="grid md:grid-cols-2 gap-4">
             <div>
                 <label class="text-sm font-semibold text-slate-700">Estado</label>
-                <select name="status" class="w-full rounded-xl border-slate-200">
+                <select name="status" class="w-full rounded-xl border border-slate-200">
                     @foreach(['applied' => 'Aplicada', 'scheduled' => 'Programada', 'overdue' => 'Vencida'] as $value => $label)
                         <option value="{{ $value }}" @selected(old('status', $deworming->status)==$value)>{{ $label }}</option>
                     @endforeach
@@ -76,7 +76,7 @@
             </div>
             <div>
                 <label class="text-sm font-semibold text-slate-700">Notas</label>
-                <textarea name="notes" rows="3" class="w-full rounded-xl border-slate-200">{{ old('notes', $deworming->notes) }}</textarea>
+                <textarea name="notes" rows="3" class="w-full rounded-xl border border-slate-200">{{ old('notes', $deworming->notes) }}</textarea>
             </div>
         </div>
 
