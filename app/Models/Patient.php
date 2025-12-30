@@ -75,6 +75,16 @@ class Patient extends BaseModel
         return $this->hasMany(HospitalStay::class, 'patient_id');
     }
 
+    public function immunizations()
+    {
+        return $this->hasMany(PatientImmunization::class, 'paciente_id');
+    }
+
+    public function dewormings()
+    {
+        return $this->hasMany(PatientDeworming::class, 'paciente_id');
+    }
+
     public function sales()
     {
         return $this->hasMany(Sale::class, 'patient_id');
