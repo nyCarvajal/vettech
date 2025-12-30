@@ -4,7 +4,7 @@
     'actions' => null,
 ])
 
-<div {{ $attributes->class('relative overflow-hidden bg-white/90 backdrop-blur-sm border border-slate-200 rounded-2xl shadow-soft p-5') }}>
+<div class="bg-white border border-gray-200 rounded-xl shadow-soft p-5">
     @if($title || $subtitle || $actions)
         <div class="flex items-start justify-between gap-4 mb-4">
             <div class="space-y-1">
