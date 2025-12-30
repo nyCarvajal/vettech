@@ -16,23 +16,23 @@
             <div class="flex flex-wrap items-center gap-2 text-sm">
                 <a
                     href="{{ route('historias-clinicas.edit', $historia) }}"
-                    class="inline-flex items-center gap-2 rounded-full bg-emerald-600 px-4 py-2 font-semibold text-white shadow-sm transition hover:bg-emerald-500"
-                    style="background-color: #059669"
+                    class="inline-flex items-center gap-2 rounded-full px-4 py-2 font-semibold text-white shadow-sm transition"
+                    style="background: linear-gradient(120deg, #c084fc, #5eead4);"
                 >Editar</a>
                 <a
                     href="{{ route('historias-clinicas.recetarios.create', $historia) }}"
-                    class="inline-flex items-center gap-2 rounded-full bg-blue-600 px-4 py-2 font-semibold text-white shadow-sm transition hover:bg-blue-500"
-                    style="background-color: #2563eb"
+                    class="inline-flex items-center gap-2 rounded-full px-4 py-2 font-semibold text-white shadow-sm transition hover:brightness-110"
+                    style="background: linear-gradient(120deg, #a78bfa, #34d399);"
                 >Agregar recetario</a>
                 <a
                     href="{{ route('historias-clinicas.remisiones.create', $historia) }}"
-                    class="inline-flex items-center gap-2 rounded-full bg-amber-500 px-4 py-2 font-semibold text-white shadow-sm transition hover:bg-amber-400"
-                    style="background-color: #f59e0b"
+                    class="inline-flex items-center gap-2 rounded-full px-4 py-2 font-semibold text-white shadow-sm transition hover:brightness-110"
+                    style="background: linear-gradient(120deg, #c084fc, #22c55e);"
                 >Nueva remisión</a>
                 <a
                     href="{{ route('historias-clinicas.pdf', $historia) }}"
-                    class="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 font-semibold text-emerald-700 shadow-sm transition hover:bg-emerald-50"
-                    style="background-color: #ffffff; color: #047857"
+                    class="inline-flex items-center gap-2 rounded-full px-4 py-2 font-semibold text-white shadow-sm transition hover:brightness-110"
+                    style="background: linear-gradient(120deg, #e9d5ff, #99f6e4); color: #0f172a;"
                 >Imprimir PDF</a>
             </div>
         </div>
@@ -72,8 +72,8 @@
             <button
                 type="button"
                 id="open-attachment-modal"
-                class="inline-flex items-center gap-2 rounded-full bg-emerald-600 px-4 py-2 font-semibold text-white shadow-sm transition hover:bg-emerald-500"
-                style="background-color: #10b981"
+                class="inline-flex items-center gap-2 rounded-full px-4 py-2 font-semibold text-white shadow-sm transition hover:brightness-110"
+                style="background: linear-gradient(120deg, #c084fc, #5eead4);"
             >
                 Subir adjunto
             </button>

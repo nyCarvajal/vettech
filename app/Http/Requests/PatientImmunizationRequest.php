@@ -29,6 +29,7 @@ class PatientImmunizationRequest extends FormRequest
             'batch_lot' => ['required', 'string', 'max:255'],
             'dose' => ['nullable', 'string', 'max:255'],
             'next_due_at' => ['nullable', 'date', 'after_or_equal:applied_at'],
+            'expires_at' => ['nullable', 'date'],
             'vet_user_id' => ['nullable', Rule::exists('usuarios', 'id')],
             'notes' => ['nullable', 'string'],
             'status' => ['required', Rule::in(['applied', 'scheduled', 'overdue'])],
