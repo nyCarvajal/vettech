@@ -31,6 +31,24 @@
         </div>
     </div>
 
+    <div class="glass-card rounded-2xl p-4 shadow flex flex-wrap gap-3 items-center justify-between">
+        <div>
+            <p class="text-xs uppercase tracking-wide text-slate-500">Acciones rápidas</p>
+            <h3 class="text-lg font-semibold text-slate-900">Registrar atención preventiva</h3>
+        </div>
+        <div class="flex flex-wrap gap-3">
+            <a href="{{ route('patients.immunizations.create', $patient) }}" class="px-4 py-2 rounded-full text-sm font-semibold text-white bg-purple-500 hover:bg-purple-600 shadow">
+                Registrar vacuna
+            </a>
+            <a href="{{ route('patients.dewormings.create', [$patient, 'internal']) }}" class="px-4 py-2 rounded-full text-sm font-semibold text-white bg-emerald-500 hover:bg-emerald-600 shadow">
+                Registrar interna
+            </a>
+            <a href="{{ route('patients.dewormings.create', [$patient, 'external']) }}" class="px-4 py-2 rounded-full text-sm font-semibold text-white bg-emerald-500 hover:bg-emerald-600 shadow">
+                Registrar externa
+            </a>
+        </div>
+    </div>
+
     <form method="get" class="grid grid-cols-1 md:grid-cols-4 gap-3">
         <input type="hidden" name="tab" value="carnet">
         <div>
