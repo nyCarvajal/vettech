@@ -98,7 +98,7 @@ html[data-bs-theme="dark"][data-sidebar-color="light"] {
 
 /* Topbar Light */
 html[data-topbar-color="light"] {
-    --#{$prefix}topbar-bg:                                 #f7f9fc;
+    --#{$prefix}topbar-bg:                                 rgba(255, 255, 255, 0.8);
     --#{$prefix}topbar-item-color:                         #4f5b6b;
     --#{$prefix}topbar-search-bg:                          #eef2f7;
 }
