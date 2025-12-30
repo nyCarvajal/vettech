@@ -9,6 +9,8 @@
      transition: all 0.3s ease-in-out;
      height: $topbar-height;
      background-color: $topbar-bg;
+     backdrop-filter: blur(8px);
+     -webkit-backdrop-filter: blur(8px);
      padding-left: $sidebar-width;
      border-bottom: $card-border-width solid $card-border-color;
 
