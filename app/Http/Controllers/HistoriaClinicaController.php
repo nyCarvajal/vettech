@@ -66,10 +66,13 @@ class HistoriaClinicaController extends Controller
             ->latest()
             ->get();
 
+        $attachments = $historiaClinica->adjuntos;
+
         return view('historias_clinicas.show', [
             'historia' => $historiaClinica,
             'prescriptions' => $prescriptions,
             'referrals' => $referrals,
+            'attachments' => $attachments,
         ]);
     }
 
@@ -115,7 +118,14 @@ class HistoriaClinicaController extends Controller
 
     public function pdf(HistoriaClinica $historiaClinica)
     {
-        $historiaClinica->load(['paraclinicos', 'diagnosticos', 'paciente.owner']);
+        $historiaClinica->load([
+            'paraclinicos',
+            'diagnosticos',
+            'paciente.owner',
+            'adjuntos' => function ($query) {
+                $query->whereIn('file_type', ['image', 'pdf']);
+            },
+        ]);
 
         $pdf = Pdf::loadView('historias_clinicas.pdf', compact('historiaClinica'))
             ->setPaper('letter');
