@@ -98,6 +98,18 @@ Route::middleware([
 
 Route::resource('owners', OwnersController::class);
 Route::resource('patients', PatientsController::class);
+Route::get('patients/{patient}/carnet', [\App\Http\Controllers\PatientVaccineCardController::class, 'show'])->name('patients.carnet');
+Route::get('pacientes/{patient}/carnet/pdf', [\App\Http\Controllers\PatientVaccineCardController::class, 'pdf'])->name('patients.carnet.pdf');
+Route::get('patients/{patient}/immunizations/create', [\App\Http\Controllers\PatientImmunizationController::class, 'create'])->name('patients.immunizations.create');
+Route::post('patients/{patient}/immunizations', [\App\Http\Controllers\PatientImmunizationController::class, 'store'])->name('patients.immunizations.store');
+Route::get('patients/{patient}/immunizations/{immunization}/edit', [\App\Http\Controllers\PatientImmunizationController::class, 'edit'])->name('patients.immunizations.edit');
+Route::put('patients/{patient}/immunizations/{immunization}', [\App\Http\Controllers\PatientImmunizationController::class, 'update'])->name('patients.immunizations.update');
+Route::delete('patients/{patient}/immunizations/{immunization}', [\App\Http\Controllers\PatientImmunizationController::class, 'destroy'])->name('patients.immunizations.destroy');
+Route::get('patients/{patient}/dewormings/{type}/create', [\App\Http\Controllers\PatientDewormingController::class, 'create'])->name('patients.dewormings.create');
+Route::post('patients/{patient}/dewormings', [\App\Http\Controllers\PatientDewormingController::class, 'store'])->name('patients.dewormings.store');
+Route::get('patients/{patient}/dewormings/{deworming}/edit', [\App\Http\Controllers\PatientDewormingController::class, 'edit'])->name('patients.dewormings.edit');
+Route::put('patients/{patient}/dewormings/{deworming}', [\App\Http\Controllers\PatientDewormingController::class, 'update'])->name('patients.dewormings.update');
+Route::delete('patients/{patient}/dewormings/{deworming}', [\App\Http\Controllers\PatientDewormingController::class, 'destroy'])->name('patients.dewormings.destroy');
 Route::get('/breeds', BreedsController::class)->name('breeds.index');
 
 Route::prefix('peluqueria')
