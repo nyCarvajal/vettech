@@ -13,7 +13,8 @@ return [
     */
     'show_warnings' => false,   // Throw an Exception on warnings from dompdf
 
-    'public_path' => null,  // Override the public path if needed
+    // Ensure DomPDF can resolve assets compiled into the public/ directory.
+    'public_path' => base_path('public'),
 
     /*
      * Dejavu Sans font is missing glyphs for converted entities, turn it off if you need to show € and £.
@@ -152,7 +153,8 @@ return [
          * the desired content might be different (e.g. screen or projection view of html file).
          * Therefore allow specification of content here.
          */
-        'default_media_type' => 'screen',
+        // Use the print media type so stylesheet rules for printing are honoured.
+        'default_media_type' => 'print',
 
         /**
          * The default paper size.
@@ -179,7 +181,7 @@ return [
          *
          * @var string
          */
-        'default_font' => 'serif',
+        'default_font' => 'sans-serif',
 
         /**
          * Image DPI setting
@@ -267,7 +269,8 @@ return [
          *
          * @var bool
          */
-        'enable_remote' => false,
+        // Allow remote assets (e.g. CDN-hosted CSS) so PDFs keep their styles.
+        'enable_remote' => true,
 
         /**
          * List of allowed remote hosts
