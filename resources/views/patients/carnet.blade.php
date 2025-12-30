@@ -4,6 +4,7 @@
 <style>
     .gradient-bg { background: linear-gradient(135deg, #ede9fe, #e0f7f4); }
     .glass-card { background: rgba(255,255,255,0.82); backdrop-filter: blur(10px); border:1px solid rgba(124,111,242,0.15); }
+    .btn-glow { box-shadow: 0 10px 25px rgba(124,58,237,0.15); }
 </style>
 @endpush
 
@@ -37,13 +38,13 @@
             <h3 class="text-lg font-semibold text-slate-900">Registrar atención preventiva</h3>
         </div>
         <div class="flex flex-wrap gap-3">
-            <a href="{{ route('patients.immunizations.create', $patient) }}" class="px-4 py-2 rounded-full text-sm font-semibold text-white bg-purple-500 hover:bg-purple-600 shadow">
+            <a href="{{ route('patients.immunizations.create', $patient) }}" class="px-4 py-2 rounded-full text-sm font-semibold text-white bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 btn-glow">
                 Registrar vacuna
             </a>
-            <a href="{{ route('patients.dewormings.create', [$patient, 'internal']) }}" class="px-4 py-2 rounded-full text-sm font-semibold text-white bg-emerald-500 hover:bg-emerald-600 shadow">
+            <a href="{{ route('patients.dewormings.create', [$patient, 'internal']) }}" class="px-4 py-2 rounded-full text-sm font-semibold text-white bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 btn-glow">
                 Registrar interna
             </a>
-            <a href="{{ route('patients.dewormings.create', [$patient, 'external']) }}" class="px-4 py-2 rounded-full text-sm font-semibold text-white bg-emerald-500 hover:bg-emerald-600 shadow">
+            <a href="{{ route('patients.dewormings.create', [$patient, 'external']) }}" class="px-4 py-2 rounded-full text-sm font-semibold text-white bg-gradient-to-r from-teal-500 to-emerald-600 hover:from-teal-600 hover:to-emerald-700 btn-glow">
                 Registrar externa
             </a>
         </div>
@@ -76,7 +77,7 @@
                     <p class="text-xs uppercase tracking-wide text-slate-500">Vacunas</p>
                     <h3 class="text-lg font-semibold text-slate-900">Historial de inmunizaciones</h3>
                 </div>
-                <a href="{{ route('patients.immunizations.create', $patient) }}" class="px-4 py-2 rounded-full text-sm font-semibold text-white bg-purple-500 hover:bg-purple-600">Registrar vacuna</a>
+                <a href="{{ route('patients.immunizations.create', $patient) }}" class="px-4 py-2 rounded-full text-sm font-semibold text-white bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 btn-glow">Registrar vacuna</a>
             </div>
             <div class="space-y-3">
                 @forelse($immunizations as $vaccine)
@@ -124,7 +125,7 @@
                         <p class="text-xs uppercase tracking-wide text-slate-500">Desparasitación interna</p>
                         <h3 class="text-lg font-semibold text-slate-900">Control digestivo</h3>
                     </div>
-                    <a href="{{ route('patients.dewormings.create', [$patient, 'internal']) }}" class="px-4 py-2 rounded-full text-sm font-semibold text-white bg-emerald-500 hover:bg-emerald-600">Registrar interna</a>
+                    <a href="{{ route('patients.dewormings.create', [$patient, 'internal']) }}" class="px-4 py-2 rounded-full text-sm font-semibold text-white bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 btn-glow">Registrar interna</a>
                 </div>
                 <div class="space-y-3">
                     @forelse($internalDewormings as $item)
@@ -165,7 +166,7 @@
                         <p class="text-xs uppercase tracking-wide text-slate-500">Desparasitación externa</p>
                         <h3 class="text-lg font-semibold text-slate-900">Piel y protección</h3>
                     </div>
-                    <a href="{{ route('patients.dewormings.create', [$patient, 'external']) }}" class="px-4 py-2 rounded-full text-sm font-semibold text-white bg-emerald-500 hover:bg-emerald-600">Registrar externa</a>
+                    <a href="{{ route('patients.dewormings.create', [$patient, 'external']) }}" class="px-4 py-2 rounded-full text-sm font-semibold text-white bg-gradient-to-r from-teal-500 to-emerald-600 hover:from-teal-600 hover:to-emerald-700 btn-glow">Registrar externa</a>
                 </div>
                 <div class="space-y-3">
                     @forelse($externalDewormings as $item)
