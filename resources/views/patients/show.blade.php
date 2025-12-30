@@ -295,6 +295,7 @@
             >
                 Enviar a peluquería
             </a>
+            <a href="{{ route('patients.carnet', $patient) }}" class="pill-action">Carnet</a>
             <a href="{{ route('patients.edit', $patient) }}" class="pill-action">Editar ficha</a>
             <a href="{{ route('patients.index') }}" class="pill-action">Volver al listado</a>
         </div>
