@@ -14,10 +14,10 @@
                 <p class="text-white/90">Tutor: {{ $tutor->name ?? 'Sin tutor' }}</p>
             </div>
             <div class="flex flex-wrap items-center gap-2 text-sm">
-                <a href="{{ route('historias-clinicas.edit', $historia) }}" class="inline-flex items-center gap-2 rounded-full bg-white/20 px-4 py-2 font-semibold text-white shadow-sm transition hover:bg-white/30 hover:text-white">Editar</a>
-                <a href="{{ route('historias-clinicas.recetarios.create', $historia) }}" class="inline-flex items-center gap-2 rounded-full bg-blue-100/80 px-4 py-2 font-semibold text-blue-900 shadow-sm transition hover:bg-blue-200">Agregar recetario</a>
-                <a href="{{ route('historias-clinicas.remisiones.create', $historia) }}" class="inline-flex items-center gap-2 rounded-full bg-amber-100 px-4 py-2 font-semibold text-amber-900 shadow-sm transition hover:bg-amber-200">Nueva remisión</a>
-                <a href="{{ route('historias-clinicas.pdf', $historia) }}" class="inline-flex items-center gap-2 rounded-full bg-emerald-100 px-4 py-2 font-semibold text-emerald-900 shadow-sm transition hover:bg-emerald-200">Imprimir PDF</a>
+                <a href="{{ route('historias-clinicas.edit', $historia) }}" class="inline-flex items-center gap-2 rounded-full bg-emerald-600 px-4 py-2 font-semibold text-white shadow-sm transition hover:bg-emerald-500">Editar</a>
+                <a href="{{ route('historias-clinicas.recetarios.create', $historia) }}" class="inline-flex items-center gap-2 rounded-full bg-blue-600 px-4 py-2 font-semibold text-white shadow-sm transition hover:bg-blue-500">Agregar recetario</a>
+                <a href="{{ route('historias-clinicas.remisiones.create', $historia) }}" class="inline-flex items-center gap-2 rounded-full bg-amber-500 px-4 py-2 font-semibold text-white shadow-sm transition hover:bg-amber-400">Nueva remisión</a>
+                <a href="{{ route('historias-clinicas.pdf', $historia) }}" class="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 font-semibold text-emerald-700 shadow-sm transition hover:bg-emerald-50">Imprimir PDF</a>
             </div>
         </div>
     </div>
@@ -48,20 +48,22 @@
     </div>
 
     <div class="grid gap-6 lg:grid-cols-3">
-        <div class="space-y-4 lg:col-span-2">
+        <div class="lg:col-span-3">
             <div class="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
-                <div class="flex items-center justify-between pb-4">
+                <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between pb-4">
                     <h3 class="text-lg font-semibold text-gray-900">Motivo y antecedentes</h3>
-                    <span class="rounded-full bg-mint-50 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-mint-700">Consulta</span>
+                    <span class="w-full rounded-full bg-mint-50 px-3 py-1 text-center text-xs font-semibold uppercase tracking-wide text-mint-700 md:w-auto">Consulta</span>
                 </div>
-                <div class="space-y-3 text-sm text-gray-700">
-                    <p><strong class="text-gray-900">Motivo de consulta:</strong> {{ $historia->motivo_consulta ?: 'Sin registrar' }}</p>
-                    <p><strong class="text-gray-900">Antecedentes / Enfermedad actual:</strong> {{ $historia->enfermedad_actual ?: 'Sin registrar' }}</p>
-                    <p><strong class="text-gray-900">Antecedentes farmacológicos:</strong> {{ $historia->antecedentes_farmacologicos ?: 'N/D' }}</p>
-                    <p><strong class="text-gray-900">Antecedentes patológicos:</strong> {{ $historia->antecedentes_patologicos ?: 'N/D' }}</p>
+                <div class="grid gap-4 text-sm text-gray-700 md:grid-cols-2">
+                    <p class="text-base"><strong class="text-gray-900">Motivo de consulta:</strong> {{ $historia->motivo_consulta ?: 'Sin registrar' }}</p>
+                    <p class="text-base md:col-span-2"><strong class="text-gray-900">Antecedentes / Enfermedad actual:</strong> {{ $historia->enfermedad_actual ?: 'Sin registrar' }}</p>
+                    <p class="text-base"><strong class="text-gray-900">Antecedentes farmacológicos:</strong> {{ $historia->antecedentes_farmacologicos ?: 'N/D' }}</p>
+                    <p class="text-base"><strong class="text-gray-900">Antecedentes patológicos:</strong> {{ $historia->antecedentes_patologicos ?: 'N/D' }}</p>
                 </div>
             </div>
+        </div>
 
+        <div class="space-y-4 lg:col-span-2">
             <div class="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
                 <div class="flex items-center justify-between pb-4">
                     <h3 class="text-lg font-semibold text-gray-900">Paraclínicos solicitados</h3>
