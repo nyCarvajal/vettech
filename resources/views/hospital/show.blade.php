@@ -64,7 +64,7 @@
                                     <h4 class="font-semibold text-emerald-700">Tratamiento / Órdenes</h4>
                                     @php($firstOrder = $day->orders->first())
                                     @if($firstOrder)
-                                        <form method="POST" action="{{ route('hospital.orders.stop', $firstOrder) }}" class="hidden"></form>
+                                        <form method="POST" action="{{ route('hospital.orders.stop', ['order' => $firstOrder->id]) }}" class="hidden"></form>
                                     @endif
                                 </div>
                                 <div class="space-y-2">
@@ -75,12 +75,12 @@
                                                     <p class="font-semibold text-emerald-700">{{ $order->source === 'inventory' ? ($order->product->name ?? 'Producto') : $order->manual_name }}</p>
                                                     <p class="text-sm text-gray-600">{{ $order->dose }} • {{ $order->route }} • {{ $order->frequency }}</p>
                                                 </div>
-                                                <form method="POST" action="{{ route('hospital.orders.stop', $order) }}">
+                                                <form method="POST" action="{{ route('hospital.orders.stop', ['order' => $order->id]) }}">
                                                     @csrf
                                                     <x-button type="submit" size="sm" color="danger">Detener</x-button>
                                                 </form>
                                             </div>
-                                            <form method="POST" action="{{ route('hospital.orders.administrations', $order) }}" class="mt-2 flex items-center gap-2">
+                                            <form method="POST" action="{{ route('hospital.orders.administrations', ['order' => $order->id]) }}" class="mt-2 flex items-center gap-2">
                                                 @csrf
                                                 <x-input name="administered_at" type="datetime-local" class="w-48" />
                                                 <x-input name="dose_given" placeholder="Dosis" class="w-32" />
