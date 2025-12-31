@@ -8,9 +8,6 @@
 
         @if($patient)
             <input type="hidden" name="patient_id" value="{{ $patient->id }}">
-            @if($patient->owner)
-                <input type="hidden" name="owner_id" value="{{ $patient->owner->id }}">
-            @endif
             <div class="bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
                 <div class="flex items-center justify-between mb-3">
                     <div>

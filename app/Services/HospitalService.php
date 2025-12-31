@@ -6,10 +6,10 @@ use App\Models\HospitalConsumption;
 use App\Models\HospitalStay;
 use App\Models\HospitalTask;
 use App\Models\HospitalTaskLog;
-use App\Models\Patient;
 use App\Models\Product;
 use App\Models\ShiftInstance;
 use App\Models\User;
+use Illuminate\Support\Facades\DB;
 use InvalidArgumentException;
 
 class HospitalService
@@ -21,8 +21,6 @@ class HospitalService
     public function admit(array $data, User $user): HospitalStay
     {
         $data['created_by'] = $user->id;
-        $data['owner_id'] = $data['owner_id'] ?? Patient::find($data['patient_id'])?->owner_id;
-
         return HospitalStay::create($data);
     }
 

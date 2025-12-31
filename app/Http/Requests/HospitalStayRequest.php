@@ -15,7 +15,6 @@ class HospitalStayRequest extends FormRequest
     {
         return [
             'patient_id' => 'required|integer',
-            'owner_id' => 'nullable|exists:owners,id',
             'cage_id' => 'required|exists:cages,id',
             'admitted_at' => 'required|date',
             'severity' => 'required|in:stable,observation,critical',
