@@ -42,6 +42,9 @@ class User extends Authenticatable
         'clinica_id',
         'role',
         'color',
+        'firma_medica_texto',
+        'firma_medica_url',
+        'firma_medica_public_id',
     ];
 
     /**

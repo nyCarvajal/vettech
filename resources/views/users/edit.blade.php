@@ -8,7 +8,7 @@
       <div class="alert alert-success">{{ session('success') }}</div>
     @endif
 <div class="card card-body" style="background: linear-gradient(135deg, #ede7ff 0%, #d0f5e6 100%); border: none;">
-    <form method="POST" action="{{ route('users.update', $user) }}">
+    <form method="POST" action="{{ route('users.update', $user) }}" enctype="multipart/form-data">
       @csrf
       @method('PUT')
 
