@@ -62,7 +62,10 @@
                             <x-card class="bg-white border border-emerald-100">
                                 <div class="flex items-center justify-between mb-2">
                                     <h4 class="font-semibold text-emerald-700">Tratamiento / Órdenes</h4>
-                                    <form method="POST" action="{{ route('hospital.orders.stop', $day->orders->first()) }}" class="hidden"></form>
+                                    @php($firstOrder = $day->orders->first())
+                                    @if($firstOrder)
+                                        <form method="POST" action="{{ route('hospital.orders.stop', $firstOrder) }}" class="hidden"></form>
+                                    @endif
                                 </div>
                                 <div class="space-y-2">
                                     @foreach($day->orders as $order)
