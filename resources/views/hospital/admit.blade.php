@@ -15,7 +15,11 @@
                 <x-input label="Jaula" name="cage_id" />
             </div>
             <div class="grid md:grid-cols-2 gap-4">
-                <x-select label="Severidad" name="severity" :options="['stable'=>'Estable','observation'=>'Observación','critical'=>'Crítica']" />
+                <x-select label="Severidad" name="severity">
+                    <option value="stable">Estable</option>
+                    <option value="observation">Observación</option>
+                    <option value="critical">Crítica</option>
+                </x-select>
                 <x-input label="Creado por (user id)" name="created_by" />
             </div>
             <x-textarea label="Diagnóstico principal" name="primary_dx" />
