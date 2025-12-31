@@ -18,8 +18,8 @@ class HospitalStayRequest extends FormRequest
             'cage_id' => 'required|exists:cages,id',
             'admitted_at' => 'required|date',
             'severity' => 'required|in:stable,observation,critical',
-            'diagnosis' => 'required|string',
-            'plan' => 'required|string',
+            'primary_dx' => 'nullable|string',
+            'plan' => 'nullable|string',
             'diet' => 'nullable|string',
         ];
     }
