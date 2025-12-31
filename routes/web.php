@@ -29,6 +29,7 @@ use App\Http\Controllers\GroomingBillingController;
 use App\Http\Controllers\GroomingController;
 use App\Http\Controllers\GroomingReportController;
 use App\Http\Controllers\GroomingStatusController;
+use App\Http\Controllers\HospitalController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\ClinicalAttachmentController;
 use App\Http\Controllers\Auth\LoginController;
@@ -282,6 +283,21 @@ Route::middleware(['auth'])
         Route::resource('prescriptions', \App\Http\Controllers\PrescriptionsController::class)->only(['index', 'create', 'store']);
         Route::get('dispensations', [\App\Http\Controllers\DispensationsController::class, 'index'])->name('dispensations.index');
         Route::post('dispensations/{prescription}', [\App\Http\Controllers\DispensationsController::class, 'store'])->name('dispensations.store');
+
+        Route::prefix('hospital')->name('hospital.')->group(function () {
+            Route::get('/', [HospitalController::class, 'index'])->name('index');
+            Route::get('/admit', [HospitalController::class, 'create'])->name('admit');
+            Route::post('/admit', [HospitalController::class, 'store'])->name('store');
+            Route::get('/{stay}', [HospitalController::class, 'show'])->name('show');
+            Route::post('/{stay}/discharge', [HospitalController::class, 'discharge'])->name('discharge');
+            Route::post('/{stay}/invoice', [HospitalController::class, 'generateInvoice'])->name('invoice');
+            Route::post('/{stay}/orders', [HospitalController::class, 'addOrder'])->name('orders.store');
+            Route::post('/orders/{order}/stop', [HospitalController::class, 'stopOrder'])->name('orders.stop');
+            Route::post('/orders/{order}/administrations', [HospitalController::class, 'addAdministration'])->name('orders.administrations');
+            Route::post('/{stay}/vitals', [HospitalController::class, 'addVitals'])->name('vitals.store');
+            Route::post('/{stay}/progress', [HospitalController::class, 'addProgress'])->name('progress.store');
+            Route::post('/{stay}/charges', [HospitalController::class, 'addCharge'])->name('charges.store');
+        });
 
         Route::get('hospital/board', \App\Http\Controllers\HospitalBoardController::class)->name('hospital.board');
         Route::prefix('hospital/stays')->name('hospital.stays.')->group(function () {
