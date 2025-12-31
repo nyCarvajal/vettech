@@ -75,6 +75,11 @@ class HospitalStay extends BaseModel
         return $this->hasMany(HospitalCharge::class, 'stay_id');
     }
 
+    public function tasks(): HasMany
+    {
+        return $this->hasMany(HospitalTask::class, 'stay_id');
+    }
+
     public function getCurrentDayAttribute(): ?HospitalDay
     {
         return $this->days()->orderByDesc('day_number')->first();
