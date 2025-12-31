@@ -43,8 +43,8 @@
         </div>
     </x-card>
 
-    <div class="grid lg:grid-cols-4 gap-4">
-        <div class="lg:col-span-3 space-y-3">
+    <div class="grid lg:grid-cols-8 gap-4">
+        <div class="lg:col-span-6 space-y-3">
             <div class="bg-emerald-50 border border-emerald-100 rounded-lg">
                 <div class="flex flex-wrap gap-2 border-b border-emerald-100 px-4 py-2">
                     @foreach($stay->days as $day)
@@ -204,7 +204,7 @@
             </div>
         </div>
 
-        <div class="space-y-3">
+        <div class="space-y-3 lg:col-span-2 text-sm">
             <x-card class="bg-white border border-emerald-100">
                 <div class="flex items-center justify-between mb-2">
                     <h4 class="font-semibold text-emerald-700">Cargos / Facturación</h4>
