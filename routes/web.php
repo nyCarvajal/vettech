@@ -288,6 +288,7 @@ Route::middleware(['auth'])
             Route::get('/', [HospitalController::class, 'index'])->name('index');
             Route::get('/admit', [HospitalController::class, 'create'])->name('admit');
             Route::post('/admit', [HospitalController::class, 'store'])->name('store');
+            Route::get('/board', \App\Http\Controllers\HospitalBoardController::class)->name('board');
             Route::get('/{stay}', [HospitalController::class, 'show'])->name('show');
             Route::post('/{stay}/discharge', [HospitalController::class, 'discharge'])->name('discharge');
             Route::post('/{stay}/invoice', [HospitalController::class, 'generateInvoice'])->name('invoice');
@@ -299,7 +300,6 @@ Route::middleware(['auth'])
             Route::post('/{stay}/charges', [HospitalController::class, 'addCharge'])->name('charges.store');
         });
 
-        Route::get('hospital/board', \App\Http\Controllers\HospitalBoardController::class)->name('hospital.board');
         Route::prefix('hospital/stays')->name('hospital.stays.')->group(function () {
             Route::get('/', [\App\Http\Controllers\HospitalStaysController::class, 'index'])->name('index');
             Route::get('/create', [\App\Http\Controllers\HospitalStaysController::class, 'create'])->name('create');
