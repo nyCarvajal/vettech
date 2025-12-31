@@ -11,7 +11,7 @@ class HospitalBoardController extends Controller
     {
         $cages = Cage::with(['stays' => function ($query) {
             $query->where('status', 'active')->latest();
-        }, 'stays.tasks.logs'])->get();
+        }, 'stays.tasks.logs', 'stays.patient', 'stays.owner'])->get();
 
         return view('hospital.board', compact('cages'));
     }
