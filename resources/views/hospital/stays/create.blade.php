@@ -89,8 +89,8 @@
         </div>
 
         <div class="space-y-2">
-            <label class="block text-sm font-medium text-gray-700" for="diagnosis">Diagnóstico</label>
-            <textarea name="diagnosis" id="diagnosis" class="border p-2 w-full rounded-lg" placeholder="Diagnóstico">{{ old('diagnosis') }}</textarea>
+            <label class="block text-sm font-medium text-gray-700" for="primary_dx">Diagnóstico</label>
+            <textarea name="primary_dx" id="primary_dx" class="border p-2 w-full rounded-lg" placeholder="Diagnóstico">{{ old('primary_dx') }}</textarea>
         </div>
 
         <button class="btn btn-primary">Guardar</button>
