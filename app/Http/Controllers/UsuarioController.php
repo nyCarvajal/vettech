@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\TipoIdentificacion;
 use App\Models\User;
 use App\Support\RoleLabelResolver;
+use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -48,7 +49,11 @@ class UsuarioController extends Controller
     {
         $data = $this->validateUser($request);
 
-        $this->createUser($data);
+        $data['email'] = strtolower($data['email']);
+
+        $signatureData = $this->processSignatureUpload($request);
+
+        $this->createUser($data, $signatureData);
 
         return redirect()
             ->route('users.index')
@@ -59,7 +64,11 @@ class UsuarioController extends Controller
     {
         $data = $this->validateUser($request);
 
-        $this->createUser($data);
+        $data['email'] = strtolower($data['email']);
+
+        $signatureData = $this->processSignatureUpload($request);
+
+        $this->createUser($data, $signatureData);
 
         return redirect()
             ->route('users.index')
@@ -107,6 +116,10 @@ class UsuarioController extends Controller
     {
         $data = $this->validateUser($request, $user);
 
+        $data['email'] = strtolower($data['email']);
+
+        $signatureData = $this->processSignatureUpload($request, $user);
+
         $updateData = [
             'nombre' => $data['nombre'],
             'apellidos' => $data['apellidos'],
@@ -117,6 +130,9 @@ class UsuarioController extends Controller
             'whatsapp' => $data['whatsapp'],
             'color' => $data['color'] ?? null,
             'role' => $data['role'],
+            'firma_medica_texto' => $signatureData['firma_medica_texto'],
+            'firma_medica_url' => $signatureData['firma_medica_url'],
+            'firma_medica_public_id' => $signatureData['firma_medica_public_id'],
         ];
 
         if (! empty($data['password'])) {
@@ -160,10 +176,10 @@ class UsuarioController extends Controller
 
     protected function validateUser(Request $request, ?User $user = null): array
     {
-        $emailRule = 'required|email|unique:users,email';
+        $emailRule = Rule::unique('users', 'email');
 
         if ($user) {
-            $emailRule .= ',' . $user->id;
+            $emailRule = $emailRule->ignore($user->id);
         }
 
         $passwordRule = $user ? 'nullable|string|confirmed|min:8' : 'required|string|confirmed|min:8';
@@ -171,7 +187,7 @@ class UsuarioController extends Controller
         return $request->validate([
             'nombre' => 'required|string|max:255',
             'apellidos' => 'required|string|max:255',
-            'email' => $emailRule,
+            'email' => ['required', 'email', 'max:255', $emailRule],
             'tipo_identificacion' => 'required|string|max:50',
             'numero_identificacion' => 'required|string|max:50',
             'direccion' => 'required|string|max:255',
@@ -179,12 +195,22 @@ class UsuarioController extends Controller
             'password' => $passwordRule,
             'color' => 'nullable|string|max:7',
             'role' => ['required', 'string', Rule::in(array_keys($this->roleOptions()))],
+            'firma_medica_texto' => 'nullable|string|max:500',
+            'firma_medica_imagen' => 'nullable|image|max:4096',
         ]);
     }
 
-    protected function createUser(array $data): void
+    protected function createUser(array $data, array $signatureData = []): void
     {
         $nombres = trim($data['nombre'] . ' ' . $data['apellidos']);
+
+        $signatureDefaults = [
+            'firma_medica_texto' => null,
+            'firma_medica_url' => null,
+            'firma_medica_public_id' => null,
+        ];
+
+        $signatureData = array_merge($signatureDefaults, $signatureData);
 
         DB::connection('mysql')
             ->table('users')
@@ -195,9 +221,43 @@ class UsuarioController extends Controller
                 'password' => Hash::make($data['password']),
                 'email_verified_at' => now(),
                 'role' => $data['role'],
+                'firma_medica_texto' => $signatureData['firma_medica_texto'],
+                'firma_medica_url' => $signatureData['firma_medica_url'],
+                'firma_medica_public_id' => $signatureData['firma_medica_public_id'],
                 'remember_token' => Str::random(60),
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
+    }
+
+    protected function processSignatureUpload(Request $request, ?User $user = null): array
+    {
+        $file = $request->file('firma_medica_imagen');
+
+        $existingData = [
+            'firma_medica_texto' => $request->string('firma_medica_texto')->trim()->value() ?? null,
+            'firma_medica_url' => $user?->firma_medica_url,
+            'firma_medica_public_id' => $user?->firma_medica_public_id,
+        ];
+
+        if (! $file) {
+            return $existingData;
+        }
+
+        $upload = Cloudinary::uploadFile($file->getRealPath(), [
+            'folder' => sprintf('clinicas/%s/firmas', Auth::user()->clinica_id ?? 'general'),
+            'resource_type' => 'image',
+            'transformation' => [['quality' => 'auto', 'fetch_format' => 'auto', 'width' => 1600, 'crop' => 'limit']],
+        ])->getResult();
+
+        if ($user && $user->firma_medica_public_id) {
+            Cloudinary::destroy($user->firma_medica_public_id, ['resource_type' => 'image']);
+        }
+
+        return [
+            'firma_medica_texto' => $existingData['firma_medica_texto'],
+            'firma_medica_url' => $upload['secure_url'] ?? ($upload['url'] ?? null),
+            'firma_medica_public_id' => $upload['public_id'] ?? $existingData['firma_medica_public_id'],
+        ];
     }
 }

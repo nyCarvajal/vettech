@@ -117,6 +117,36 @@
          value="{{ old('color', $user->color ?? '#c7b7ff') }}">
 </div>
 
+{{-- Firma médica (texto) --}}
+<div class="mb-3">
+  <label for="firma_medica_texto" class="form-label">Firma médica (texto)</label>
+  <input id="firma_medica_texto"
+         name="firma_medica_texto"
+         type="text"
+         class="form-control @error('firma_medica_texto') is-invalid @enderror"
+         value="{{ old('firma_medica_texto', $user->firma_medica_texto ?? '') }}"
+         placeholder="Nombre del médico o texto de la firma">
+  @error('firma_medica_texto') <div class="invalid-feedback">{{ $message }}</div> @enderror
+</div>
+
+{{-- Imagen de la firma --}}
+<div class="mb-3">
+  <label for="firma_medica_imagen" class="form-label">Imagen de la firma</label>
+  @if(isset($user) && $user->firma_medica_url)
+    <div class="mb-2">
+      <span class="d-block small text-muted">Firma actual</span>
+      <img src="{{ $user->firma_medica_url }}" alt="Firma médica" class="img-thumbnail" style="max-height: 120px;">
+    </div>
+  @endif
+  <input id="firma_medica_imagen"
+         name="firma_medica_imagen"
+         type="file"
+         class="form-control @error('firma_medica_imagen') is-invalid @enderror"
+         accept="image/*">
+  <div class="form-text">Se cargará de forma segura en Cloudinary.</div>
+  @error('firma_medica_imagen') <div class="invalid-feedback">{{ $message }}</div> @enderror
+</div>
+
 {{-- Password --}}
 <div class="mb-3">
   <label for="password" class="form-label">Contraseña</label>
