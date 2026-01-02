@@ -150,7 +150,7 @@
                                 <h4 class="font-semibold text-emerald-700 mb-2">Signos vitales</h4>
                                 <form method="POST" action="{{ route('hospital.vitals.store', $stay) }}" class="grid grid-cols-2 gap-2 mb-3">
                                     @csrf
-                                    <x-input name="measured_at" type="datetime-local" label="Fecha" />
+                                    <x-input name="measured_at" type="datetime-local" label="Fecha" value="{{ now()->format('Y-m-d\\TH:i') }}" />
                                     <x-input name="temp" label="Temp" />
                                     <x-input name="hr" label="FC" />
                                     <x-input name="rr" label="FR" />
