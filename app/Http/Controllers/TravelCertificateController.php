@@ -1,0 +1,206 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Http\Requests\CancelTravelCertificateRequest;
+use App\Http\Requests\IssueTravelCertificateRequest;
+use App\Http\Requests\StoreTravelCertificateRequest;
+use App\Http\Requests\UpdateTravelCertificateRequest;
+use App\Models\Country;
+use App\Models\GeoDepartment;
+use App\Models\GeoMunicipality;
+use App\Models\TravelCertificate;
+use App\Models\TravelCertificateAttachment;
+use App\Models\TravelCertificateDeworming;
+use App\Models\TravelCertificateVaccination;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Carbon\Carbon;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\View\View;
+
+class TravelCertificateController extends Controller
+{
+    public function index(Request $request): View
+    {
+        Gate::authorize('viewAny', TravelCertificate::class);
+
+        $query = TravelCertificate::query();
+
+        if ($request->filled('type')) {
+            $query->where('type', $request->string('type'));
+        }
+        if ($request->filled('status')) {
+            $query->where('status', $request->string('status'));
+        }
+        if ($request->filled('travel_departure_from')) {
+            $query->whereDate('travel_departure_date', '>=', $request->date('travel_departure_from'));
+        }
+        if ($request->filled('travel_departure_to')) {
+            $query->whereDate('travel_departure_date', '<=', $request->date('travel_departure_to'));
+        }
+        if ($request->filled('owner_name')) {
+            $query->where('owner_name', 'like', '%' . $request->owner_name . '%');
+        }
+        if ($request->filled('pet_name')) {
+            $query->where('pet_name', 'like', '%' . $request->pet_name . '%');
+        }
+
+        /** @var LengthAwarePaginator $certificates */
+        $certificates = $query->latest()->paginate(15)->withQueryString();
+
+        return view('travel_certificates.index', compact('certificates'));
+    }
+
+    public function create(): View
+    {
+        Gate::authorize('create', TravelCertificate::class);
+
+        $departments = GeoDepartment::orderBy('name')->get();
+        $countries = Country::orderBy('name_es')->get();
+        $default = config('travel_certificates.default_clinic');
+        $declaration = config('travel_certificates.default_declaration');
+
+        return view('travel_certificates.create', compact('departments', 'countries', 'default', 'declaration'));
+    }
+
+    public function store(StoreTravelCertificateRequest $request): RedirectResponse
+    {
+        $data = $request->validated();
+        $data['code'] = TravelCertificate::generateCode($request->user()->tenant_id ?? null);
+        $data['origin_type'] = $data['type'] === 'national_co' ? 'co' : 'international';
+        $data['status'] = 'draft';
+
+        $certificate = TravelCertificate::create($data);
+
+        $this->syncRelations($certificate, $data, $request);
+
+        return redirect()->route('travel-certificates.show', $certificate)->with('status', 'Certificado creado');
+    }
+
+    public function show(TravelCertificate $travel_certificate): View
+    {
+        Gate::authorize('view', $travel_certificate);
+
+        return view('travel_certificates.show', ['certificate' => $travel_certificate->load(['vaccinations', 'dewormings', 'attachments'])]);
+    }
+
+    public function edit(TravelCertificate $travel_certificate): View
+    {
+        Gate::authorize('update', $travel_certificate);
+
+        $departments = GeoDepartment::orderBy('name')->get();
+        $countries = Country::orderBy('name_es')->get();
+        $declaration = $travel_certificate->declaration_text;
+
+        return view('travel_certificates.edit', [
+            'certificate' => $travel_certificate->load(['vaccinations', 'dewormings', 'attachments']),
+            'departments' => $departments,
+            'countries' => $countries,
+            'declaration' => $declaration,
+        ]);
+    }
+
+    public function update(UpdateTravelCertificateRequest $request, TravelCertificate $travel_certificate): RedirectResponse
+    {
+        $data = $request->validated();
+        $data['origin_type'] = $data['type'] === 'national_co' ? 'co' : 'international';
+
+        $travel_certificate->update($data);
+        $this->syncRelations($travel_certificate, $data, $request);
+
+        return redirect()->route('travel-certificates.show', $travel_certificate)->with('status', 'Certificado actualizado');
+    }
+
+    public function destroy(TravelCertificate $travel_certificate): RedirectResponse
+    {
+        Gate::authorize('delete', $travel_certificate);
+        $travel_certificate->delete();
+
+        return redirect()->route('travel-certificates.index')->with('status', 'Certificado eliminado');
+    }
+
+    public function issue(IssueTravelCertificateRequest $request, TravelCertificate $travel_certificate): RedirectResponse
+    {
+        $issuedAt = $request->date('issued_at') ?? now();
+        $expiresAt = $request->date('expires_at') ?? Carbon::parse($issuedAt)->addDays(config('travel_certificates.default_validity_days', 5));
+
+        $travel_certificate->update([
+            'status' => 'issued',
+            'issued_at' => $issuedAt,
+            'expires_at' => $expiresAt,
+        ]);
+
+        return redirect()->route('travel-certificates.show', $travel_certificate)->with('status', 'Certificado emitido');
+    }
+
+    public function cancel(CancelTravelCertificateRequest $request, TravelCertificate $travel_certificate): RedirectResponse
+    {
+        $travel_certificate->update([
+            'status' => 'canceled',
+            'canceled_reason' => $request->string('canceled_reason'),
+        ]);
+
+        return redirect()->route('travel-certificates.show', $travel_certificate)->with('status', 'Certificado anulado');
+    }
+
+    public function duplicate(TravelCertificate $travel_certificate): RedirectResponse
+    {
+        Gate::authorize('duplicate', $travel_certificate);
+
+        $clone = $travel_certificate->replicate(['code', 'status', 'issued_at', 'expires_at']);
+        $clone->status = 'draft';
+        $clone->code = TravelCertificate::generateCode($travel_certificate->tenant_id);
+        $clone->save();
+
+        foreach ($travel_certificate->vaccinations as $vaccination) {
+            $clone->vaccinations()->create(Arr::except($vaccination->toArray(), ['id', 'travel_certificate_id', 'created_at', 'updated_at']));
+        }
+
+        foreach ($travel_certificate->dewormings as $deworming) {
+            $clone->dewormings()->create(Arr::except($deworming->toArray(), ['id', 'travel_certificate_id', 'created_at', 'updated_at']));
+        }
+
+        return redirect()->route('travel-certificates.edit', $clone)->with('status', 'Certificado duplicado');
+    }
+
+    public function pdf(TravelCertificate $travel_certificate)
+    {
+        Gate::authorize('exportPdf', $travel_certificate);
+
+        $pdf = Pdf::loadView('travel_certificates.pdf', ['certificate' => $travel_certificate->load(['vaccinations', 'dewormings', 'attachments'])]);
+        return $pdf->download($travel_certificate->code . '.pdf');
+    }
+
+    protected function syncRelations(TravelCertificate $certificate, array $data, Request $request): void
+    {
+        $certificate->vaccinations()->delete();
+        foreach ($data['vaccinations'] ?? [] as $vaccination) {
+            $certificate->vaccinations()->create($vaccination);
+        }
+
+        $certificate->dewormings()->delete();
+        foreach ($data['dewormings'] ?? [] as $deworming) {
+            $certificate->dewormings()->create($deworming);
+        }
+
+        if ($request->has('attachments')) {
+            $certificate->attachments()->delete();
+            foreach ($request->attachments as $attachment) {
+                $file = $attachment['file'];
+                $path = $file->store('travel-certificates', ['disk' => 'public']);
+                $certificate->attachments()->create([
+                    'title' => $attachment['title'],
+                    'file_path' => $path,
+                    'mime' => $file->getClientMimeType(),
+                    'size_bytes' => $file->getSize(),
+                ]);
+            }
+        }
+    }
+}
