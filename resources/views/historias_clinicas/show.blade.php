@@ -16,23 +16,23 @@
             <div class="flex flex-wrap items-center gap-2 text-sm">
                 <a
                     href="{{ route('historias-clinicas.edit', $historia) }}"
-                    class="inline-flex items-center gap-2 rounded-full bg-emerald-600 px-4 py-2 font-semibold text-white shadow-sm transition hover:bg-emerald-500"
-                    style="background-color: #059669"
+                    class="inline-flex items-center gap-2 rounded-full px-4 py-2 font-semibold text-white shadow-sm transition"
+                    style="background: linear-gradient(120deg, #c084fc, #5eead4);"
                 >Editar</a>
                 <a
                     href="{{ route('historias-clinicas.recetarios.create', $historia) }}"
-                    class="inline-flex items-center gap-2 rounded-full bg-blue-600 px-4 py-2 font-semibold text-white shadow-sm transition hover:bg-blue-500"
-                    style="background-color: #2563eb"
+                    class="inline-flex items-center gap-2 rounded-full px-4 py-2 font-semibold text-white shadow-sm transition hover:brightness-110"
+                    style="background: linear-gradient(120deg, #a78bfa, #34d399);"
                 >Agregar recetario</a>
                 <a
                     href="{{ route('historias-clinicas.remisiones.create', $historia) }}"
-                    class="inline-flex items-center gap-2 rounded-full bg-amber-500 px-4 py-2 font-semibold text-white shadow-sm transition hover:bg-amber-400"
-                    style="background-color: #f59e0b"
+                    class="inline-flex items-center gap-2 rounded-full px-4 py-2 font-semibold text-white shadow-sm transition hover:brightness-110"
+                    style="background: linear-gradient(120deg, #c084fc, #22c55e);"
                 >Nueva remisión</a>
                 <a
                     href="{{ route('historias-clinicas.pdf', $historia) }}"
-                    class="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 font-semibold text-emerald-700 shadow-sm transition hover:bg-emerald-50"
-                    style="background-color: #ffffff; color: #047857"
+                    class="inline-flex items-center gap-2 rounded-full px-4 py-2 font-semibold text-white shadow-sm transition hover:brightness-110"
+                    style="background: linear-gradient(120deg, #e9d5ff, #99f6e4); color: #0f172a;"
                 >Imprimir PDF</a>
             </div>
         </div>
@@ -53,13 +53,85 @@
             <h2 class="text-lg font-semibold text-gray-900">{{ $tutor->name ?? 'Sin tutor' }}</h2>
             <p class="text-sm text-gray-600">Tel: {{ $tutor->phone ?: 'N/D' }} · WhatsApp: {{ $tutor->whatsapp ?: 'N/D' }}</p>
         </div>
-        <div class="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
+        <div class="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm col-span-full">
             <p class="text-xs font-semibold uppercase tracking-wider text-mint-700">Actividad</p>
-            <div class="mt-2 grid w-full grid-cols-1 gap-2 text-sm text-gray-700 sm:grid-cols-3">
-                <span class="rounded-full bg-mint-50 px-3 py-2 text-center font-semibold text-mint-700">{{ $historia->paraclinicos->count() }} paraclínicos</span>
-                <span class="rounded-full bg-amber-50 px-3 py-2 text-center font-semibold text-amber-700">{{ $historia->diagnosticos->count() }} diagnósticos</span>
-                <span class="rounded-full bg-blue-50 px-3 py-2 text-center font-semibold text-blue-700">{{ $prescriptions->count() }} recetarios</span>
+            <div class="mt-3 flex flex-wrap gap-2 text-sm font-semibold text-gray-700">
+                <span class="rounded-full bg-mint-50 px-4 py-2 text-mint-700">{{ $historia->paraclinicos->count() }} paraclínicos</span>
+                <span class="rounded-full bg-amber-50 px-4 py-2 text-amber-700">{{ $historia->diagnosticos->count() }} diagnósticos</span>
+                <span class="rounded-full bg-blue-50 px-4 py-2 text-blue-700">{{ $prescriptions->count() }} recetarios</span>
             </div>
+        </div>
+    </div>
+
+    <div class="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+        <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between pb-4">
+            <div>
+                <h3 class="text-lg font-semibold text-gray-900">Adjuntos</h3>
+                <p class="text-sm text-gray-600">Imágenes, PDFs y videos vinculados a la historia clínica.</p>
+            </div>
+            <button
+                type="button"
+                id="open-attachment-modal"
+                class="inline-flex items-center gap-2 rounded-full px-4 py-2 font-semibold text-white shadow-sm transition hover:brightness-110"
+                style="background: linear-gradient(120deg, #c084fc, #5eead4);"
+            >
+                Subir adjunto
+            </button>
+        </div>
+
+        @if($errors->any())
+            <div class="mb-3 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-rose-800">
+                {{ $errors->first() }}
+            </div>
+        @endif
+
+        <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3" id="attachments-grid">
+            @forelse($attachments as $attachment)
+                <div class="rounded-xl border border-gray-100 bg-white p-4 shadow-sm flex flex-col gap-3">
+                    <div class="aspect-video rounded-lg bg-gray-50 flex items-center justify-center overflow-hidden">
+                        @if($attachment->file_type === 'image')
+                            <img src="{{ $attachment->cloudinary_secure_url }}" alt="{{ $attachment->titulo }}" class="h-full w-full object-cover">
+                        @elseif($attachment->file_type === 'pdf')
+                            <div class="flex flex-col items-center text-gray-500">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M7 3h8l4 4v14H7z"/><path d="M7 3v4h4"/></svg>
+                                <span class="text-sm font-semibold">PDF</span>
+                            </div>
+                        @else
+                            <div class="flex flex-col items-center text-gray-500">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 17v-7l8-4 8 4v7l-8 4z"/><path d="M10 14v-4l4 2z"/></svg>
+                                <span class="text-sm font-semibold">Video</span>
+                            </div>
+                        @endif
+                    </div>
+
+                    <div class="flex items-start justify-between">
+                        <div>
+                            <p class="font-semibold text-gray-900">{{ $attachment->titulo_limpio }}</p>
+                            <p class="text-xs text-gray-500">{{ strtoupper($attachment->file_type) }} • {{ number_format($attachment->size_bytes / 1024 / 1024, 2) }} MB</p>
+                            <p class="text-xs text-gray-400">{{ $attachment->created_at?->format('d/m/Y H:i') }}</p>
+                        </div>
+                        <div class="flex gap-2 text-xs font-semibold">
+                            @if($attachment->file_type === 'image')
+                                <button type="button" class="rounded-full border border-emerald-200 px-3 py-1 text-emerald-700 hover:bg-emerald-50 transition" onclick="window.open('{{ $attachment->cloudinary_secure_url }}','_blank')">Ver</button>
+                            @elseif($attachment->file_type === 'pdf')
+                                <a class="rounded-full border border-blue-200 px-3 py-1 text-blue-700 hover:bg-blue-50 transition" href="{{ $attachment->cloudinary_secure_url }}" target="_blank" rel="noopener">Ver</a>
+                            @else
+                                <a class="rounded-full border border-indigo-200 px-3 py-1 text-indigo-700 hover:bg-indigo-50 transition" href="{{ $attachment->cloudinary_secure_url }}" target="_blank" rel="noopener">Reproducir</a>
+                            @endif
+                            <a class="rounded-full border border-gray-200 px-3 py-1 text-gray-700 hover:bg-gray-50 transition" href="{{ $attachment->cloudinary_secure_url }}" download>Descargar</a>
+                            <form method="POST" action="{{ route('historias-clinicas.adjuntos.destroy', $attachment) }}">
+                                @csrf
+                                @method('DELETE')
+                                <button class="rounded-full border border-rose-200 px-3 py-1 text-rose-700 hover:bg-rose-50 transition" type="submit" onclick="return confirm('¿Eliminar adjunto?')">Eliminar</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            @empty
+                <div class="md:col-span-2 lg:col-span-3 flex items-center justify-center rounded-xl border border-dashed border-gray-200 bg-gray-50 p-6 text-gray-500">
+                    No hay adjuntos registrados aún.
+                </div>
+            @endforelse
         </div>
     </div>
 

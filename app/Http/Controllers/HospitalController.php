@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Middleware\ConnectTenantDB;
 use App\Http\Requests\AdministrationRequest;
 use App\Http\Requests\AdmitRequest;
 use App\Http\Requests\ChargeRequest;
@@ -11,13 +12,16 @@ use App\Http\Requests\VitalsRequest;
 use App\Models\HospitalDay;
 use App\Models\HospitalOrder;
 use App\Models\HospitalStay;
+use App\Models\Clinica;
 use App\Models\Patient;
 use App\Services\HospitalBillingService;
 use App\Services\HospitalStayService;
 use App\Services\HospitalTreatmentService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
+use App\Support\TenantDatabase;
 
 class HospitalController extends Controller
 {
@@ -26,10 +30,18 @@ class HospitalController extends Controller
         private readonly HospitalTreatmentService $treatmentService,
         private readonly HospitalBillingService $billingService,
     ) {
+        $this->middleware(ConnectTenantDB::class);
+        $this->middleware(function ($request, $next) {
+            $this->ensureTenantConnection();
+
+            return $next($request);
+        });
     }
 
     public function index(): View
     {
+        $this->ensureTenantConnection();
+
         $stays = HospitalStay::with(['patient', 'owner', 'cage'])
             ->orderByDesc('admitted_at')
             ->get();
@@ -39,6 +51,8 @@ class HospitalController extends Controller
 
     public function create(Request $request): View
     {
+        $this->ensureTenantConnection();
+
         $patient = $request->has('patient_id') ? Patient::find($request->integer('patient_id')) : null;
 
         return view('hospital.admit', compact('patient'));
@@ -46,6 +60,8 @@ class HospitalController extends Controller
 
     public function store(AdmitRequest $request): RedirectResponse
     {
+        $this->ensureTenantConnection();
+
         $stay = $this->stayService->admit($request->validated());
 
         return redirect()->route('hospital.show', $stay);
@@ -53,6 +69,8 @@ class HospitalController extends Controller
 
     public function show(HospitalStay $stay): View
     {
+        $this->ensureTenantConnection();
+
         $this->stayService->ensureDays($stay);
         $stay->load(['patient', 'owner', 'cage', 'days.orders', 'days.administrations', 'days.vitals', 'days.progressNotes', 'charges']);
 
@@ -61,6 +79,8 @@ class HospitalController extends Controller
 
     public function addOrder(OrderRequest $request, HospitalStay $stay): RedirectResponse
     {
+        $this->ensureTenantConnection();
+
         $data = $request->validated();
         $data['stay_id'] = $stay->id;
         $this->treatmentService->createOrder($data);
@@ -70,6 +90,8 @@ class HospitalController extends Controller
 
     public function stopOrder(HospitalOrder $order): RedirectResponse
     {
+        $this->ensureTenantConnection();
+
         $this->treatmentService->stopOrder($order);
 
         return back()->with('status', 'Orden detenida.');
@@ -77,6 +99,8 @@ class HospitalController extends Controller
 
     public function addAdministration(AdministrationRequest $request, HospitalOrder $order): RedirectResponse
     {
+        $this->ensureTenantConnection();
+
         $this->treatmentService->createAdministration($order, $request->validated());
 
         return back()->with('status', 'Aplicación registrada.');
@@ -84,6 +108,8 @@ class HospitalController extends Controller
 
     public function addVitals(VitalsRequest $request, HospitalStay $stay): RedirectResponse
     {
+        $this->ensureTenantConnection();
+
         $data = $request->validated();
         /** @var HospitalDay $day */
         $day = $stay->days()->whereDate('date', now()->toDateString())->first() ?? $stay->days()->create([
@@ -97,6 +123,8 @@ class HospitalController extends Controller
 
     public function addProgress(ProgressNoteRequest $request, HospitalStay $stay): RedirectResponse
     {
+        $this->ensureTenantConnection();
+
         $data = $request->validated();
         $day = $stay->days()->whereDate('date', now()->toDateString())->first() ?? $stay->days()->create([
             'date' => now()->toDateString(),
@@ -110,6 +138,8 @@ class HospitalController extends Controller
 
     public function addCharge(ChargeRequest $request, HospitalStay $stay): RedirectResponse
     {
+        $this->ensureTenantConnection();
+
         $data = $request->validated();
         $data['stay_id'] = $stay->id;
         $this->billingService->addCharge($data);
@@ -119,6 +149,8 @@ class HospitalController extends Controller
 
     public function generateInvoice(HospitalStay $stay): RedirectResponse
     {
+        $this->ensureTenantConnection();
+
         $sale = $this->billingService->generateInvoice($stay);
 
         return back()->with('status', 'Factura generada #' . $sale->id);
@@ -126,8 +158,29 @@ class HospitalController extends Controller
 
     public function discharge(HospitalStay $stay): RedirectResponse
     {
+        $this->ensureTenantConnection();
+
         $this->stayService->discharge($stay);
 
         return redirect()->route('hospital.index')->with('status', 'Paciente dado de alta.');
+    }
+
+    private function ensureTenantConnection(): void
+    {
+        if (config('database.connections.tenant.database')) {
+            return;
+        }
+
+        $user = Auth::user();
+        if (! $user) {
+            return;
+        }
+
+        $clinica = Clinica::resolveForUser($user);
+        $database = $clinica->db ?? $user->db;
+
+        abort_unless($database, 403, 'No se pudo determinar la clínica del usuario.');
+
+        TenantDatabase::connect($database);
     }
 }

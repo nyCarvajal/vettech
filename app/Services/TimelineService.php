@@ -109,7 +109,7 @@ class TimelineService
                     'type' => 'hospital',
                     'occurred_at' => $stay->admitted_at,
                     'title' => 'Hospitalización',
-                    'summary' => $stay->diagnosis,
+                    'summary' => $stay->primary_dx,
                     'url' => null,
                     'meta' => [
                         'estado' => $stay->status,

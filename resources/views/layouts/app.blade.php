@@ -6,11 +6,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ config('app.name', 'VetTech') }}</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@4.3.0/fonts/remixicon.css">
     @php
         $hasViteAssets = file_exists(public_path('hot')) || file_exists(public_path('build/manifest.json'));
     @endphp
     @if($hasViteAssets)
         @vite(['resources/css/app.css', 'resources/js/app.js', 'resources/scss/icons.scss', 'resources/scss/style.scss', 'resources/sass/app.scss'])
+    @else
+        <!-- Fallback CSS y JS para cuando Vite no está disponible -->
+        <link rel="stylesheet" href="{{ asset('css/app-fallback.css') }}">
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" defer></script>
     @endif
 
     <!-- Fallback CSS para cuando Vite no está disponible o el bundle no carga -->

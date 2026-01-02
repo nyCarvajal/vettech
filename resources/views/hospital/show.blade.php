@@ -43,8 +43,8 @@
         </div>
     </x-card>
 
-    <div class="grid lg:grid-cols-4 gap-4">
-        <div class="lg:col-span-3 space-y-3">
+    <div class="grid lg:grid-cols-8 gap-4">
+        <div class="lg:col-span-6 space-y-3">
             <div class="bg-emerald-50 border border-emerald-100 rounded-lg">
                 <div class="flex flex-wrap gap-2 border-b border-emerald-100 px-4 py-2">
                     @foreach($stay->days as $day)
@@ -62,7 +62,10 @@
                             <x-card class="bg-white border border-emerald-100">
                                 <div class="flex items-center justify-between mb-2">
                                     <h4 class="font-semibold text-emerald-700">Tratamiento / Órdenes</h4>
-                                    <form method="POST" action="{{ route('hospital.orders.stop', $day->orders->first()) }}" class="hidden"></form>
+                                    @php($firstOrder = $day->orders->first())
+                                    @if($firstOrder)
+                                        <form method="POST" action="{{ route('hospital.orders.stop', ['order' => $firstOrder->id]) }}" class="hidden"></form>
+                                    @endif
                                 </div>
                                 <div class="space-y-2">
                                     @foreach($day->orders as $order)
@@ -72,12 +75,12 @@
                                                     <p class="font-semibold text-emerald-700">{{ $order->source === 'inventory' ? ($order->product->name ?? 'Producto') : $order->manual_name }}</p>
                                                     <p class="text-sm text-gray-600">{{ $order->dose }} • {{ $order->route }} • {{ $order->frequency }}</p>
                                                 </div>
-                                                <form method="POST" action="{{ route('hospital.orders.stop', $order) }}">
+                                                <form method="POST" action="{{ route('hospital.orders.stop', ['order' => $order->id]) }}">
                                                     @csrf
                                                     <x-button type="submit" size="sm" color="danger">Detener</x-button>
                                                 </form>
                                             </div>
-                                            <form method="POST" action="{{ route('hospital.orders.administrations', $order) }}" class="mt-2 flex items-center gap-2">
+                                            <form method="POST" action="{{ route('hospital.orders.administrations', ['order' => $order->id]) }}" class="mt-2 flex items-center gap-2">
                                                 @csrf
                                                 <x-input name="administered_at" type="datetime-local" class="w-48" />
                                                 <x-input name="dose_given" placeholder="Dosis" class="w-32" />
@@ -90,8 +93,17 @@
                                     <form method="POST" action="{{ route('hospital.orders.store', $stay) }}" class="space-y-2 p-3 rounded border border-dashed border-emerald-200">
                                         @csrf
                                         <div class="grid grid-cols-2 gap-2">
-                                            <x-select name="source" label="Tipo" :options="['inventory'=>'Inventario','manual'=>'Manual']" />
-                                            <x-select name="type" label="Categoría" :options="['medication'=>'Medicamento','procedure'=>'Procedimiento','feeding'=>'Alimentación','fluid'=>'Fluidos','other'=>'Otro']" />
+                                            <x-select name="source" label="Tipo">
+                                                <option value="inventory">Inventario</option>
+                                                <option value="manual">Manual</option>
+                                            </x-select>
+                                            <x-select name="type" label="Categoría">
+                                                <option value="medication">Medicamento</option>
+                                                <option value="procedure">Procedimiento</option>
+                                                <option value="feeding">Alimentación</option>
+                                                <option value="fluid">Fluidos</option>
+                                                <option value="other">Otro</option>
+                                            </x-select>
                                         </div>
                                         <div class="grid grid-cols-2 gap-2">
                                             <x-input name="product_id" label="Producto (id)" />
@@ -167,7 +179,11 @@
                                 <h4 class="font-semibold text-emerald-700 mb-2">Evolución / Progreso</h4>
                                 <form method="POST" action="{{ route('hospital.progress.store', $stay) }}" class="space-y-2">
                                     @csrf
-                                    <x-select name="shift" label="Turno" :options="['manana'=>'Mañana','tarde'=>'Tarde','noche'=>'Noche']" />
+                                    <x-select name="shift" label="Turno">
+                                        <option value="manana">Mañana</option>
+                                        <option value="tarde">Tarde</option>
+                                        <option value="noche">Noche</option>
+                                    </x-select>
                                     <x-textarea name="content" label="Nota" />
                                     <x-input type="hidden" name="logged_at" value="{{ now()->format('Y-m-d\TH:i') }}" />
                                     <x-input type="hidden" name="author_id" value="{{ auth()->id() }}" />
@@ -188,7 +204,7 @@
             </div>
         </div>
 
-        <div class="space-y-3">
+        <div class="space-y-3 lg:col-span-2 text-sm">
             <x-card class="bg-white border border-emerald-100">
                 <div class="flex items-center justify-between mb-2">
                     <h4 class="font-semibold text-emerald-700">Cargos / Facturación</h4>
@@ -207,7 +223,11 @@
                 </div>
                 <form method="POST" action="{{ route('hospital.charges.store', $stay) }}" class="mt-3 space-y-2">
                     @csrf
-                    <x-select name="source" label="Tipo" :options="['service'=>'Servicio','inventory'=>'Inventario','manual'=>'Manual']" />
+                    <x-select name="source" label="Tipo">
+                        <option value="service">Servicio</option>
+                        <option value="inventory">Inventario</option>
+                        <option value="manual">Manual</option>
+                    </x-select>
                     <x-input name="product_id" label="Producto (id)" />
                     <x-input name="description" label="Descripción" />
                     <div class="grid grid-cols-2 gap-2">

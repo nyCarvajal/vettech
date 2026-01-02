@@ -21,6 +21,7 @@ class PatientImmunization extends BaseModel
         'batch_lot',
         'dose',
         'next_due_at',
+        'expires_at',
         'vet_user_id',
         'notes',
         'status',
@@ -29,6 +30,7 @@ class PatientImmunization extends BaseModel
     protected $casts = [
         'applied_at' => 'date',
         'next_due_at' => 'date',
+        'expires_at' => 'date',
         'contains_rabies' => 'boolean',
     ];
 
