@@ -61,7 +61,7 @@ class TravelCertificateController extends Controller
     {
         Gate::authorize('create', TravelCertificate::class);
 
-        $departments = GeoDepartment::orderBy('name')->get();
+        $departments = GeoDepartment::orderBy('nombre')->get();
         $countries = Country::orderBy('name_es')->get();
         $default = config('travel_certificates.default_clinic');
         $declaration = config('travel_certificates.default_declaration');
@@ -94,7 +94,7 @@ class TravelCertificateController extends Controller
     {
         Gate::authorize('update', $travel_certificate);
 
-        $departments = GeoDepartment::orderBy('name')->get();
+        $departments = GeoDepartment::orderBy('nombre')->get();
         $countries = Country::orderBy('name_es')->get();
         $declaration = $travel_certificate->declaration_text;
 

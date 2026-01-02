@@ -50,12 +50,12 @@ return new class extends Migration
             $table->enum('origin_type', ['co', 'international'])->nullable();
             $table->string('origin_country_code', 2)->nullable();
             $table->string('origin_city')->nullable();
-            $table->foreignId('origin_department_id')->nullable()->constrained('geo_departments');
-            $table->foreignId('origin_municipality_id')->nullable()->constrained('geo_municipalities');
+            $table->bigInteger('origin_department_id')->nullable();
+            $table->bigInteger('origin_municipality_id')->nullable();
             $table->string('destination_country_code', 2)->nullable();
             $table->string('destination_city')->nullable();
-            $table->foreignId('destination_department_id')->nullable()->constrained('geo_departments');
-            $table->foreignId('destination_municipality_id')->nullable()->constrained('geo_municipalities');
+            $table->bigInteger('destination_department_id')->nullable();
+            $table->bigInteger('destination_municipality_id')->nullable();
             $table->dateTime('clinical_exam_at');
             $table->text('clinical_notes')->nullable();
             $table->boolean('fit_for_travel')->default(true);
@@ -67,6 +67,20 @@ return new class extends Migration
             $table->unsignedBigInteger('updated_by')->nullable();
             $table->timestamps();
         });
+
+        if (Schema::hasTable('departamentos')) {
+            Schema::table('travel_certificates', function (Blueprint $table) {
+                $table->foreign('origin_department_id')->references('id')->on('departamentos');
+                $table->foreign('destination_department_id')->references('id')->on('departamentos');
+            });
+        }
+
+        if (Schema::hasTable('municipios')) {
+            Schema::table('travel_certificates', function (Blueprint $table) {
+                $table->foreign('origin_municipality_id')->references('id')->on('municipios');
+                $table->foreign('destination_municipality_id')->references('id')->on('municipios');
+            });
+        }
 
         Schema::create('travel_certificate_vaccinations', function (Blueprint $table) {
             $table->id();

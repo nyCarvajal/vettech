@@ -15,8 +15,8 @@ class TravelCertificateTest extends TestCase
     {
         parent::setUp();
         $this->seed(\Database\Seeders\CountrySeeder::class);
-        $this->seed(\Database\Seeders\GeoDepartmentSeeder::class);
-        $this->seed(\Database\Seeders\GeoMunicipalitySeeder::class);
+        \App\Models\GeoDepartment::create(['id' => 1, 'nombre' => 'Antioquia', 'codigo' => 5]);
+        \App\Models\GeoMunicipality::create(['id' => 1, 'departamento_id' => 1, 'codigo' => 5001, 'nombre' => 'Medellín']);
     }
 
     public function test_store_national_certificate(): void

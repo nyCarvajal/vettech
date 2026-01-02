@@ -9,6 +9,6 @@ class GeoController extends Controller
 {
     public function municipalities(GeoDepartment $department): JsonResponse
     {
-        return response()->json($department->municipalities()->orderBy('name')->get());
+        return response()->json($department->municipalities()->orderBy('nombre')->get());
     }
 }

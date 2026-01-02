@@ -17,8 +17,6 @@ class DatabaseSeeder extends Seeder
             VettechSeeder::class,
             GroomingDemoSeeder::class,
             CountrySeeder::class,
-            GeoDepartmentSeeder::class,
-            GeoMunicipalitySeeder::class,
         ]);
     }
 }

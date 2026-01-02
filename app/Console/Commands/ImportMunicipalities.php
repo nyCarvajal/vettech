@@ -26,10 +26,10 @@ class ImportMunicipalities extends Command
             if (! isset($row['department'], $row['name'])) {
                 continue;
             }
-            $department = GeoDepartment::firstOrCreate(['name' => $row['department']]);
+            $department = GeoDepartment::firstOrCreate(['nombre' => $row['department']]);
             GeoMunicipality::updateOrCreate(
-                ['geo_department_id' => $department->id, 'name' => $row['name']],
-                ['code' => $row['code'] ?? null]
+                ['departamento_id' => $department->id, 'nombre' => $row['name']],
+                ['codigo' => $row['code'] ?? null]
             );
         }
 

@@ -9,10 +9,21 @@ class GeoMunicipality extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['geo_department_id', 'name', 'code'];
+    protected $table = 'municipios';
+    public $timestamps = false;
+    public $incrementing = false;
+    protected $primaryKey = 'id';
+    protected $keyType = 'int';
+    protected $fillable = ['id', 'departamento_id', 'codigo', 'nombre'];
+    protected $appends = ['name'];
 
     public function department()
     {
-        return $this->belongsTo(GeoDepartment::class, 'geo_department_id');
+        return $this->belongsTo(GeoDepartment::class, 'departamento_id');
+    }
+
+    public function getNameAttribute(): ?string
+    {
+        return $this->attributes['nombre'] ?? null;
     }
 }

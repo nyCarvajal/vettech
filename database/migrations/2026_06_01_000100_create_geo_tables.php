@@ -8,25 +8,28 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('geo_departments', function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
-            $table->string('code')->nullable();
-            $table->timestamps();
-        });
+        if (! Schema::hasTable('departamentos')) {
+            Schema::create('departamentos', function (Blueprint $table) {
+                $table->bigInteger('id');
+                $table->string('nombre');
+                $table->integer('codigo');
+                $table->integer('pais_id')->nullable()->default(52);
+            });
+        }
 
-        Schema::create('geo_municipalities', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('geo_department_id')->constrained()->cascadeOnDelete();
-            $table->string('name');
-            $table->string('code')->nullable();
-            $table->timestamps();
-        });
+        if (! Schema::hasTable('municipios')) {
+            Schema::create('municipios', function (Blueprint $table) {
+                $table->bigInteger('id');
+                $table->bigInteger('departamento_id');
+                $table->integer('codigo');
+                $table->string('nombre');
+            });
+        }
     }
 
     public function down(): void
     {
-        Schema::dropIfExists('geo_municipalities');
-        Schema::dropIfExists('geo_departments');
+        Schema::dropIfExists('municipios');
+        Schema::dropIfExists('departamentos');
     }
 };
