@@ -135,6 +135,78 @@
         </div>
     </div>
 
+    <div class="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+        <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between pb-4">
+            <div>
+                <h3 class="text-lg font-semibold text-gray-900">Adjuntos</h3>
+                <p class="text-sm text-gray-600">Imágenes, PDFs y videos vinculados a la historia clínica.</p>
+            </div>
+            <button
+                type="button"
+                id="open-attachment-modal"
+                class="inline-flex items-center gap-2 rounded-full bg-emerald-600 px-4 py-2 font-semibold text-white shadow-sm transition hover:bg-emerald-500"
+                style="background-color: #10b981"
+            >
+                Subir adjunto
+            </button>
+        </div>
+
+        @if($errors->any())
+            <div class="mb-3 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-rose-800">
+                {{ $errors->first() }}
+            </div>
+        @endif
+
+        <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3" id="attachments-grid">
+            @forelse($attachments as $attachment)
+                <div class="rounded-xl border border-gray-100 bg-white p-4 shadow-sm flex flex-col gap-3">
+                    <div class="aspect-video rounded-lg bg-gray-50 flex items-center justify-center overflow-hidden">
+                        @if($attachment->file_type === 'image')
+                            <img src="{{ $attachment->cloudinary_secure_url }}" alt="{{ $attachment->titulo }}" class="h-full w-full object-cover">
+                        @elseif($attachment->file_type === 'pdf')
+                            <div class="flex flex-col items-center text-gray-500">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M7 3h8l4 4v14H7z"/><path d="M7 3v4h4"/></svg>
+                                <span class="text-sm font-semibold">PDF</span>
+                            </div>
+                        @else
+                            <div class="flex flex-col items-center text-gray-500">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 17v-7l8-4 8 4v7l-8 4z"/><path d="M10 14v-4l4 2z"/></svg>
+                                <span class="text-sm font-semibold">Video</span>
+                            </div>
+                        @endif
+                    </div>
+
+                    <div class="flex items-start justify-between">
+                        <div>
+                            <p class="font-semibold text-gray-900">{{ $attachment->titulo_limpio }}</p>
+                            <p class="text-xs text-gray-500">{{ strtoupper($attachment->file_type) }} • {{ number_format($attachment->size_bytes / 1024 / 1024, 2) }} MB</p>
+                            <p class="text-xs text-gray-400">{{ $attachment->created_at?->format('d/m/Y H:i') }}</p>
+                        </div>
+                        <div class="flex gap-2 text-xs font-semibold">
+                            @if($attachment->file_type === 'image')
+                                <button type="button" class="rounded-full border border-emerald-200 px-3 py-1 text-emerald-700 hover:bg-emerald-50 transition" onclick="window.open('{{ $attachment->cloudinary_secure_url }}','_blank')">Ver</button>
+                            @elseif($attachment->file_type === 'pdf')
+                                <a class="rounded-full border border-blue-200 px-3 py-1 text-blue-700 hover:bg-blue-50 transition" href="{{ $attachment->cloudinary_secure_url }}" target="_blank" rel="noopener">Ver</a>
+                            @else
+                                <a class="rounded-full border border-indigo-200 px-3 py-1 text-indigo-700 hover:bg-indigo-50 transition" href="{{ $attachment->cloudinary_secure_url }}" target="_blank" rel="noopener">Reproducir</a>
+                            @endif
+                            <a class="rounded-full border border-gray-200 px-3 py-1 text-gray-700 hover:bg-gray-50 transition" href="{{ $attachment->cloudinary_secure_url }}" download>Descargar</a>
+                            <form method="POST" action="{{ route('historias-clinicas.adjuntos.destroy', $attachment) }}">
+                                @csrf
+                                @method('DELETE')
+                                <button class="rounded-full border border-rose-200 px-3 py-1 text-rose-700 hover:bg-rose-50 transition" type="submit" onclick="return confirm('¿Eliminar adjunto?')">Eliminar</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            @empty
+                <div class="md:col-span-2 lg:col-span-3 flex items-center justify-center rounded-xl border border-dashed border-gray-200 bg-gray-50 p-6 text-gray-500">
+                    No hay adjuntos registrados aún.
+                </div>
+            @endforelse
+        </div>
+    </div>
+
     <div class="grid gap-6 lg:grid-cols-3">
         <div class="lg:col-span-3">
             <div class="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
