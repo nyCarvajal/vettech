@@ -144,6 +144,48 @@
         @endforelse
     </div>
 
+    @php
+        $imageAttachments = $historiaClinica->adjuntos->where('file_type', 'image');
+        $pdfAttachments = $historiaClinica->adjuntos->where('file_type', 'pdf');
+    @endphp
+
+    @if($imageAttachments->count() || $pdfAttachments->count())
+        <div class="card">
+            <div class="section-title">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M4 7h16v10H4z" />
+                    <path d="M9 12h6" />
+                    <path d="M9 9h6" />
+                </svg>
+                <h3>Adjuntos</h3>
+            </div>
+
+            @if($imageAttachments->count())
+                <p class="muted" style="margin: 6px 0 4px 0;">Imágenes</p>
+                <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px;">
+                    @foreach($imageAttachments as $image)
+                        <div style="border:1px solid var(--border);border-radius:10px;padding:6px;text-align:center;">
+                            <img src="{{ $image->cloudinary_secure_url }}" alt="{{ $image->titulo_limpio }}" style="width:100%;height:90px;object-fit:cover;border-radius:8px;">
+                            <div style="font-size:11px;margin-top:4px;color:var(--muted);">{{ $image->titulo_limpio }}</div>
+                        </div>
+                    @endforeach
+                </div>
+            @endif
+
+            @if($pdfAttachments->count())
+                <p class="muted" style="margin: 12px 0 4px 0;">PDFs</p>
+                <ul class="list">
+                    @foreach($pdfAttachments as $pdf)
+                        <li class="list-item">
+                            <strong>{{ $pdf->titulo_limpio }}</strong>
+                            <span class="badge">PDF</span>
+                        </li>
+                    @endforeach
+                </ul>
+            @endif
+        </div>
+    @endif
+
     <div class="card">
         <div class="section-title">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">

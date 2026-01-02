@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use App\Models\Paciente;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use App\Models\ClinicalAttachment;
 
 class HistoriaClinica extends Model
 {
@@ -78,5 +80,11 @@ class HistoriaClinica extends Model
     public function diagnosticos()
     {
         return $this->hasMany(HistoriaClinicaDiagnostico::class);
+    }
+
+    public function adjuntos(): HasMany
+    {
+        return $this->hasMany(ClinicalAttachment::class, 'historia_id')
+            ->latest();
     }
 }

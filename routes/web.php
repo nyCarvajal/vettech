@@ -30,6 +30,7 @@ use App\Http\Controllers\GroomingController;
 use App\Http\Controllers\GroomingReportController;
 use App\Http\Controllers\GroomingStatusController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\ClinicalAttachmentController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\AdministrativeReportController;
 use App\Http\Controllers\AdminDashboardController;
@@ -194,6 +195,10 @@ Route::get('clinica/perfil', [ClinicaController::class,'showOwn'])
        ->name('historias-clinicas.autosave');
   Route::get('historias-clinicas/{historiaClinica}/pdf', [HistoriaClinicaController::class, 'pdf'])
         ->name('historias-clinicas.pdf');
+  Route::get('historias-clinicas/{historiaClinica}/adjuntos', [ClinicalAttachmentController::class, 'index'])
+        ->name('historias-clinicas.adjuntos.index');
+  Route::post('historias-clinicas/{historiaClinica}/adjuntos', [ClinicalAttachmentController::class, 'store'])
+        ->name('historias-clinicas.adjuntos.store');
   Route::get('historias-clinicas/{historiaClinica}/recetario', [HistoriaClinicaController::class, 'createRecetario'])
         ->name('historias-clinicas.recetarios.create');
   Route::post('historias-clinicas/{historiaClinica}/recetario', [HistoriaClinicaController::class, 'storeRecetario'])
@@ -211,6 +216,8 @@ Route::get('clinica/perfil', [ClinicaController::class,'showOwn'])
   Route::resource('historias-clinicas', HistoriaClinicaController::class, [
       'parameters' => ['historias-clinicas' => 'historiaClinica'],
   ]);
+  Route::delete('adjuntos/{attachment}', [ClinicalAttachmentController::class, 'destroy'])
+        ->name('historias-clinicas.adjuntos.destroy');
   Route::get('items/{item}/agregar-unidades', [ItemController::class, 'addUnitsForm'])->name('items.add-units-form');
   Route::post('items/{item}/agregar-unidades', [ItemController::class, 'addUnits'])->name('items.add-units');
 Route::get('/calendar', [ReservaController::class, 'calendar'])->name('reservas.calendar');
@@ -292,9 +299,14 @@ Route::middleware(['auth'])
         Route::post('cash/sessions/{cashSession}/close', [\App\Http\Controllers\CashSessionsController::class, 'close'])->name('cash.sessions.close');
         Route::post('cash/movements', [\App\Http\Controllers\CashMovementsController::class, 'store'])->name('cash.movements.store');
     });
-    Route::get('{first}/{second}/{third}', [RoutingController::class, 'thirdLevel'])->name('third');
-    Route::get('{first}/{second}', [RoutingController::class, 'secondLevel'])->name('second');
-    Route::get('{any}', [RoutingController::class, 'root'])->name('any');
+    Route::middleware([
+        Authenticate::class,
+        ConnectTenantDB::class,
+    ])->group(function () {
+        Route::get('{first}/{second}/{third}', [RoutingController::class, 'thirdLevel'])->name('third');
+        Route::get('{first}/{second}', [RoutingController::class, 'secondLevel'])->name('second');
+        Route::get('{any}', [RoutingController::class, 'root'])->name('any');
+    });
 
 
 	

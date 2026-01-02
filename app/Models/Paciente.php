@@ -10,6 +10,7 @@ use App\Models\HistoriaClinica;
 use App\Models\Owner;
 use App\Models\Species;
 use App\Models\Breed;
+use App\Models\ClinicalAttachment;
 
 class Paciente extends BaseModel
 {
@@ -44,6 +45,11 @@ class Paciente extends BaseModel
     public function owner()
     {
         return $this->belongsTo(Owner::class, 'owner_id');
+    }
+
+    public function adjuntos(): HasMany
+    {
+        return $this->hasMany(ClinicalAttachment::class, 'paciente_id');
     }
 
     public function species(): BelongsTo
