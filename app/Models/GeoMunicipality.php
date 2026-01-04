@@ -10,6 +10,7 @@ class GeoMunicipality extends Model
     use HasFactory;
 
     protected $table = 'municipios';
+    protected $connection = 'tenant';
     public $timestamps = false;
     public $incrementing = false;
     protected $primaryKey = 'id';

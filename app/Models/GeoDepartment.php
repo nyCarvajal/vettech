@@ -10,6 +10,7 @@ class GeoDepartment extends Model
     use HasFactory;
 
     protected $table = 'departamentos';
+    protected $connection = 'tenant';
     public $timestamps = false;
     public $incrementing = false;
     protected $primaryKey = 'id';
