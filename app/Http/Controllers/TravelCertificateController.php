@@ -77,13 +77,12 @@ class TravelCertificateController extends Controller
             $defaultClinic['city'] = $clinic->municipio ?? $defaultClinic['city'];
         }
         if ($user) {
-            $defaultClinic['vet_name'] = trim(($user->nombre ?? '')) ?: $defaultClinic['vet_name'];
+            $defaultClinic['vet_name'] = trim(($user->nombres ?? '')) ?: $defaultClinic['vet_name'];
             $defaultClinic['vet_license'] = $user->firma_medica_texto ?? $user->numero_identificacion ?? $defaultClinic['vet_license'];
         }
         $vets = User::query()
-            ->orderBy('nombre')
-            ->orderBy('apellidos')
-            ->get(['id', 'nombre', 'apellidos', 'numero_identificacion', 'firma_medica_texto']);
+            ->orderBy('nombres')
+            ->get(['id', 'nombres', 'numero_identificacion', 'firma_medica_texto']);
 
         if ($user) {
             $vets = $vets
