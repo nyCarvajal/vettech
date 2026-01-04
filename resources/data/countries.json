@@ -1,0 +1,13 @@
+[
+  {"code2":"CO","name_es":"Colombia","name_en":"Colombia"},
+  {"code2":"US","name_es":"Estados Unidos","name_en":"United States"},
+  {"code2":"ES","name_es":"España","name_en":"Spain"},
+  {"code2":"MX","name_es":"México","name_en":"Mexico"},
+  {"code2":"AR","name_es":"Argentina","name_en":"Argentina"},
+  {"code2":"CL","name_es":"Chile","name_en":"Chile"},
+  {"code2":"PE","name_es":"Perú","name_en":"Peru"},
+  {"code2":"EC","name_es":"Ecuador","name_en":"Ecuador"},
+  {"code2":"PA","name_es":"Panamá","name_en":"Panama"},
+  {"code2":"BR","name_es":"Brasil","name_en":"Brazil"},
+  {"code2":"CA","name_es":"Canadá","name_en":"Canada"}
+]
