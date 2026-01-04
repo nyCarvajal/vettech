@@ -5,6 +5,9 @@
     <h1 class="text-2xl font-bold">Generar consentimiento</h1>
     <form method="POST" action="{{ route('consents.store') }}" class="space-y-4">
         @csrf
+        @if($patient)
+            <input type="hidden" name="patient_id" value="{{ $patient->id }}">
+        @endif
         <div>
             <label class="block text-sm font-medium">Plantilla</label>
             <select name="template_id" class="mt-1 w-full border rounded px-3 py-2">
@@ -18,7 +21,7 @@
                 <h2 class="font-semibold mb-2">Tutor</h2>
                 @foreach(['first_name'=>'Nombre','last_name'=>'Apellido','document'=>'Documento','phone'=>'Teléfono','email'=>'Email'] as $field=>$label)
                 <label class="block text-sm">{{ $label }}
-                    <input type="text" name="owner_snapshot[{{ $field }}]" class="mt-1 w-full border rounded px-3 py-2" />
+                    <input type="text" name="owner_snapshot[{{ $field }}]" value="{{ $ownerSnapshot[$field] ?? '' }}" class="mt-1 w-full border rounded px-3 py-2" />
                 </label>
                 @endforeach
             </div>
@@ -26,7 +29,7 @@
                 <h2 class="font-semibold mb-2">Paciente</h2>
                 @foreach(['name'=>'Nombre','species'=>'Especie','breed'=>'Raza','age'=>'Edad','weight'=>'Peso'] as $field=>$label)
                 <label class="block text-sm">{{ $label }}
-                    <input type="text" name="pet_snapshot[{{ $field }}]" class="mt-1 w-full border rounded px-3 py-2" />
+                    <input type="text" name="pet_snapshot[{{ $field }}]" value="{{ $petSnapshot[$field] ?? '' }}" class="mt-1 w-full border rounded px-3 py-2" />
                 </label>
                 @endforeach
             </div>

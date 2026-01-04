@@ -91,6 +91,10 @@
                                         Tipos de identificaciones</a>
                               </li>
                               <li class="sub-nav-item">
+                                   <a class="sub-nav-link" href="{{ route('consent-templates.index') }}">
+                                        Consentimientos informados</a>
+                              </li>
+                              <li class="sub-nav-item">
                                    <a class="sub-nav-link" href="{{ route('areas.index') }}">
                                         Listar áreas</a>
                               </li>
