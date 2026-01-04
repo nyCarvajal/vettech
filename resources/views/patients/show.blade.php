@@ -303,6 +303,14 @@
                     Certificado de viaje
                 </a>
             @endcan
+            @can('create', \App\Models\ConsentDocument::class)
+                <a
+                    href="{{ route('consents.create', ['patient_id' => $patient->id]) }}"
+                    class="pill-action"
+                >
+                    Consentimiento informado
+                </a>
+            @endcan
             <a href="{{ route('patients.carnet', $patient) }}" class="pill-action">Carnet</a>
             <a href="{{ route('patients.edit', $patient) }}" class="pill-action">Editar ficha</a>
             <a href="{{ route('patients.index') }}" class="pill-action">Volver al listado</a>
