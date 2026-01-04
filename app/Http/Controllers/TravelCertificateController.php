@@ -81,9 +81,15 @@ class TravelCertificateController extends Controller
             $defaultClinic['vet_license'] = $user->firma_medica_texto ?? $user->numero_identificacion ?? $defaultClinic['vet_license'];
         }
         $vets = User::query()
-            ->when($clinic, fn ($query) => $query->where('clinica_id', $clinic->id))
-            ->orderBy('nombres')
-            ->get(['id', 'nombres', 'numero_identificacion', 'firma_medica_texto']);
+            ->orderBy('nombre')
+            ->orderBy('apellidos')
+            ->get(['id', 'nombre', 'apellidos', 'numero_identificacion', 'firma_medica_texto']);
+
+        if ($user) {
+            $vets = $vets
+                ->sortBy(fn ($vet) => $vet->id === $user->id ? 0 : 1)
+                ->values();
+        }
         $declaration = config('travel_certificates.default_declaration');
         $patient = $request->filled('patient_id')
             ? Patient::with(['owner.departamento', 'owner.municipio', 'species', 'breed'])->find($request->integer('patient_id'))
