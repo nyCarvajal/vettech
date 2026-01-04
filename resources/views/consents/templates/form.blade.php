@@ -1,5 +1,12 @@
+@once
+    @push('scripts')
+        @vite('resources/js/consents/template-editor.js')
+    @endpush
+@endonce
+
 @php($requiredSigners = ['owner' => 'Tutor', 'vet' => 'Veterinario', 'witness' => 'Testigo'])
-<div class="space-y-4" x-data="{insert(tag){const textarea=$refs.body; const start=textarea.selectionStart; const end=textarea.selectionEnd; const text=textarea.value; textarea.value=text.slice(0,start)+tag+text.slice(end); textarea.focus(); textarea.selectionStart=textarea.selectionEnd=start+tag.length;}}">
+@php($bodyHtml = old('body_html', $template->body_html))
+<div class="space-y-4" data-consent-template-editor>
     <div>
         <label class="block text-sm font-medium">Nombre</label>
         <input type="text" name="name" value="{{ old('name', $template->name) }}" class="mt-1 w-full border rounded px-3 py-2">
@@ -20,7 +27,13 @@
     </div>
     <div>
         <label class="block text-sm font-medium">Cuerpo (HTML)</label>
-        <textarea x-ref="body" name="body_html" rows="10" class="mt-1 w-full border rounded px-3 py-2">{{ old('body_html', $template->body_html) }}</textarea>
+        <div class="mt-1 space-y-2">
+            <input type="hidden" name="body_html" value="{{ $bodyHtml }}" data-editor-input>
+            <div data-editor class="bg-white border rounded min-h-[240px] p-3">
+                {!! $bodyHtml !!}
+            </div>
+            <p class="text-xs text-gray-500">Usa el editor para personalizar el contenido. Las etiquetas se reemplazarán con los datos del paciente cuando se genere el consentimiento.</p>
+        </div>
     </div>
     <div class="bg-gray-50 border rounded p-4">
         <p class="font-semibold mb-2">Etiquetas disponibles</p>
@@ -29,7 +42,7 @@
             @php($placeholderTag = '{{' . $key . '}}')
             <label class="flex items-center space-x-2">
                 <input type="checkbox" name="allowed_placeholders[]" value="{{ $key }}" {{ in_array($key, old('allowed_placeholders', $template->allowed_placeholders ?? [])) ? 'checked' : '' }}>
-                <button type="button" class="text-indigo-600 underline" @click="insert('{{ $placeholderTag }}')">{{ $key }}</button>
+                <button type="button" class="text-indigo-600 underline" data-placeholder-insert="{{ $placeholderTag }}">{{ $key }}</button>
             </label>
             @endforeach
         </div>
