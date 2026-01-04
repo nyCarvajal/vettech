@@ -101,7 +101,9 @@ class TravelCertificateController extends Controller
         $data['origin_type'] = $data['type'] === 'national_co' ? 'co' : 'international';
         $data['status'] = 'draft';
 
-        $certificate = TravelCertificate::create($data);
+        $certificateAttributes = $this->extractCertificateAttributes($data, $request);
+
+        $certificate = TravelCertificate::create($certificateAttributes);
 
         $this->syncRelations($certificate, $data, $request);
 
@@ -161,7 +163,9 @@ class TravelCertificateController extends Controller
         $data = $request->validated();
         $data['origin_type'] = $data['type'] === 'national_co' ? 'co' : 'international';
 
-        $travel_certificate->update($data);
+        $certificateAttributes = $this->extractCertificateAttributes($data, $request, $travel_certificate);
+
+        $travel_certificate->update($certificateAttributes);
         $this->syncRelations($travel_certificate, $data, $request);
 
         return redirect()->route('travel-certificates.show', $travel_certificate)->with('status', 'Certificado actualizado');
@@ -225,6 +229,19 @@ class TravelCertificateController extends Controller
 
         $pdf = Pdf::loadView('travel_certificates.pdf', ['certificate' => $travel_certificate->load(['vaccinations', 'dewormings', 'attachments'])]);
         return $pdf->download($travel_certificate->code . '.pdf');
+    }
+
+    protected function extractCertificateAttributes(array $data, Request $request, ?TravelCertificate $existing = null): array
+    {
+        $model = $existing ?? new TravelCertificate();
+
+        $attributes = Arr::only($data, $model->getFillable());
+
+        if (! $existing) {
+            $attributes['tenant_id'] = $request->user()->tenant_id ?? null;
+        }
+
+        return $attributes;
     }
 
     protected function syncRelations(TravelCertificate $certificate, array $data, Request $request): void
