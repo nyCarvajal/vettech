@@ -9,6 +9,7 @@ use App\Http\Requests\UpdateTravelCertificateRequest;
 use App\Models\Country;
 use App\Models\GeoDepartment;
 use App\Models\GeoMunicipality;
+use App\Models\Patient;
 use App\Models\TravelCertificate;
 use App\Models\TravelCertificateAttachment;
 use App\Models\TravelCertificateDeworming;
@@ -57,7 +58,7 @@ class TravelCertificateController extends Controller
         return view('travel_certificates.index', compact('certificates'));
     }
 
-    public function create(): View
+    public function create(Request $request): View
     {
         Gate::authorize('create', TravelCertificate::class);
 
@@ -65,8 +66,13 @@ class TravelCertificateController extends Controller
         $countries = Country::orderBy('name_es')->get();
         $default = config('travel_certificates.default_clinic');
         $declaration = config('travel_certificates.default_declaration');
+        $patient = $request->filled('patient_id')
+            ? Patient::with(['owner.departamento', 'owner.municipio', 'species', 'breed'])->find($request->integer('patient_id'))
+            : null;
+        $prefill = $patient ? $this->prefillFromPatient($patient) : [];
+        $certificate = new TravelCertificate();
 
-        return view('travel_certificates.create', compact('departments', 'countries', 'default', 'declaration'));
+        return view('travel_certificates.create', compact('departments', 'countries', 'default', 'declaration', 'patient', 'prefill', 'certificate'));
     }
 
     public function store(StoreTravelCertificateRequest $request): RedirectResponse
@@ -202,5 +208,43 @@ class TravelCertificateController extends Controller
                 ]);
             }
         }
+    }
+
+    protected function prefillFromPatient(Patient $patient): array
+    {
+        $weightKg = null;
+        if ($patient->peso_actual !== null) {
+            $weightKg = $patient->weight_unit === 'g'
+                ? (float) $patient->peso_actual / 1000
+                : (float) $patient->peso_actual;
+        }
+
+        $ageMonths = null;
+        if ($patient->age_value !== null) {
+            $ageMonths = $patient->age_unit === 'months'
+                ? $patient->age_value
+                : $patient->age_value * 12;
+        }
+
+        return [
+            'pet_id' => $patient->id,
+            'pet_name' => $patient->display_name,
+            'pet_species' => optional($patient->species)->name,
+            'pet_breed' => optional($patient->breed)->name,
+            'pet_sex' => $patient->sexo,
+            'pet_age_months' => $ageMonths,
+            'pet_weight_kg' => $weightKg,
+            'pet_color' => $patient->color,
+            'pet_microchip' => $patient->microchip,
+            'owner_name' => optional($patient->owner)->name,
+            'owner_document_type' => optional($patient->owner)->document_type,
+            'owner_document_number' => optional($patient->owner)->document,
+            'owner_phone' => optional($patient->owner)->phone ?? optional($patient->owner)->whatsapp,
+            'owner_email' => optional($patient->owner)->email,
+            'owner_address' => optional($patient->owner)->address,
+            'owner_city' => optional(optional($patient->owner)->municipio)->nombre
+                ?? optional(optional($patient->owner)->departamento)->nombre
+                ?? $patient->ciudad,
+        ];
     }
 }

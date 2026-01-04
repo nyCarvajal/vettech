@@ -1,3 +1,6 @@
+@php
+    $prefill = $prefill ?? [];
+@endphp
 @csrf
 <div class="space-y-4" x-data="{ type: '{{ old('type', $certificate->type ?? 'national_co') }}' }">
     <div class="grid grid-cols-2 gap-4">
@@ -30,24 +33,25 @@
 
     <h3 class="text-lg font-semibold">Tutor</h3>
     <div class="grid grid-cols-2 gap-4">
-        <input type="text" name="owner_name" placeholder="Nombre" value="{{ old('owner_name', $certificate->owner_name ?? '') }}" class="border rounded p-2">
-        <input type="text" name="owner_document_number" placeholder="Documento" value="{{ old('owner_document_number', $certificate->owner_document_number ?? '') }}" class="border rounded p-2">
-        <input type="text" name="owner_phone" placeholder="Teléfono" value="{{ old('owner_phone', $certificate->owner_phone ?? '') }}" class="border rounded p-2">
-        <input type="email" name="owner_email" placeholder="Email" value="{{ old('owner_email', $certificate->owner_email ?? '') }}" class="border rounded p-2">
-        <input type="text" name="owner_address" placeholder="Dirección" value="{{ old('owner_address', $certificate->owner_address ?? '') }}" class="border rounded p-2">
-        <input type="text" name="owner_city" placeholder="Ciudad" value="{{ old('owner_city', $certificate->owner_city ?? '') }}" class="border rounded p-2">
+        <input type="text" name="owner_name" placeholder="Nombre" value="{{ old('owner_name', $certificate->owner_name ?? $prefill['owner_name'] ?? '') }}" class="border rounded p-2">
+        <input type="text" name="owner_document_number" placeholder="Documento" value="{{ old('owner_document_number', $certificate->owner_document_number ?? $prefill['owner_document_number'] ?? '') }}" class="border rounded p-2">
+        <input type="text" name="owner_phone" placeholder="Teléfono" value="{{ old('owner_phone', $certificate->owner_phone ?? $prefill['owner_phone'] ?? '') }}" class="border rounded p-2">
+        <input type="email" name="owner_email" placeholder="Email" value="{{ old('owner_email', $certificate->owner_email ?? $prefill['owner_email'] ?? '') }}" class="border rounded p-2">
+        <input type="text" name="owner_address" placeholder="Dirección" value="{{ old('owner_address', $certificate->owner_address ?? $prefill['owner_address'] ?? '') }}" class="border rounded p-2">
+        <input type="text" name="owner_city" placeholder="Ciudad" value="{{ old('owner_city', $certificate->owner_city ?? $prefill['owner_city'] ?? '') }}" class="border rounded p-2">
     </div>
 
     <h3 class="text-lg font-semibold">Mascota</h3>
     <div class="grid grid-cols-2 gap-4">
-        <input type="text" name="pet_name" placeholder="Nombre" value="{{ old('pet_name', $certificate->pet_name ?? '') }}" class="border rounded p-2">
-        <input type="text" name="pet_species" placeholder="Especie" value="{{ old('pet_species', $certificate->pet_species ?? '') }}" class="border rounded p-2">
-        <input type="text" name="pet_breed" placeholder="Raza" value="{{ old('pet_breed', $certificate->pet_breed ?? '') }}" class="border rounded p-2">
-        <input type="text" name="pet_sex" placeholder="Sexo" value="{{ old('pet_sex', $certificate->pet_sex ?? '') }}" class="border rounded p-2">
-        <input type="number" name="pet_age_months" placeholder="Edad (meses)" value="{{ old('pet_age_months', $certificate->pet_age_months ?? '') }}" class="border rounded p-2">
-        <input type="number" step="0.01" name="pet_weight_kg" placeholder="Peso (kg)" value="{{ old('pet_weight_kg', $certificate->pet_weight_kg ?? '') }}" class="border rounded p-2">
-        <input type="text" name="pet_color" placeholder="Color" value="{{ old('pet_color', $certificate->pet_color ?? '') }}" class="border rounded p-2">
-        <input type="text" name="pet_microchip" placeholder="Microchip" value="{{ old('pet_microchip', $certificate->pet_microchip ?? '') }}" class="border rounded p-2">
+        <input type="hidden" name="pet_id" value="{{ old('pet_id', $certificate->pet_id ?? $prefill['pet_id'] ?? '') }}">
+        <input type="text" name="pet_name" placeholder="Nombre" value="{{ old('pet_name', $certificate->pet_name ?? $prefill['pet_name'] ?? '') }}" class="border rounded p-2">
+        <input type="text" name="pet_species" placeholder="Especie" value="{{ old('pet_species', $certificate->pet_species ?? $prefill['pet_species'] ?? '') }}" class="border rounded p-2">
+        <input type="text" name="pet_breed" placeholder="Raza" value="{{ old('pet_breed', $certificate->pet_breed ?? $prefill['pet_breed'] ?? '') }}" class="border rounded p-2">
+        <input type="text" name="pet_sex" placeholder="Sexo" value="{{ old('pet_sex', $certificate->pet_sex ?? $prefill['pet_sex'] ?? '') }}" class="border rounded p-2">
+        <input type="number" name="pet_age_months" placeholder="Edad (meses)" value="{{ old('pet_age_months', $certificate->pet_age_months ?? $prefill['pet_age_months'] ?? '') }}" class="border rounded p-2">
+        <input type="number" step="0.01" name="pet_weight_kg" placeholder="Peso (kg)" value="{{ old('pet_weight_kg', $certificate->pet_weight_kg ?? $prefill['pet_weight_kg'] ?? '') }}" class="border rounded p-2">
+        <input type="text" name="pet_color" placeholder="Color" value="{{ old('pet_color', $certificate->pet_color ?? $prefill['pet_color'] ?? '') }}" class="border rounded p-2">
+        <input type="text" name="pet_microchip" placeholder="Microchip" value="{{ old('pet_microchip', $certificate->pet_microchip ?? $prefill['pet_microchip'] ?? '') }}" class="border rounded p-2">
     </div>
 
     <h3 class="text-lg font-semibold">Viaje</h3>
