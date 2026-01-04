@@ -55,8 +55,9 @@
         <link rel="stylesheet" href="{{ asset('css/app-fallback.css') }}">
         <script id="tailwind-cdn-primary" src="https://cdn.tailwindcss.com"></script>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" defer></script>
-        <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
     @endif
+
+    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
 
     <!-- Fallback CSS para cuando Vite no está disponible o el bundle no carga -->
     <link rel="stylesheet" href="{{ asset('css/app-fallback.css') }}">
