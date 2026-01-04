@@ -13,7 +13,7 @@
             <div class="prose max-w-none">{!! $consent->merged_body_html !!}</div>
         </div>
         <div class="bg-white shadow rounded p-4 space-y-2">
-            <form method="POST" action="{{ route('public.consents.sign', $token) }}" @submit="submitSignature" class="space-y-2">
+            <form method="POST" action="{{ route('public.consents.sign', $token) }}" @submit="submitSignature" enctype="multipart/form-data" class="space-y-2">
                 @csrf
                 <input type="hidden" name="signature_base64" x-ref="signatureInput">
                 <label class="block text-sm">Nombre completo
