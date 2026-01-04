@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="max-w-5xl mx-auto py-8 space-y-6">
+<div class="max-w-6xl mx-auto py-8 space-y-6">
     <div class="rounded-2xl bg-gradient-to-r from-indigo-600 via-sky-500 to-emerald-500 text-white shadow-xl p-6 flex flex-wrap items-center justify-between gap-4">
         <div>
             <p class="uppercase tracking-wide text-xs font-semibold opacity-80">Consentimientos informados</p>
@@ -35,10 +35,10 @@
                     <span class="hidden sm:block">Configuración inicial</span>
                 </div>
             </div>
-            <div class="p-6 grid gap-4 md:grid-cols-[2fr_1fr] items-start">
+            <div class="p-6 grid gap-4 md:grid-cols-[3fr_1fr] items-start">
                 <div class="space-y-2">
                     <label class="block text-sm font-medium text-slate-700">Plantilla a usar</label>
-                    <select name="template_id" class="mt-1 w-full border-slate-200 rounded-xl px-4 py-3 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                    <select name="template_id" class="mt-1 w-full border-slate-200 rounded-xl px-4 py-3 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 min-h-[52px]">
                         @foreach($templates as $template)
                             <option value="{{ $template->id }}" @selected(old('template_id') == $template->id)>{{ $template->name }}</option>
                         @endforeach
