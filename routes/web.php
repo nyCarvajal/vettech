@@ -292,7 +292,7 @@ Route::match(['GET','POST'], 'webhook/whatsapp',
  Route::get('', [RoutingController::class, 'index'])->name('root');
 
 // Vettech módulo V1
-Route::middleware(['auth'])
+Route::middleware([Authenticate::class, ConnectTenantDB::class, SubstituteBindings::class])
     ->prefix('vet')
     ->group(function () {
         Route::resource('products', \App\Http\Controllers\ProductsController::class)->except(['show', 'destroy']);
