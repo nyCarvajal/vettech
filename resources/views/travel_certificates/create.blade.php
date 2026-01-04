@@ -27,41 +27,12 @@
             </div>
         </div>
 
-        <div class="grid grid-cols-1 xl:grid-cols-12 gap-6">
-            <div class="xl:col-span-8">
-                <div class="bg-white shadow-soft rounded-2xl border border-gray-100 p-6 h-full">
-                    <h2 class="text-lg font-semibold text-gray-900 mb-4">Detalles del certificado</h2>
-                    <form id="travel-certificate-form" method="POST" action="{{ route('travel-certificates.store') }}" enctype="multipart/form-data" class="space-y-6">
-                        @include('travel_certificates._form', ['prefill' => $prefill ?? [], 'patient' => $patient ?? null])
-                    </form>
-                </div>
-            </div>
-
-            <div class="xl:col-span-4 space-y-4">
-                <div class="bg-white border border-gray-100 rounded-2xl shadow-soft p-5 h-full">
-                    <div class="flex items-center gap-3 mb-3">
-                        <div class="h-10 w-10 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center text-lg font-semibold">✈️</div>
-                        <div>
-                            <p class="text-sm text-gray-500">Atajo rápido</p>
-                            <p class="text-base font-semibold text-gray-900">Formulario en pantalla completa</p>
-                        </div>
-                    </div>
-                    <p class="text-sm text-gray-600 leading-relaxed">Los campos están organizados en tarjetas de ancho completo para que completes la información sin tener que desplazarte por columnas angostas. El fondo suave resalta las secciones principales.</p>
-                    @if(!empty($prefill['pet_name']) || ($patient ?? null))
-                        <div class="mt-4 grid grid-cols-1 gap-3">
-                            <div class="p-3 rounded-xl border border-blue-100 bg-blue-50 text-blue-800">
-                                <p class="text-xs uppercase font-semibold">Paciente</p>
-                                <p class="text-sm font-medium">{{ $prefill['pet_name'] ?? ($patient->name ?? 'Paciente') }}</p>
-                            </div>
-                            @if(!empty($prefill['owner_name']))
-                                <div class="p-3 rounded-xl border border-emerald-100 bg-emerald-50 text-emerald-800">
-                                    <p class="text-xs uppercase font-semibold">Tutor</p>
-                                    <p class="text-sm font-medium">{{ $prefill['owner_name'] }}</p>
-                                </div>
-                            @endif
-                        </div>
-                    @endif
-                </div>
+        <div class="grid grid-cols-1">
+            <div class="bg-white shadow-soft rounded-2xl border border-gray-100 p-6 h-full">
+                <h2 class="text-lg font-semibold text-gray-900 mb-4">Detalles del certificado</h2>
+                <form id="travel-certificate-form" method="POST" action="{{ route('travel-certificates.store') }}" enctype="multipart/form-data" class="space-y-6">
+                    @include('travel_certificates._form', ['prefill' => $prefill ?? [], 'patient' => $patient ?? null])
+                </form>
             </div>
         </div>
     </div>
