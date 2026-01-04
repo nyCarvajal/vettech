@@ -91,9 +91,33 @@ class ConsentDocumentController extends Controller
         return redirect()->route('consents.show', $document)->with('status', 'Consentimiento listo para firmar');
     }
 
-    public function show(ConsentDocument $consent)
+    public function show(ConsentDocument $consent, PlaceholderService $placeholderService)
     {
         $consent->load('template', 'signatures', 'publicLinks');
+
+        // If the stored HTML is missing or still has placeholders, rebuild it with the snapshots
+        $stillHasPlaceholders = empty($consent->merged_body_html)
+            || preg_match('/\{\{\s*[a-zA-Z0-9_\.]+\s*\}\}/', $consent->merged_body_html);
+
+        if ($stillHasPlaceholders && $consent->template?->body_html) {
+            $context = [
+                'owner' => $consent->owner_snapshot ?? [],
+                'pet' => $consent->pet_snapshot ?? [],
+                'clinic' => auth()->user()?->clinic ?? [],
+                'vet' => [
+                    'name' => auth()->user()?->name,
+                    'license' => auth()->user()?->license ?? null,
+                ],
+                'now' => ['date' => now()->toDateString(), 'datetime' => now()->toDateTimeString()],
+            ];
+
+            $mergedHtml = $placeholderService->merge($consent->template->body_html, $context);
+            $consent->forceFill([
+                'merged_body_html' => $mergedHtml,
+                'merged_plain_text' => strip_tags($mergedHtml),
+            ])->save();
+        }
+
         return view('consents.show', compact('consent'));
     }
 
