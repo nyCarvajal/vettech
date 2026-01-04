@@ -1,14 +1,49 @@
 @csrf
-<div x-data="{ section: 'basics', medications: @json(old('anesthesia_medications', $procedure->anesthesiaMedications->toArray() ?? [])) }" class="space-y-6">
+<div
+    x-data="{ section: 'basics', medications: @json(old('anesthesia_medications', $procedure->anesthesiaMedications->toArray() ?? [])) }"
+    class="space-y-6"
+    data-procedure-form
+    data-active-section="basics"
+>
     <div class="flex space-x-2">
-        <button type="button" @click="section='basics'" :class="section==='basics' ? 'bg-indigo-600 text-white' : 'bg-gray-200'" class="px-3 py-2 rounded">Datos básicos</button>
-        <button type="button" @click="section='schedule'" :class="section==='schedule' ? 'bg-indigo-600 text-white' : 'bg-gray-200'" class="px-3 py-2 rounded">Programación</button>
-        <button type="button" @click="section='anesthesia'" :class="section==='anesthesia' ? 'bg-indigo-600 text-white' : 'bg-gray-200'" class="px-3 py-2 rounded">Anestesia</button>
-        <button type="button" @click="section='notes'" :class="section==='notes' ? 'bg-indigo-600 text-white' : 'bg-gray-200'" class="px-3 py-2 rounded">Notas</button>
-        <button type="button" @click="section='consent'" :class="section==='consent' ? 'bg-indigo-600 text-white' : 'bg-gray-200'" class="px-3 py-2 rounded">Consentimiento</button>
+        <button
+            type="button"
+            data-section-button="basics"
+            @click="section='basics'"
+            :class="section==='basics' ? 'bg-indigo-600 text-white' : 'bg-gray-200 text-gray-800'"
+            class="px-3 py-2 rounded bg-gray-200 text-gray-800"
+        >Datos básicos</button>
+        <button
+            type="button"
+            data-section-button="schedule"
+            @click="section='schedule'"
+            :class="section==='schedule' ? 'bg-indigo-600 text-white' : 'bg-gray-200 text-gray-800'"
+            class="px-3 py-2 rounded bg-gray-200 text-gray-800"
+        >Programación</button>
+        <button
+            type="button"
+            data-section-button="anesthesia"
+            @click="section='anesthesia'"
+            :class="section==='anesthesia' ? 'bg-indigo-600 text-white' : 'bg-gray-200 text-gray-800'"
+            class="px-3 py-2 rounded bg-gray-200 text-gray-800"
+        >Anestesia</button>
+        <button
+            type="button"
+            data-section-button="notes"
+            @click="section='notes'"
+            :class="section==='notes' ? 'bg-indigo-600 text-white' : 'bg-gray-200 text-gray-800'"
+            class="px-3 py-2 rounded bg-gray-200 text-gray-800"
+        >Notas</button>
+        <button
+            type="button"
+            data-section-button="consent"
+            @click="section='consent'"
+            :class="section==='consent' ? 'bg-indigo-600 text-white' : 'bg-gray-200 text-gray-800'"
+            class="px-3 py-2 rounded bg-gray-200 text-gray-800"
+        >Consentimiento</button>
     </div>
 
-    <div x-show="section==='basics'" class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-white p-4 rounded shadow">
+    <div x-show="section==='basics'" data-section="basics" class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-white p-4 rounded shadow">
         <div>
             <label class="block text-sm font-medium">Tipo *</label>
             <select name="type" class="input input-bordered w-full" required>
@@ -42,7 +77,7 @@
         </div>
     </div>
 
-    <div x-show="section==='schedule'" class="grid grid-cols-1 md:grid-cols-3 gap-4 bg-white p-4 rounded shadow">
+    <div x-show="section==='schedule'" data-section="schedule" class="grid grid-cols-1 md:grid-cols-3 gap-4 bg-white p-4 rounded shadow">
         <div>
             <label class="block text-sm font-medium">Programado para</label>
             <input type="datetime-local" name="scheduled_at" value="{{ old('scheduled_at', optional($procedure->scheduled_at)->format('Y-m-d\TH:i')) }}" class="input input-bordered w-full">
@@ -69,7 +104,7 @@
         </div>
     </div>
 
-    <div x-show="section==='anesthesia'" class="space-y-4 bg-white p-4 rounded shadow">
+    <div x-show="section==='anesthesia'" data-section="anesthesia" class="space-y-4 bg-white p-4 rounded shadow">
         <div>
             <label class="block text-sm font-medium">Plan anestésico</label>
             <textarea name="anesthesia_plan" rows="3" class="input input-bordered w-full">{{ old('anesthesia_plan', $procedure->anesthesia_plan) }}</textarea>
@@ -105,7 +140,7 @@
         </div>
     </div>
 
-    <div x-show="section==='notes'" class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-white p-4 rounded shadow">
+    <div x-show="section==='notes'" data-section="notes" class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-white p-4 rounded shadow">
         <div>
             <label class="block text-sm font-medium">Preoperatorio</label>
             <textarea name="preop_notes" rows="3" class="input input-bordered w-full">{{ old('preop_notes', $procedure->preop_notes) }}</textarea>
@@ -132,7 +167,7 @@
         </div>
     </div>
 
-    <div x-show="section==='consent'" class="bg-white p-4 rounded shadow space-y-4">
+    <div x-show="section==='consent'" data-section="consent" class="bg-white p-4 rounded shadow space-y-4">
         <div>
             <label class="block text-sm font-medium">Consentimiento firmado</label>
             <input type="text" name="consent_document_id" value="{{ old('consent_document_id', $procedure->consent_document_id) }}" class="input input-bordered w-full" placeholder="ID de documento firmado">
@@ -144,3 +179,37 @@
         </div>
     </div>
 </div>
+
+@once
+    @push('scripts')
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                const wrapper = document.querySelector('[data-procedure-form]');
+                if (!wrapper || wrapper.__x) return; // Alpine ya controla el formulario
+
+                const buttons = Array.from(wrapper.querySelectorAll('[data-section-button]'));
+                const sections = Array.from(wrapper.querySelectorAll('[data-section]'));
+                if (!buttons.length || !sections.length) return;
+
+                const toggleSection = (target) => {
+                    buttons.forEach((btn) => {
+                        const isActive = btn.dataset.sectionButton === target;
+                        btn.classList.toggle('bg-indigo-600', isActive);
+                        btn.classList.toggle('text-white', isActive);
+                        btn.classList.toggle('bg-gray-200', !isActive);
+                        btn.classList.toggle('text-gray-800', !isActive);
+                    });
+
+                    sections.forEach((section) => {
+                        const isActive = section.dataset.section === target;
+                        section.classList.toggle('hidden', !isActive);
+                    });
+                };
+
+                const initial = wrapper.dataset.activeSection || buttons[0].dataset.sectionButton;
+                toggleSection(initial);
+                buttons.forEach((btn) => btn.addEventListener('click', () => toggleSection(btn.dataset.sectionButton)));
+            });
+        </script>
+    @endpush
+@endonce
