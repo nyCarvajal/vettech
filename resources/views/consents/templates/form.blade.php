@@ -26,9 +26,10 @@
         <p class="font-semibold mb-2">Etiquetas disponibles</p>
         <div class="grid grid-cols-2 md:grid-cols-3 gap-2">
             @foreach($placeholders as $key => $meta)
+            @php($placeholderTag = '{{' . $key . '}}')
             <label class="flex items-center space-x-2">
                 <input type="checkbox" name="allowed_placeholders[]" value="{{ $key }}" {{ in_array($key, old('allowed_placeholders', $template->allowed_placeholders ?? [])) ? 'checked' : '' }}>
-                <button type="button" class="text-indigo-600 underline" @click="insert('{{ '{{'.$key.'}}' }}')">{{ $key }}</button>
+                <button type="button" class="text-indigo-600 underline" @click="insert('{{ $placeholderTag }}')">{{ $key }}</button>
             </label>
             @endforeach
         </div>
