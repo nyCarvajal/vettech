@@ -9,6 +9,7 @@ class Country extends Model
 {
     use HasFactory;
 
+    protected $connection = 'mysql';
     protected $primaryKey = 'code2';
     public $incrementing = false;
     protected $keyType = 'string';
