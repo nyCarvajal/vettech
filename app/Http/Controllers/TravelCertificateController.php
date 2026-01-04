@@ -14,6 +14,8 @@ use App\Models\TravelCertificate;
 use App\Models\TravelCertificateAttachment;
 use App\Models\TravelCertificateDeworming;
 use App\Models\TravelCertificateVaccination;
+use App\Models\User;
+use App\Models\Clinica;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
@@ -64,7 +66,24 @@ class TravelCertificateController extends Controller
 
         $departments = GeoDepartment::orderBy('nombre')->get();
         $countries = Country::orderBy('name_es')->get();
-        $default = config('travel_certificates.default_clinic');
+        $user = $request->user();
+        $clinic = Clinica::resolveForUser($user) ?? optional($user)->clinica;
+        $defaultClinic = config('travel_certificates.default_clinic');
+        if ($clinic) {
+            $defaultClinic['name'] = $clinic->nombre ?? $defaultClinic['name'];
+            $defaultClinic['nit'] = $clinic->nit ?? $defaultClinic['nit'];
+            $defaultClinic['address'] = $clinic->direccion ?? $defaultClinic['address'];
+            $defaultClinic['phone'] = $clinic->telefono ?? $defaultClinic['phone'];
+            $defaultClinic['city'] = $clinic->municipio ?? $defaultClinic['city'];
+        }
+        if ($user) {
+            $defaultClinic['vet_name'] = trim(($user->nombre ?? '') . ' ' . ($user->apellidos ?? '')) ?: $defaultClinic['vet_name'];
+            $defaultClinic['vet_license'] = $user->firma_medica_texto ?? $user->numero_identificacion ?? $defaultClinic['vet_license'];
+        }
+        $vets = User::query()
+            ->when($clinic, fn ($query) => $query->where('clinica_id', $clinic->id))
+            ->orderBy('nombre')
+            ->get(['id', 'nombre', 'apellidos', 'numero_identificacion', 'firma_medica_texto']);
         $declaration = config('travel_certificates.default_declaration');
         $patient = $request->filled('patient_id')
             ? Patient::with(['owner.departamento', 'owner.municipio', 'species', 'breed'])->find($request->integer('patient_id'))
@@ -72,7 +91,7 @@ class TravelCertificateController extends Controller
         $prefill = $patient ? $this->prefillFromPatient($patient) : [];
         $certificate = new TravelCertificate();
 
-        return view('travel_certificates.create', compact('departments', 'countries', 'default', 'declaration', 'patient', 'prefill', 'certificate'));
+        return view('travel_certificates.create', compact('departments', 'countries', 'defaultClinic', 'declaration', 'patient', 'prefill', 'certificate', 'vets', 'user'));
     }
 
     public function store(StoreTravelCertificateRequest $request): RedirectResponse
@@ -86,7 +105,11 @@ class TravelCertificateController extends Controller
 
         $this->syncRelations($certificate, $data, $request);
 
-        return redirect()->route('travel-certificates.show', $certificate)->with('status', 'Certificado creado');
+        $redirect = $request->boolean('save_and_continue')
+            ? redirect()->route('travel-certificates.edit', $certificate)
+            : redirect()->route('travel-certificates.show', $certificate);
+
+        return $redirect->with('status', 'Certificado creado');
     }
 
     public function show(TravelCertificate $travel_certificate): View
@@ -103,12 +126,33 @@ class TravelCertificateController extends Controller
         $departments = GeoDepartment::orderBy('nombre')->get();
         $countries = Country::orderBy('name_es')->get();
         $declaration = $travel_certificate->declaration_text;
+        $user = request()->user();
+        $clinic = Clinica::resolveForUser($user) ?? optional($user)->clinica;
+        $defaultClinic = config('travel_certificates.default_clinic');
+        if ($clinic) {
+            $defaultClinic['name'] = $clinic->nombre ?? $defaultClinic['name'];
+            $defaultClinic['nit'] = $clinic->nit ?? $defaultClinic['nit'];
+            $defaultClinic['address'] = $clinic->direccion ?? $defaultClinic['address'];
+            $defaultClinic['phone'] = $clinic->telefono ?? $defaultClinic['phone'];
+            $defaultClinic['city'] = $clinic->municipio ?? $defaultClinic['city'];
+        }
+        if ($user) {
+            $defaultClinic['vet_name'] = trim(($user->nombre ?? '') . ' ' . ($user->apellidos ?? '')) ?: $defaultClinic['vet_name'];
+            $defaultClinic['vet_license'] = $user->firma_medica_texto ?? $user->numero_identificacion ?? $defaultClinic['vet_license'];
+        }
+        $vets = User::query()
+            ->when($clinic, fn ($query) => $query->where('clinica_id', $clinic->id))
+            ->orderBy('nombre')
+            ->get(['id', 'nombre', 'apellidos', 'numero_identificacion', 'firma_medica_texto']);
 
         return view('travel_certificates.edit', [
             'certificate' => $travel_certificate->load(['vaccinations', 'dewormings', 'attachments']),
             'departments' => $departments,
             'countries' => $countries,
             'declaration' => $declaration,
+            'defaultClinic' => $defaultClinic,
+            'vets' => $vets,
+            'user' => $user,
         ]);
     }
 
