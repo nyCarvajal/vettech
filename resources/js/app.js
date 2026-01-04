@@ -4,11 +4,6 @@ import bootstrap from 'bootstrap/dist/js/bootstrap'
 window.bootstrap = bootstrap;
 import 'iconify-icon';
 import 'simplebar/dist/simplebar'
-import Alpine from 'alpinejs'
-
-window.Alpine = Alpine;
-Alpine.start();
-
 // resources/js/app.js
 import './pages/dashboard.js';
 import './pages/chart';
