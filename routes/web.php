@@ -24,6 +24,8 @@ use App\Http\Controllers\ProveedorController;
 use App\Http\Controllers\HistoriaClinicaController;
 use App\Http\Controllers\OwnersController;
 use App\Http\Controllers\PatientsController;
+use App\Http\Controllers\TravelCertificateController;
+use App\Http\Controllers\GeoController;
 use App\Http\Controllers\BreedsController;
 use App\Http\Controllers\GroomingBillingController;
 use App\Http\Controllers\GroomingController;
@@ -112,6 +114,13 @@ Route::post('patients/{patient}/dewormings', [\App\Http\Controllers\PatientDewor
 Route::get('patients/{patient}/dewormings/{deworming}/edit', [\App\Http\Controllers\PatientDewormingController::class, 'edit'])->name('patients.dewormings.edit');
 Route::put('patients/{patient}/dewormings/{deworming}', [\App\Http\Controllers\PatientDewormingController::class, 'update'])->name('patients.dewormings.update');
 Route::delete('patients/{patient}/dewormings/{deworming}', [\App\Http\Controllers\PatientDewormingController::class, 'destroy'])->name('patients.dewormings.destroy');
+
+Route::get('geo/departments/{department}/municipalities', [GeoController::class, 'municipalities'])->name('geo.departments.municipalities');
+Route::post('travel-certificates/{travel_certificate}/issue', [TravelCertificateController::class, 'issue'])->name('travel-certificates.issue');
+Route::post('travel-certificates/{travel_certificate}/cancel', [TravelCertificateController::class, 'cancel'])->name('travel-certificates.cancel');
+Route::post('travel-certificates/{travel_certificate}/duplicate', [TravelCertificateController::class, 'duplicate'])->name('travel-certificates.duplicate');
+Route::get('travel-certificates/{travel_certificate}/pdf', [TravelCertificateController::class, 'pdf'])->name('travel-certificates.pdf');
+Route::resource('travel-certificates', TravelCertificateController::class);
 Route::get('/breeds', BreedsController::class)->name('breeds.index');
 
 Route::prefix('peluqueria')
