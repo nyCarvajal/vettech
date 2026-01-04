@@ -3,8 +3,9 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
-class ConsentSignature extends BaseModel
+class ConsentSignature extends Model
 {
     use HasFactory;
 
