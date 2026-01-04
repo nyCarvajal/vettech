@@ -323,6 +323,13 @@ Route::middleware(['auth'])
         Route::post('cash/sessions', [\App\Http\Controllers\CashSessionsController::class, 'store'])->name('cash.sessions.store');
         Route::post('cash/sessions/{cashSession}/close', [\App\Http\Controllers\CashSessionsController::class, 'close'])->name('cash.sessions.close');
         Route::post('cash/movements', [\App\Http\Controllers\CashMovementsController::class, 'store'])->name('cash.movements.store');
+
+        Route::resource('procedures', \App\Http\Controllers\ProcedureController::class);
+        Route::post('procedures/{procedure}/status', [\App\Http\Controllers\ProcedureController::class, 'changeStatus'])->name('procedures.change-status');
+        Route::post('procedures/{procedure}/attachments', [\App\Http\Controllers\ProcedureAttachmentController::class, 'store'])->name('procedures.attachments.store');
+        Route::delete('procedures/{procedure}/attachments/{attachment}', [\App\Http\Controllers\ProcedureAttachmentController::class, 'destroy'])->name('procedures.attachments.destroy');
+        Route::post('procedures/{procedure}/consent/link', [\App\Http\Controllers\ProcedureConsentController::class, 'linkSignedConsent'])->name('procedures.consent.link');
+        Route::post('procedures/{procedure}/consent/create', [\App\Http\Controllers\ProcedureConsentController::class, 'createFromTemplate'])->name('procedures.consent.create');
     });
     Route::middleware([
         Authenticate::class,
