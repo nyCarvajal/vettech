@@ -2,7 +2,36 @@
 
 @section('content')
 <div class="max-w-5xl mx-auto py-8 space-y-6">
-    <div class="rounded-2xl bg-gradient-to-r from-indigo-600 via-sky-500 to-emerald-500 text-white shadow-xl p-6 flex flex-wrap items-center justify-between gap-4">
+    <style>
+        .consent-hero-gradient {
+            background: linear-gradient(90deg, #4f46e5 0%, #0ea5e9 50%, #10b981 100%);
+        }
+
+        .consent-primary-button {
+            background: linear-gradient(90deg, #4f46e5 0%, #10b981 100%);
+        }
+
+        .consent-card {
+            background-color: #ffffff;
+        }
+
+        .consent-badge-indigo {
+            background-color: #eef2ff;
+            color: #4338ca;
+        }
+
+        .consent-badge-emerald {
+            background-color: #ecfdf3;
+            color: #047857;
+        }
+
+        .consent-badge-sky {
+            background-color: #f0f9ff;
+            color: #0369a1;
+        }
+    </style>
+
+    <div class="rounded-2xl bg-gradient-to-r from-indigo-600 via-sky-500 to-emerald-500 text-white shadow-xl p-6 flex flex-wrap items-center justify-between gap-4 consent-hero-gradient">
         <div>
             <p class="uppercase tracking-wide text-xs font-semibold opacity-80">Consentimientos informados</p>
             <h1 class="text-3xl font-extrabold mt-1">Generar consentimiento</h1>
@@ -23,7 +52,7 @@
             <input type="hidden" name="patient_id" value="{{ $patient->id }}">
         @endif
 
-        <div class="bg-white shadow-lg rounded-2xl border border-slate-200/80">
+        <div class="bg-white shadow-lg rounded-2xl border border-slate-200/80 consent-card">
             <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
                 <div>
                     <p class="text-xs uppercase text-slate-500">Paso 1</p>
@@ -31,7 +60,7 @@
                     <p class="text-sm text-slate-500">Solo se muestran las plantillas activas disponibles.</p>
                 </div>
                 <div class="flex items-center gap-2 text-slate-500 text-sm">
-                    <span class="inline-flex h-9 w-9 items-center justify-center rounded-full bg-indigo-50 text-indigo-600 font-semibold">1</span>
+                    <span class="inline-flex h-9 w-9 items-center justify-center rounded-full bg-indigo-50 text-indigo-600 font-semibold consent-badge-indigo">1</span>
                     <span class="hidden sm:block">Configuración inicial</span>
                 </div>
             </div>
@@ -52,14 +81,14 @@
         </div>
 
         <div class="grid gap-6 lg:grid-cols-2">
-            <div class="bg-white shadow-lg rounded-2xl border border-slate-200/80">
+                <div class="bg-white shadow-lg rounded-2xl border border-slate-200/80 consent-card">
                 <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
                     <div>
                         <p class="text-xs uppercase text-slate-500">Paso 2</p>
                         <h2 class="text-lg font-semibold text-slate-800">Datos del tutor</h2>
                         <p class="text-sm text-slate-500">Confirma la información de contacto del firmante.</p>
                     </div>
-                    <span class="inline-flex h-9 w-9 items-center justify-center rounded-full bg-emerald-50 text-emerald-600 font-semibold">2</span>
+                    <span class="inline-flex h-9 w-9 items-center justify-center rounded-full bg-emerald-50 text-emerald-600 font-semibold consent-badge-emerald">2</span>
                 </div>
                 <div class="p-6 grid gap-4 sm:grid-cols-2">
                     @foreach([
@@ -84,14 +113,14 @@
                 </div>
             </div>
 
-            <div class="bg-white shadow-lg rounded-2xl border border-slate-200/80">
+            <div class="bg-white shadow-lg rounded-2xl border border-slate-200/80 consent-card">
                 <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
                     <div>
                         <p class="text-xs uppercase text-slate-500">Paso 3</p>
                         <h2 class="text-lg font-semibold text-slate-800">Datos del paciente</h2>
                         <p class="text-sm text-slate-500">Usados para personalizar el cuerpo del consentimiento.</p>
                     </div>
-                    <span class="inline-flex h-9 w-9 items-center justify-center rounded-full bg-sky-50 text-sky-600 font-semibold">3</span>
+                    <span class="inline-flex h-9 w-9 items-center justify-center rounded-full bg-sky-50 text-sky-600 font-semibold consent-badge-sky">3</span>
                 </div>
                 <div class="p-6 grid gap-4 sm:grid-cols-2">
                     @foreach([
@@ -120,7 +149,7 @@
 
         <div class="flex justify-end gap-3">
             <a href="{{ url()->previous() }}" class="px-4 py-2 rounded-xl border border-slate-200 text-slate-600 hover:text-slate-800 hover:border-slate-300 transition">Cancelar</a>
-            <button type="submit" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 to-emerald-500 text-white font-semibold shadow-md hover:shadow-lg transition">Generar consentimiento</button>
+            <button type="submit" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 to-emerald-500 text-white font-semibold shadow-md hover:shadow-lg transition consent-primary-button">Generar consentimiento</button>
         </div>
     </form>
 </div>
