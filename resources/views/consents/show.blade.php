@@ -39,7 +39,7 @@
             <canvas x-ref="canvas" class="border w-full h-40" style="touch-action: none;"></canvas>
             <div class="flex space-x-2">
                 <button type="button" @click="clear" class="px-3 py-1 border rounded">Limpiar</button>
-                <button type="submit" class="bg-indigo-600 text-white px-4 py-2 rounded">Guardar firma</button>
+                <button type="submit" class="bg-indigo-600 text-white px-4 py-2 rounded">Firmar</button>
             </div>
         </form>
     </div>
