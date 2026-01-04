@@ -1,14 +1,69 @@
 @csrf
-<div x-data="{ section: 'basics', medications: @json(old('anesthesia_medications', $procedure->anesthesiaMedications->toArray() ?? [])) }" class="space-y-6">
+@php
+    $patientSnapshotData = old('patient_snapshot')
+        ? (is_string(old('patient_snapshot')) ? json_decode(old('patient_snapshot'), true) ?? [] : old('patient_snapshot'))
+        : ($patientSnapshot ?? ($procedure->patient_snapshot ?? []));
+    $ownerSnapshotData = old('owner_snapshot')
+        ? (is_string(old('owner_snapshot')) ? json_decode(old('owner_snapshot'), true) ?? [] : old('owner_snapshot'))
+        : ($ownerSnapshot ?? ($procedure->owner_snapshot ?? []));
+    $responsibleUsersList = $responsibleUsers ?? collect();
+    $defaultResponsibleName = $defaultResponsibleName ?? null;
+    $defaultResponsibleLicense = $defaultResponsibleLicense ?? null;
+    $selectedResponsibleName = old('responsible_vet_name', $procedure->responsible_vet_name ?: $defaultResponsibleName);
+    $initialLicense = old('responsible_vet_license', $procedure->responsible_vet_license ?: $defaultResponsibleLicense);
+    $recentPatientConsents = $recentPatientConsents ?? collect();
+@endphp
+
+<input type="hidden" name="patient_id" value="{{ old('patient_id', $procedure->patient_id ?? optional($patient ?? null)->id) }}">
+<input type="hidden" name="owner_id" value="{{ old('owner_id', $procedure->owner_id ?? optional(optional($patient ?? null)->owner)->id) }}">
+<input type="hidden" name="patient_snapshot" value='@json($patientSnapshotData, JSON_UNESCAPED_UNICODE)'>
+<input type="hidden" name="owner_snapshot" value='@json($ownerSnapshotData, JSON_UNESCAPED_UNICODE)'>
+
+<div
+    x-data="{ section: 'basics', medications: @json(old('anesthesia_medications', $procedure->anesthesiaMedications->toArray() ?? [])) }"
+    class="space-y-6"
+    data-procedure-form
+    data-active-section="basics"
+>
     <div class="flex space-x-2">
-        <button type="button" @click="section='basics'" :class="section==='basics' ? 'bg-indigo-600 text-white' : 'bg-gray-200'" class="px-3 py-2 rounded">Datos básicos</button>
-        <button type="button" @click="section='schedule'" :class="section==='schedule' ? 'bg-indigo-600 text-white' : 'bg-gray-200'" class="px-3 py-2 rounded">Programación</button>
-        <button type="button" @click="section='anesthesia'" :class="section==='anesthesia' ? 'bg-indigo-600 text-white' : 'bg-gray-200'" class="px-3 py-2 rounded">Anestesia</button>
-        <button type="button" @click="section='notes'" :class="section==='notes' ? 'bg-indigo-600 text-white' : 'bg-gray-200'" class="px-3 py-2 rounded">Notas</button>
-        <button type="button" @click="section='consent'" :class="section==='consent' ? 'bg-indigo-600 text-white' : 'bg-gray-200'" class="px-3 py-2 rounded">Consentimiento</button>
+        <button
+            type="button"
+            data-section-button="basics"
+            @click="section='basics'"
+            :class="section==='basics' ? 'bg-indigo-600 text-white' : 'bg-gray-200 text-gray-800'"
+            class="px-3 py-2 rounded bg-gray-200 text-gray-800"
+        >Datos básicos</button>
+        <button
+            type="button"
+            data-section-button="schedule"
+            @click="section='schedule'"
+            :class="section==='schedule' ? 'bg-indigo-600 text-white' : 'bg-gray-200 text-gray-800'"
+            class="px-3 py-2 rounded bg-gray-200 text-gray-800"
+        >Programación</button>
+        <button
+            type="button"
+            data-section-button="anesthesia"
+            @click="section='anesthesia'"
+            :class="section==='anesthesia' ? 'bg-indigo-600 text-white' : 'bg-gray-200 text-gray-800'"
+            class="px-3 py-2 rounded bg-gray-200 text-gray-800"
+        >Anestesia</button>
+        <button
+            type="button"
+            data-section-button="notes"
+            @click="section='notes'"
+            :class="section==='notes' ? 'bg-indigo-600 text-white' : 'bg-gray-200 text-gray-800'"
+            class="px-3 py-2 rounded bg-gray-200 text-gray-800"
+        >Notas</button>
+        <button
+            type="button"
+            data-section-button="consent"
+            @click="section='consent'"
+            :class="section==='consent' ? 'bg-indigo-600 text-white' : 'bg-gray-200 text-gray-800'"
+            class="px-3 py-2 rounded bg-gray-200 text-gray-800"
+        >Consentimiento</button>
     </div>
 
-    <div x-show="section==='basics'" class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-white p-4 rounded shadow">
+    <div x-show="section==='basics'" data-section="basics" class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-white p-4 rounded shadow">
         <div>
             <label class="block text-sm font-medium">Tipo *</label>
             <select name="type" class="input input-bordered w-full" required>
@@ -32,17 +87,83 @@
                 @endforeach
             </select>
         </div>
-        <div class="md:col-span-2">
-            <label class="block text-sm font-medium">Paciente (snapshot JSON)</label>
-            <textarea name="patient_snapshot" class="input input-bordered w-full" rows="3">{{ old('patient_snapshot', json_encode($procedure->patient_snapshot ?? [], JSON_PRETTY_PRINT)) }}</textarea>
-        </div>
-        <div class="md:col-span-2">
-            <label class="block text-sm font-medium">Tutor (snapshot JSON)</label>
-            <textarea name="owner_snapshot" class="input input-bordered w-full" rows="3">{{ old('owner_snapshot', json_encode($procedure->owner_snapshot ?? [], JSON_PRETTY_PRINT)) }}</textarea>
+        <div class="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="border border-gray-200 rounded-lg p-4 bg-gray-50">
+                <div class="flex items-center justify-between mb-2">
+                    <h3 class="font-semibold text-gray-800">Paciente</h3>
+                    <span class="text-xs px-2 py-1 rounded bg-indigo-100 text-indigo-800">Solo lectura</span>
+                </div>
+                @if(! empty($patientSnapshotData))
+                    <dl class="text-sm text-gray-700 space-y-1">
+                        <div class="grid grid-cols-3 gap-1">
+                            <dt class="font-medium">Nombre</dt>
+                            <dd class="col-span-2">{{ $patientSnapshotData['name'] ?? '—' }}</dd>
+                        </div>
+                        <div class="grid grid-cols-3 gap-1">
+                            <dt class="font-medium">Especie</dt>
+                            <dd class="col-span-2">{{ $patientSnapshotData['species'] ?? '—' }}</dd>
+                        </div>
+                        <div class="grid grid-cols-3 gap-1">
+                            <dt class="font-medium">Raza</dt>
+                            <dd class="col-span-2">{{ $patientSnapshotData['breed'] ?? '—' }}</dd>
+                        </div>
+                        <div class="grid grid-cols-3 gap-1">
+                            <dt class="font-medium">Sexo</dt>
+                            <dd class="col-span-2">{{ $patientSnapshotData['sex'] ?? '—' }}</dd>
+                        </div>
+                        <div class="grid grid-cols-3 gap-1">
+                            <dt class="font-medium">Edad</dt>
+                            <dd class="col-span-2">{{ $patientSnapshotData['age'] ?? '—' }}</dd>
+                        </div>
+                        <div class="grid grid-cols-3 gap-1">
+                            <dt class="font-medium">Peso</dt>
+                            <dd class="col-span-2">{{ $patientSnapshotData['weight'] ?? '—' }}</dd>
+                        </div>
+                        <div class="grid grid-cols-3 gap-1">
+                            <dt class="font-medium">Microchip</dt>
+                            <dd class="col-span-2">{{ $patientSnapshotData['microchip'] ?? '—' }}</dd>
+                        </div>
+                    </dl>
+                @else
+                    <p class="text-sm text-gray-500">No se encontraron datos del paciente.</p>
+                @endif
+            </div>
+            <div class="border border-gray-200 rounded-lg p-4 bg-gray-50">
+                <div class="flex items-center justify-between mb-2">
+                    <h3 class="font-semibold text-gray-800">Tutor</h3>
+                    <span class="text-xs px-2 py-1 rounded bg-indigo-100 text-indigo-800">Solo lectura</span>
+                </div>
+                @if(! empty($ownerSnapshotData))
+                    <dl class="text-sm text-gray-700 space-y-1">
+                        <div class="grid grid-cols-3 gap-1">
+                            <dt class="font-medium">Nombre</dt>
+                            <dd class="col-span-2">{{ $ownerSnapshotData['name'] ?? '—' }}</dd>
+                        </div>
+                        <div class="grid grid-cols-3 gap-1">
+                            <dt class="font-medium">Documento</dt>
+                            <dd class="col-span-2">{{ $ownerSnapshotData['document'] ?? '—' }}</dd>
+                        </div>
+                        <div class="grid grid-cols-3 gap-1">
+                            <dt class="font-medium">Teléfono</dt>
+                            <dd class="col-span-2">{{ $ownerSnapshotData['phone'] ?? '—' }}</dd>
+                        </div>
+                        <div class="grid grid-cols-3 gap-1">
+                            <dt class="font-medium">Correo</dt>
+                            <dd class="col-span-2">{{ $ownerSnapshotData['email'] ?? '—' }}</dd>
+                        </div>
+                        <div class="grid grid-cols-3 gap-1">
+                            <dt class="font-medium">Dirección</dt>
+                            <dd class="col-span-2">{{ $ownerSnapshotData['address'] ?? '—' }}</dd>
+                        </div>
+                    </dl>
+                @else
+                    <p class="text-sm text-gray-500">No se encontraron datos del tutor.</p>
+                @endif
+            </div>
         </div>
     </div>
 
-    <div x-show="section==='schedule'" class="grid grid-cols-1 md:grid-cols-3 gap-4 bg-white p-4 rounded shadow">
+    <div x-show="section==='schedule'" data-section="schedule" class="grid grid-cols-1 md:grid-cols-3 gap-4 bg-white p-4 rounded shadow">
         <div>
             <label class="block text-sm font-medium">Programado para</label>
             <input type="datetime-local" name="scheduled_at" value="{{ old('scheduled_at', optional($procedure->scheduled_at)->format('Y-m-d\TH:i')) }}" class="input input-bordered w-full">
@@ -61,15 +182,31 @@
         </div>
         <div>
             <label class="block text-sm font-medium">Responsable</label>
-            <input type="text" name="responsible_vet_name" value="{{ old('responsible_vet_name', $procedure->responsible_vet_name) }}" class="input input-bordered w-full">
+            <select name="responsible_vet_name" class="input input-bordered w-full" data-responsible-select>
+                @if($defaultResponsibleName)
+                    <option value="{{ $defaultResponsibleName }}" data-license="{{ $defaultResponsibleLicense }}" @selected($selectedResponsibleName===$defaultResponsibleName)>
+                        {{ $defaultResponsibleName }} (tú)
+                    </option>
+                @endif
+                @foreach($responsibleUsersList as $user)
+                    @php
+                        $fullName = trim(($user->nombre ?? '') . ' ' . ($user->apellidos ?? ''));
+                        $license = $user->firma_medica_texto ?? $user->numero_identificacion;
+                    @endphp
+                    @continue($defaultResponsibleName && $fullName === $defaultResponsibleName)
+                    <option value="{{ $fullName }}" data-license="{{ $license }}" @selected($selectedResponsibleName===$fullName)>
+                        {{ $fullName }}
+                    </option>
+                @endforeach
+            </select>
         </div>
         <div>
             <label class="block text-sm font-medium">Licencia</label>
-            <input type="text" name="responsible_vet_license" value="{{ old('responsible_vet_license', $procedure->responsible_vet_license) }}" class="input input-bordered w-full">
+            <input type="text" name="responsible_vet_license" value="{{ $initialLicense }}" class="input input-bordered w-full" data-responsible-license>
         </div>
     </div>
 
-    <div x-show="section==='anesthesia'" class="space-y-4 bg-white p-4 rounded shadow">
+    <div x-show="section==='anesthesia'" data-section="anesthesia" class="space-y-4 bg-white p-4 rounded shadow">
         <div>
             <label class="block text-sm font-medium">Plan anestésico</label>
             <textarea name="anesthesia_plan" rows="3" class="input input-bordered w-full">{{ old('anesthesia_plan', $procedure->anesthesia_plan) }}</textarea>
@@ -105,7 +242,7 @@
         </div>
     </div>
 
-    <div x-show="section==='notes'" class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-white p-4 rounded shadow">
+    <div x-show="section==='notes'" data-section="notes" class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-white p-4 rounded shadow">
         <div>
             <label class="block text-sm font-medium">Preoperatorio</label>
             <textarea name="preop_notes" rows="3" class="input input-bordered w-full">{{ old('preop_notes', $procedure->preop_notes) }}</textarea>
@@ -132,15 +269,110 @@
         </div>
     </div>
 
-    <div x-show="section==='consent'" class="bg-white p-4 rounded shadow space-y-4">
+    <div x-show="section==='consent'" data-section="consent" class="bg-white p-4 rounded shadow space-y-4">
         <div>
             <label class="block text-sm font-medium">Consentimiento firmado</label>
-            <input type="text" name="consent_document_id" value="{{ old('consent_document_id', $procedure->consent_document_id) }}" class="input input-bordered w-full" placeholder="ID de documento firmado">
+            <input
+                type="text"
+                name="consent_document_id"
+                value="{{ old('consent_document_id', $procedure->consent_document_id)}}"
+                class="input input-bordered w-full"
+                placeholder="ID de documento firmado"
+                data-consent-input
+            >
             <p class="text-xs text-gray-500 mt-1">Ingresa el ID de un consentimiento firmado o usa los botones de la vista para generarlo.</p>
         </div>
+        @if($recentPatientConsents->isNotEmpty())
+            <div>
+                <label class="block text-sm font-medium">Consentimientos recientes del paciente</label>
+                <select class="input input-bordered w-full" data-consent-select>
+                    <option value="">Selecciona uno (opcional)</option>
+                    @foreach($recentPatientConsents as $consent)
+                        <option
+                            value="{{ $consent->id }}"
+                            data-code="{{ $consent->code }}"
+                            @selected(old('consent_document_id', $procedure->consent_document_id) == $consent->id)
+                        >
+                            #{{ $consent->code }} — {{ optional($consent->template)->name ?? 'Plantilla' }}
+                        </option>
+                    @endforeach
+                </select>
+                <p class="text-xs text-gray-500 mt-1">Se muestran los últimos 5 consentimientos creados para este paciente. Puedes dejarlos en blanco si vas a generar uno nuevo.</p>
+            </div>
+        @endif
         <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm text-gray-700">
             <p>Vincula un consentimiento firmado existente para este paciente/tutor.</p>
             <p>También puedes generar uno nuevo desde plantilla y firmarlo sin salir.</p>
         </div>
     </div>
 </div>
+
+@once
+    @push('scripts')
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                const wrapper = document.querySelector('[data-procedure-form]');
+                if (!wrapper || wrapper.__x) return; // Alpine ya controla el formulario
+
+                const buttons = Array.from(wrapper.querySelectorAll('[data-section-button]'));
+                const sections = Array.from(wrapper.querySelectorAll('[data-section]'));
+                if (!buttons.length || !sections.length) return;
+
+                const toggleSection = (target) => {
+                    buttons.forEach((btn) => {
+                        const isActive = btn.dataset.sectionButton === target;
+                        btn.classList.toggle('bg-indigo-600', isActive);
+                        btn.classList.toggle('text-white', isActive);
+                        btn.classList.toggle('bg-gray-200', !isActive);
+                        btn.classList.toggle('text-gray-800', !isActive);
+                    });
+
+                    sections.forEach((section) => {
+                        const isActive = section.dataset.section === target;
+                        section.classList.toggle('hidden', !isActive);
+                    });
+                };
+
+                const initial = wrapper.dataset.activeSection || buttons[0].dataset.sectionButton;
+                toggleSection(initial);
+                buttons.forEach((btn) => btn.addEventListener('click', () => toggleSection(btn.dataset.sectionButton)));
+
+                const responsibleSelect = wrapper.querySelector('[data-responsible-select]');
+                const licenseInput = wrapper.querySelector('[data-responsible-license]');
+                const consentSelect = wrapper.querySelector('[data-consent-select]');
+                const consentInput = wrapper.querySelector('[data-consent-input]');
+
+                const syncLicense = (force = false) => {
+                    if (!responsibleSelect || !licenseInput) return;
+                    const option = responsibleSelect.selectedOptions[0];
+                    if (!option) return;
+
+                    const license = option.dataset.license ?? '';
+                    if (force || !licenseInput.value.trim()) {
+                        licenseInput.value = license;
+                    }
+                };
+
+                syncLicense(true);
+                responsibleSelect?.addEventListener('change', () => syncLicense(true));
+
+                const syncConsent = () => {
+                    if (!consentSelect || !consentInput) return;
+                    const selected = consentSelect.selectedOptions[0];
+                    if (!selected || !selected.value) return;
+                    if (!consentInput.value || consentInput.value === selected.value) {
+                        consentInput.value = selected.value;
+                    }
+                };
+
+                syncConsent();
+
+                consentSelect?.addEventListener('change', (event) => {
+                    if (!consentInput) return;
+                    const selected = event.target.selectedOptions[0];
+                    consentInput.value = selected?.value ?? '';
+                });
+            });
+        </script>
+    @endpush
+@endonce
