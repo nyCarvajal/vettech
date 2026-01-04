@@ -8,10 +8,6 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use App\Models\TravelCertificate;
 use App\Policies\TravelCertificatePolicy;
-use App\Models\ConsentTemplate;
-use App\Models\ConsentDocument;
-use App\Policies\ConsentTemplatePolicy;
-use App\Policies\ConsentDocumentPolicy;
 
 class AuthServiceProvider extends ServiceProvider
 {
@@ -22,8 +18,6 @@ class AuthServiceProvider extends ServiceProvider
      */
     protected $policies = [
         TravelCertificate::class => TravelCertificatePolicy::class,
-        ConsentTemplate::class => ConsentTemplatePolicy::class,
-        ConsentDocument::class => ConsentDocumentPolicy::class,
     ];
 
     /**
