@@ -4,10 +4,26 @@ import bootstrap from 'bootstrap/dist/js/bootstrap'
 window.bootstrap = bootstrap;
 import 'iconify-icon';
 import 'simplebar/dist/simplebar'
-import Alpine from 'alpinejs'
+const ensureAlpine = async () => {
+  if (window.Alpine) {
+    return window.Alpine;
+  }
 
-window.Alpine = Alpine;
-Alpine.start();
+  try {
+    const module = await import('https://cdn.jsdelivr.net/npm/alpinejs@3.14.0/dist/module.esm.js');
+    window.Alpine = module?.default ?? module;
+    return window.Alpine;
+  } catch (error) {
+    console.error('No se pudo cargar AlpineJS desde el CDN:', error);
+    return null;
+  }
+};
+
+ensureAlpine().then((Alpine) => {
+  if (Alpine?.start) {
+    Alpine.start();
+  }
+});
 
 // resources/js/app.js
 import './pages/dashboard.js';
