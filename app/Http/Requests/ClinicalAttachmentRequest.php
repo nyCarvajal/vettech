@@ -22,15 +22,7 @@ class ClinicalAttachmentRequest extends FormRequest
                 'required',
                 'file',
                 'max:10240',
-                Rule::mimetypes([
-                    'image/jpeg',
-                    'image/png',
-                    'image/webp',
-                    'application/pdf',
-                    'video/mp4',
-                    'video/webm',
-                    'video/quicktime',
-                ]),
+                'mimetypes:image/jpeg,image/png,image/webp,application/pdf,video/mp4,video/webm,video/quicktime',
                 Rule::mimes(['jpg', 'jpeg', 'png', 'webp', 'pdf', 'mp4', 'webm', 'mov']),
             ],
         ];
