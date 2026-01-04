@@ -7,6 +7,7 @@ use App\Http\Requests\Consent\StoreConsentDocumentRequest;
 use App\Models\ConsentAttachment;
 use App\Models\ConsentDocument;
 use App\Models\ConsentTemplate;
+use App\Models\Patient;
 use App\Services\ConsentCodeGenerator;
 use App\Services\PlaceholderService;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -24,7 +25,39 @@ class ConsentDocumentController extends Controller
     public function create(Request $request)
     {
         $templates = ConsentTemplate::where('is_active', true)->get();
-        return view('consents.create', compact('templates'));
+
+        $patient = null;
+        $ownerSnapshot = [];
+        $petSnapshot = [];
+
+        if ($request->filled('patient_id')) {
+            $patient = Patient::with('owner', 'species', 'breed')->find($request->integer('patient_id'));
+
+            if ($patient) {
+                $ownerSnapshot = [
+                    'full_name' => $patient->owner?->name,
+                    'first_name' => $patient->owner?->name,
+                    'phone' => $patient->owner?->phone,
+                    'email' => $patient->owner?->email,
+                    'document' => $patient->owner?->document,
+                    'address' => $patient->owner?->address,
+                    'city' => $patient->owner?->municipio?->nombre,
+                ];
+
+                $petSnapshot = [
+                    'name' => $patient->display_name,
+                    'species' => $patient->species?->name,
+                    'breed' => $patient->breed?->name,
+                    'sex' => $patient->sexo,
+                    'age' => $patient->edad,
+                    'weight' => $patient->peso_actual,
+                    'color' => $patient->color,
+                    'microchip' => $patient->microchip,
+                ];
+            }
+        }
+
+        return view('consents.create', compact('templates', 'patient', 'ownerSnapshot', 'petSnapshot'));
     }
 
     public function store(StoreConsentDocumentRequest $request, PlaceholderService $placeholderService, ConsentCodeGenerator $codeGenerator)

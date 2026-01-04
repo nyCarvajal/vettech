@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class ConsentDocument extends Model
 {
@@ -24,8 +25,6 @@ class ConsentDocument extends Model
         'created_by',
         'signed_at',
         'canceled_reason',
-        'patient_id',
-        'patient_snapshot',
     ];
 
     protected $casts = [
