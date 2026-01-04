@@ -382,7 +382,7 @@
             </div>
 
             <div class="flex items-center justify-end gap-2">
-                <button type="button" class="rounded-full border border-gray-200 px-4 py-2 text-gray-700 hover:bg-gray-50" id="cancel-attachment">Cancelar</button>
+                <button type="button" class="rounded-full border border-gray-200 bg-gray-100 px-4 py-2 text-gray-700 hover:bg-gray-200" id="cancel-attachment">Cancelar</button>
                 <button type="submit" class="rounded-full bg-emerald-600 px-4 py-2 text-white font-semibold shadow-sm hover:bg-emerald-500">Subir</button>
             </div>
         </form>
