@@ -24,17 +24,19 @@ class BaseModel extends Model
         /** @var Tenancy|null $tenancy */
         $tenancy = app()->bound('tenancy') ? app('tenancy') : null;
 
-        $tenantDatabase = config('database.connections.tenant.database');
-
-        if ($tenancy && $tenancy->initialized && $tenantDatabase) {
+        if ($tenancy && $tenancy->initialized && $tenancy->tenant) {
             return 'tenant';
         }
 
-        // Si ya existe una base de datos configurada para la conexión tenant,
-        // úsala para evitar leer desde la base "comun" en rutas que sí
-        // inicializan la conexión pero aún no el objeto Tenancy.
-        return $tenantDatabase
-            ? 'tenant'
-            : parent::getConnectionName();
+        $tenantDatabase = config('database.connections.tenant.database');
+
+        if ($tenantDatabase) {
+            return 'tenant';
+        }
+
+        // Default to the model's declared connection ("tenant") so consent
+        // lookups never fall back to the shared "mysql" database, even when
+        // Tenancy has not been fully bootstrapped yet.
+        return $this->connection ?? parent::getConnectionName();
     }
 }

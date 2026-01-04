@@ -3,11 +3,10 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
-class ConsentPublicLink extends Model
+class ConsentPublicLink extends BaseModel
 {
     use HasFactory;
 
