@@ -31,6 +31,11 @@ use App\Http\Controllers\GroomingBillingController;
 use App\Http\Controllers\GroomingController;
 use App\Http\Controllers\GroomingReportController;
 use App\Http\Controllers\GroomingStatusController;
+use App\Http\Controllers\Consent\ConsentTemplateController;
+use App\Http\Controllers\Consent\ConsentDocumentController;
+use App\Http\Controllers\Consent\ConsentSignatureController;
+use App\Http\Controllers\Consent\ConsentPublicLinkController;
+use App\Http\Controllers\Consent\PublicConsentController;
 use App\Http\Controllers\HospitalController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\ClinicalAttachmentController;
@@ -85,6 +90,11 @@ Route::get('/auth/signin', [LoginController::class, 'showLoginForm'])
 Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])
      ->middleware('auth')
      ->name('logout');
+
+Route::get('public/consents/sign/{token}', [PublicConsentController::class, 'show'])->name('public.consents.show');
+Route::post('public/consents/sign/{token}', [PublicConsentController::class, 'sign'])
+    ->middleware('throttle:20,1')
+    ->name('public.consents.sign');
 
 
 Route::middleware([
@@ -323,6 +333,14 @@ Route::middleware(['auth'])
         Route::post('cash/sessions', [\App\Http\Controllers\CashSessionsController::class, 'store'])->name('cash.sessions.store');
         Route::post('cash/sessions/{cashSession}/close', [\App\Http\Controllers\CashSessionsController::class, 'close'])->name('cash.sessions.close');
         Route::post('cash/movements', [\App\Http\Controllers\CashMovementsController::class, 'store'])->name('cash.movements.store');
+
+        Route::resource('consent-templates', ConsentTemplateController::class);
+        Route::resource('consents', ConsentDocumentController::class);
+        Route::post('consents/{consent}/sign', [ConsentSignatureController::class, 'store'])->name('consents.sign');
+        Route::post('consents/{consent}/public-link', [ConsentPublicLinkController::class, 'create'])->name('consents.public-link');
+        Route::post('consents/{consent}/public-link/{link}/revoke', [ConsentPublicLinkController::class, 'revoke'])->name('consents.public-link.revoke');
+        Route::post('consents/{consent}/cancel', [ConsentDocumentController::class, 'cancel'])->name('consents.cancel');
+        Route::get('consents/{consent}/pdf', [ConsentDocumentController::class, 'pdf'])->name('consents.pdf');
     });
     Route::middleware([
         Authenticate::class,
