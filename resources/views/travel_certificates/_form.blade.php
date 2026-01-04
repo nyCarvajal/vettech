@@ -31,6 +31,7 @@
         ])),
         defaultVetId: {{ optional($user)->id ?? 'null' }},
     })"
+    x-init="init()"
 >
     <div class="bg-gradient-to-r from-indigo-50 via-white to-teal-50 p-6 rounded-2xl shadow-sm border border-indigo-100">
         <div class="flex items-center justify-between mb-4">
@@ -176,7 +177,7 @@
                                 <select name="origin_department_id" x-model="state.originDepartment" @change="loadMunicipalities('origin')" class="w-full rounded-lg border-slate-200 focus:border-indigo-500 focus:ring-indigo-200">
                                     <option value="">Seleccione</option>
                                     @foreach($departments as $department)
-                                        <option value="{{ $department->id }}">{{ $department->name }}</option>
+                                        <option value="{{ $department->id }}" @selected((string)old('origin_department_id', $certificate->origin_department_id ?? '') === (string)$department->id)>{{ $department->name }}</option>
                                     @endforeach
                                 </select>
                                 <label class="text-xs text-slate-500">Ciudad / Municipio</label>
@@ -208,7 +209,7 @@
                                 <select name="destination_department_id" x-model="state.destinationDepartment" @change="loadMunicipalities('destination')" class="w-full rounded-lg border-slate-200 focus:border-indigo-500 focus:ring-indigo-200">
                                     <option value="">Seleccione</option>
                                     @foreach($departments as $department)
-                                        <option value="{{ $department->id }}">{{ $department->name }}</option>
+                                        <option value="{{ $department->id }}" @selected((string)old('destination_department_id', $certificate->destination_department_id ?? '') === (string)$department->id)>{{ $department->name }}</option>
                                     @endforeach
                                 </select>
                                 <label class="text-xs text-slate-500">Ciudad / Municipio</label>

@@ -21,7 +21,7 @@
                 <a href="{{ route('travel-certificates.index') }}" class="inline-flex items-center px-3 py-2 text-sm font-semibold text-gray-800 bg-white border border-gray-200 rounded-lg shadow-sm hover:bg-gray-50 hover:border-gray-300">
                     Volver al listado
                 </a>
-                <button form="travel-certificate-form" type="submit" class="inline-flex items-center px-4 py-2 text-sm font-semibold text-white bg-blue-700 rounded-lg shadow-md hover:bg-blue-800 focus:ring-2 focus:ring-offset-1 focus:ring-blue-500">
+                <button form="travel-certificate-form" type="submit" class="inline-flex items-center px-4 py-2 text-sm font-semibold text-white bg-blue-700 rounded-lg shadow-md hover:bg-blue-800 focus:ring-2 focus:ring-offset-1 focus:ring-blue-500 focus:outline-none transition-colors">
                     Guardar certificado
                 </button>
             </div>
