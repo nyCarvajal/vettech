@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use App\Models\TravelCertificate;
 use App\Policies\TravelCertificatePolicy;
@@ -25,7 +26,11 @@ class AuthServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Gate::before(function ($user) {
-            if (method_exists($user, 'hasRole') && $user->hasRole('admin')) {
+            if (
+                Schema::hasTable('roles') &&
+                method_exists($user, 'hasRole') &&
+                $user->hasRole('admin')
+            ) {
                 return true;
             }
             return null;
@@ -37,6 +42,10 @@ class AuthServiceProvider extends ServiceProvider
             'hospital.admit', 'hospital.discharge', 'hospital.task.create',
         ] as $permission) {
             Gate::define($permission, function ($user) use ($permission) {
+                if (! Schema::hasTable('permissions') || ! Schema::hasTable('permission_role') || ! Schema::hasTable('role_user')) {
+                    return false;
+                }
+
                 $count = DB::table('permissions')
                     ->join('permission_role', 'permissions.id', '=', 'permission_role.permission_id')
                     ->join('role_user', 'permission_role.role_id', '=', 'role_user.role_id')
