@@ -3,16 +3,15 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class ConsentDocument extends Model
+class ConsentDocument extends BaseModel
 {
     use HasFactory;
     use SoftDeletes;
 
     protected $fillable = [
-       'patient_id',
+        'patient_id',
         'tenant_id',
         'code',
         'status',
@@ -38,6 +37,16 @@ class ConsentDocument extends Model
     public function template()
     {
         return $this->belongsTo(ConsentTemplate::class, 'template_id');
+    }
+
+    public function owner()
+    {
+        return $this->belongsTo(Owner::class, 'owner_id');
+    }
+
+    public function pet()
+    {
+        return $this->belongsTo(Patient::class, 'pet_id');
     }
 
     public function signatures()
