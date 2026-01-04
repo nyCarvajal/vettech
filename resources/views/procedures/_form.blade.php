@@ -1,4 +1,23 @@
 @csrf
+@php
+    $patientSnapshotData = old('patient_snapshot')
+        ? (is_string(old('patient_snapshot')) ? json_decode(old('patient_snapshot'), true) ?? [] : old('patient_snapshot'))
+        : ($patientSnapshot ?? ($procedure->patient_snapshot ?? []));
+    $ownerSnapshotData = old('owner_snapshot')
+        ? (is_string(old('owner_snapshot')) ? json_decode(old('owner_snapshot'), true) ?? [] : old('owner_snapshot'))
+        : ($ownerSnapshot ?? ($procedure->owner_snapshot ?? []));
+    $responsibleUsersList = $responsibleUsers ?? collect();
+    $defaultResponsibleName = $defaultResponsibleName ?? null;
+    $defaultResponsibleLicense = $defaultResponsibleLicense ?? null;
+    $selectedResponsibleName = old('responsible_vet_name', $procedure->responsible_vet_name ?: $defaultResponsibleName);
+    $initialLicense = old('responsible_vet_license', $procedure->responsible_vet_license ?: $defaultResponsibleLicense);
+@endphp
+
+<input type="hidden" name="patient_id" value="{{ old('patient_id', $procedure->patient_id ?? optional($patient ?? null)->id) }}">
+<input type="hidden" name="owner_id" value="{{ old('owner_id', $procedure->owner_id ?? optional(optional($patient ?? null)->owner)->id) }}">
+<input type="hidden" name="patient_snapshot" value='@json($patientSnapshotData, JSON_UNESCAPED_UNICODE)'>
+<input type="hidden" name="owner_snapshot" value='@json($ownerSnapshotData, JSON_UNESCAPED_UNICODE)'>
+
 <div
     x-data="{ section: 'basics', medications: @json(old('anesthesia_medications', $procedure->anesthesiaMedications->toArray() ?? [])) }"
     class="space-y-6"
@@ -67,13 +86,79 @@
                 @endforeach
             </select>
         </div>
-        <div class="md:col-span-2">
-            <label class="block text-sm font-medium">Paciente (snapshot JSON)</label>
-            <textarea name="patient_snapshot" class="input input-bordered w-full" rows="3">{{ old('patient_snapshot', json_encode($procedure->patient_snapshot ?? [], JSON_PRETTY_PRINT)) }}</textarea>
-        </div>
-        <div class="md:col-span-2">
-            <label class="block text-sm font-medium">Tutor (snapshot JSON)</label>
-            <textarea name="owner_snapshot" class="input input-bordered w-full" rows="3">{{ old('owner_snapshot', json_encode($procedure->owner_snapshot ?? [], JSON_PRETTY_PRINT)) }}</textarea>
+        <div class="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="border border-gray-200 rounded-lg p-4 bg-gray-50">
+                <div class="flex items-center justify-between mb-2">
+                    <h3 class="font-semibold text-gray-800">Paciente</h3>
+                    <span class="text-xs px-2 py-1 rounded bg-indigo-100 text-indigo-800">Solo lectura</span>
+                </div>
+                @if(! empty($patientSnapshotData))
+                    <dl class="text-sm text-gray-700 space-y-1">
+                        <div class="grid grid-cols-3 gap-1">
+                            <dt class="font-medium">Nombre</dt>
+                            <dd class="col-span-2">{{ $patientSnapshotData['name'] ?? '—' }}</dd>
+                        </div>
+                        <div class="grid grid-cols-3 gap-1">
+                            <dt class="font-medium">Especie</dt>
+                            <dd class="col-span-2">{{ $patientSnapshotData['species'] ?? '—' }}</dd>
+                        </div>
+                        <div class="grid grid-cols-3 gap-1">
+                            <dt class="font-medium">Raza</dt>
+                            <dd class="col-span-2">{{ $patientSnapshotData['breed'] ?? '—' }}</dd>
+                        </div>
+                        <div class="grid grid-cols-3 gap-1">
+                            <dt class="font-medium">Sexo</dt>
+                            <dd class="col-span-2">{{ $patientSnapshotData['sex'] ?? '—' }}</dd>
+                        </div>
+                        <div class="grid grid-cols-3 gap-1">
+                            <dt class="font-medium">Edad</dt>
+                            <dd class="col-span-2">{{ $patientSnapshotData['age'] ?? '—' }}</dd>
+                        </div>
+                        <div class="grid grid-cols-3 gap-1">
+                            <dt class="font-medium">Peso</dt>
+                            <dd class="col-span-2">{{ $patientSnapshotData['weight'] ?? '—' }}</dd>
+                        </div>
+                        <div class="grid grid-cols-3 gap-1">
+                            <dt class="font-medium">Microchip</dt>
+                            <dd class="col-span-2">{{ $patientSnapshotData['microchip'] ?? '—' }}</dd>
+                        </div>
+                    </dl>
+                @else
+                    <p class="text-sm text-gray-500">No se encontraron datos del paciente.</p>
+                @endif
+            </div>
+            <div class="border border-gray-200 rounded-lg p-4 bg-gray-50">
+                <div class="flex items-center justify-between mb-2">
+                    <h3 class="font-semibold text-gray-800">Tutor</h3>
+                    <span class="text-xs px-2 py-1 rounded bg-indigo-100 text-indigo-800">Solo lectura</span>
+                </div>
+                @if(! empty($ownerSnapshotData))
+                    <dl class="text-sm text-gray-700 space-y-1">
+                        <div class="grid grid-cols-3 gap-1">
+                            <dt class="font-medium">Nombre</dt>
+                            <dd class="col-span-2">{{ $ownerSnapshotData['name'] ?? '—' }}</dd>
+                        </div>
+                        <div class="grid grid-cols-3 gap-1">
+                            <dt class="font-medium">Documento</dt>
+                            <dd class="col-span-2">{{ $ownerSnapshotData['document'] ?? '—' }}</dd>
+                        </div>
+                        <div class="grid grid-cols-3 gap-1">
+                            <dt class="font-medium">Teléfono</dt>
+                            <dd class="col-span-2">{{ $ownerSnapshotData['phone'] ?? '—' }}</dd>
+                        </div>
+                        <div class="grid grid-cols-3 gap-1">
+                            <dt class="font-medium">Correo</dt>
+                            <dd class="col-span-2">{{ $ownerSnapshotData['email'] ?? '—' }}</dd>
+                        </div>
+                        <div class="grid grid-cols-3 gap-1">
+                            <dt class="font-medium">Dirección</dt>
+                            <dd class="col-span-2">{{ $ownerSnapshotData['address'] ?? '—' }}</dd>
+                        </div>
+                    </dl>
+                @else
+                    <p class="text-sm text-gray-500">No se encontraron datos del tutor.</p>
+                @endif
+            </div>
         </div>
     </div>
 
@@ -96,11 +181,27 @@
         </div>
         <div>
             <label class="block text-sm font-medium">Responsable</label>
-            <input type="text" name="responsible_vet_name" value="{{ old('responsible_vet_name', $procedure->responsible_vet_name) }}" class="input input-bordered w-full">
+            <select name="responsible_vet_name" class="input input-bordered w-full" data-responsible-select>
+                @if($defaultResponsibleName)
+                    <option value="{{ $defaultResponsibleName }}" data-license="{{ $defaultResponsibleLicense }}" @selected($selectedResponsibleName===$defaultResponsibleName)>
+                        {{ $defaultResponsibleName }} (tú)
+                    </option>
+                @endif
+                @foreach($responsibleUsersList as $user)
+                    @php
+                        $fullName = trim(($user->nombre ?? '') . ' ' . ($user->apellidos ?? ''));
+                        $license = $user->firma_medica_texto ?? $user->numero_identificacion;
+                    @endphp
+                    @continue($defaultResponsibleName && $fullName === $defaultResponsibleName)
+                    <option value="{{ $fullName }}" data-license="{{ $license }}" @selected($selectedResponsibleName===$fullName)>
+                        {{ $fullName }}
+                    </option>
+                @endforeach
+            </select>
         </div>
         <div>
             <label class="block text-sm font-medium">Licencia</label>
-            <input type="text" name="responsible_vet_license" value="{{ old('responsible_vet_license', $procedure->responsible_vet_license) }}" class="input input-bordered w-full">
+            <input type="text" name="responsible_vet_license" value="{{ $initialLicense }}" class="input input-bordered w-full" data-responsible-license>
         </div>
     </div>
 
@@ -170,7 +271,7 @@
     <div x-show="section==='consent'" data-section="consent" class="bg-white p-4 rounded shadow space-y-4">
         <div>
             <label class="block text-sm font-medium">Consentimiento firmado</label>
-            <input type="text" name="consent_document_id" value="{{ old('consent_document_id', $procedure->consent_document_id) }}" class="input input-bordered w-full" placeholder="ID de documento firmado">
+            <input type="text" name="consent_document_id" value="{{ old('consent_document_id', $procedure->consent_document_id)}}" class="input input-bordered w-full" placeholder="ID de documento firmado">
             <p class="text-xs text-gray-500 mt-1">Ingresa el ID de un consentimiento firmado o usa los botones de la vista para generarlo.</p>
         </div>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm text-gray-700">
@@ -209,6 +310,23 @@
                 const initial = wrapper.dataset.activeSection || buttons[0].dataset.sectionButton;
                 toggleSection(initial);
                 buttons.forEach((btn) => btn.addEventListener('click', () => toggleSection(btn.dataset.sectionButton)));
+
+                const responsibleSelect = wrapper.querySelector('[data-responsible-select]');
+                const licenseInput = wrapper.querySelector('[data-responsible-license]');
+
+                const syncLicense = (force = false) => {
+                    if (!responsibleSelect || !licenseInput) return;
+                    const option = responsibleSelect.selectedOptions[0];
+                    if (!option) return;
+
+                    const license = option.dataset.license ?? '';
+                    if (force || !licenseInput.value.trim()) {
+                        licenseInput.value = license;
+                    }
+                };
+
+                syncLicense(true);
+                responsibleSelect?.addEventListener('change', () => syncLicense(true));
             });
         </script>
     @endpush

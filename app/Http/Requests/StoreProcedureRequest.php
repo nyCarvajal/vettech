@@ -14,6 +14,8 @@ class StoreProcedureRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'patient_id' => ['nullable', 'exists:pacientes,id'],
+            'owner_id' => ['nullable', 'exists:owners,id'],
             'type' => ['required', 'in:surgery,procedure'],
             'name' => ['required', 'string', 'max:255'],
             'status' => ['required', 'in:scheduled,in_progress,completed,canceled'],
