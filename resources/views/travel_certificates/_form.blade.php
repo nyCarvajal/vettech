@@ -33,7 +33,7 @@
     })"
     x-init="init()"
 >
-    <div class="bg-gradient-to-r from-indigo-50 via-white to-teal-50 p-6 rounded-2xl shadow-sm border border-indigo-100">
+    <div class="bg-gradient-to-r from-indigo-50 via-white to-teal-50 p-6 rounded-2xl shadow-sm border border-indigo-100 certificate-overview-bg">
         <div class="flex items-center justify-between mb-4">
             <div>
                 <p class="text-xs uppercase tracking-wide text-indigo-500 font-semibold">Certificado de viaje</p>
