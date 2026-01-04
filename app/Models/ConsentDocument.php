@@ -12,6 +12,7 @@ class ConsentDocument extends Model
     use SoftDeletes;
 
     protected $fillable = [
+        'patient_id',
         'tenant_id',
         'code',
         'status',
@@ -19,6 +20,7 @@ class ConsentDocument extends Model
         'owner_id',
         'pet_id',
         'owner_snapshot',
+        'patient_snapshot',
         'pet_snapshot',
         'merged_body_html',
         'merged_plain_text',

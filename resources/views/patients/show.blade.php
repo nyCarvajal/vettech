@@ -295,6 +295,14 @@
             >
                 Enviar a peluquería
             </a>
+            @can('create', \App\Models\Procedure::class)
+                <a
+                    href="{{ route('procedures.create', ['patient_id' => $patient->id]) }}"
+                    class="pill-action"
+                >
+                    Nueva cirugía / procedimiento
+                </a>
+            @endcan
             @can('create', \App\Models\TravelCertificate::class)
                 <a
                     href="{{ route('travel-certificates.create', ['patient_id' => $patient->id]) }}"
