@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="max-w-4xl mx-auto py-6 space-y-4" x-data="signaturePad()">
+<div class="max-w-4xl mx-auto py-6 space-y-4" x-data="signaturePad()" x-init="init()">
     <div class="flex justify-between items-center">
         <div>
             <h1 class="text-2xl font-bold">{{ $consent->code }}</h1>
@@ -36,7 +36,7 @@
                 </label>
             </div>
             <input type="hidden" name="signer_role" value="owner">
-            <canvas x-ref="canvas" class="border w-full h-40"></canvas>
+            <canvas x-ref="canvas" class="border w-full h-40" style="touch-action: none;"></canvas>
             <div class="flex space-x-2">
                 <button type="button" @click="clear" class="px-3 py-1 border rounded">Limpiar</button>
                 <button type="submit" class="bg-indigo-600 text-white px-4 py-2 rounded">Guardar firma</button>
@@ -112,15 +112,32 @@ function signaturePad(){
             const getPos = (e)=>{
                 const rect = canvas.getBoundingClientRect();
                 const point = e.touches ? e.touches[0] : e;
+                const scaleX = canvas.width / rect.width;
+                const scaleY = canvas.height / rect.height;
                 return {
-                    x: (point.clientX - rect.left),
-                    y: (point.clientY - rect.top)
+                    x: (point.clientX - rect.left) * scaleX / dpr,
+                    y: (point.clientY - rect.top) * scaleY / dpr,
                 };
             };
 
-            canvas.addEventListener('pointerdown', (e)=>{const {x,y}=getPos(e); start(x,y);});
-            canvas.addEventListener('pointermove', (e)=>{const {x,y}=getPos(e); draw(x,y);});
-            ['pointerup','pointerleave','pointercancel'].forEach(evt=>canvas.addEventListener(evt, end));
+            canvas.addEventListener('pointerdown', (e)=>{
+                e.preventDefault();
+                canvas.setPointerCapture(e.pointerId);
+                const {x,y}=getPos(e);
+                start(x,y);
+            });
+
+            canvas.addEventListener('pointermove', (e)=>{
+                if (!drawing) return;
+                e.preventDefault();
+                const {x,y}=getPos(e);
+                draw(x,y);
+            });
+
+            ['pointerup','pointerleave','pointercancel'].forEach(evt=>canvas.addEventListener(evt, (e)=>{
+                e.preventDefault();
+                end();
+            }));
 
             resize();
             window.addEventListener('resize', resize);

@@ -7,6 +7,7 @@ use App\Http\Requests\Consent\StoreConsentDocumentRequest;
 use App\Models\ConsentAttachment;
 use App\Models\ConsentDocument;
 use App\Models\ConsentTemplate;
+use App\Models\Owner;
 use App\Models\Patient;
 use App\Services\ConsentCodeGenerator;
 use App\Services\PlaceholderService;
@@ -64,8 +65,21 @@ class ConsentDocumentController extends Controller
     {
         $template = ConsentTemplate::findOrFail($request->integer('template_id'));
 
-        $owner = $request->input('owner_snapshot', []);
-        $pet = $request->input('pet_snapshot', []);
+        $patient = null;
+        if ($request->filled('patient_id')) {
+            $patient = Patient::with('owner', 'species', 'breed')->find($request->integer('patient_id'));
+        }
+
+        $owner = $this->enrichOwnerSnapshot(
+            $request->input('owner_snapshot', []),
+            $patient?->owner
+        );
+
+        $pet = $this->enrichPetSnapshot(
+            $request->input('pet_snapshot', []),
+            $patient
+        );
+
         $context = [
             'owner' => $owner,
             'pet' => $pet,
@@ -81,6 +95,8 @@ class ConsentDocumentController extends Controller
             'code' => $codeGenerator->generate($request->user()->tenant_id ?? null),
             'status' => 'pending_signature',
             'template_id' => $template->id,
+            'owner_id' => $patient?->owner?->id,
+            'pet_id' => $patient?->id,
             'owner_snapshot' => $owner,
             'pet_snapshot' => $pet,
             'merged_body_html' => $mergedHtml,
@@ -93,16 +109,41 @@ class ConsentDocumentController extends Controller
 
     public function show(ConsentDocument $consent, PlaceholderService $placeholderService)
     {
-        $consent->load('template', 'signatures', 'publicLinks');
+        $consent->load(
+            'template',
+            'signatures',
+            'publicLinks',
+            'pet.owner',
+            'pet.species',
+            'pet.breed',
+            'owner'
+        );
 
-        // If the stored HTML is missing or still has placeholders, rebuild it with the snapshots
+        $ownerSnapshot = $this->enrichOwnerSnapshot(
+            $consent->owner_snapshot ?? [],
+            $consent->owner ?? $consent->pet?->owner
+        );
+
+        $petSnapshot = $this->enrichPetSnapshot(
+            $consent->pet_snapshot ?? [],
+            $consent->pet
+        );
+
+        // Ensure the view and subsequent logic see the enriched data
+        $consent->owner_snapshot = $ownerSnapshot;
+        $consent->pet_snapshot = $petSnapshot;
+
+        // If the stored HTML is missing, still has placeholders, or we just enriched the snapshots, rebuild it
         $stillHasPlaceholders = empty($consent->merged_body_html)
             || preg_match('/\{\{\s*[a-zA-Z0-9_\.]+\s*\}\}/', $consent->merged_body_html);
 
-        if ($stillHasPlaceholders && $consent->template?->body_html) {
+        $snapshotsImproved = $consent->owner_snapshot !== $ownerSnapshot
+            || $consent->pet_snapshot !== $petSnapshot;
+
+        if (($stillHasPlaceholders || $snapshotsImproved) && $consent->template?->body_html) {
             $context = [
-                'owner' => $consent->owner_snapshot ?? [],
-                'pet' => $consent->pet_snapshot ?? [],
+                'owner' => $ownerSnapshot,
+                'pet' => $petSnapshot,
                 'clinic' => auth()->user()?->clinic ?? [],
                 'vet' => [
                     'name' => auth()->user()?->name,
@@ -113,6 +154,8 @@ class ConsentDocumentController extends Controller
 
             $mergedHtml = $placeholderService->merge($consent->template->body_html, $context);
             $consent->forceFill([
+                'owner_snapshot' => $ownerSnapshot,
+                'pet_snapshot' => $petSnapshot,
                 'merged_body_html' => $mergedHtml,
                 'merged_plain_text' => strip_tags($mergedHtml),
             ])->save();
@@ -144,5 +187,44 @@ class ConsentDocumentController extends Controller
         );
 
         return $pdf->download($consent->code . '.pdf');
+    }
+
+    private function enrichOwnerSnapshot(array $snapshot, ?Owner $owner = null): array
+    {
+        if ($owner) {
+            $snapshot['full_name'] = $snapshot['full_name'] ?? $owner->name;
+            $snapshot['first_name'] = $snapshot['first_name'] ?? $owner->name;
+            $snapshot['last_name'] = $snapshot['last_name'] ?? '';
+            $snapshot['document'] = $snapshot['document'] ?? $owner->document;
+            $snapshot['phone'] = $snapshot['phone'] ?? ($owner->phone ?? $owner->whatsapp ?? null);
+            $snapshot['email'] = $snapshot['email'] ?? $owner->email;
+            $snapshot['address'] = $snapshot['address'] ?? $owner->address;
+            $snapshot['city'] = $snapshot['city'] ?? $owner->municipio?->nombre;
+        }
+
+        if (! isset($snapshot['full_name']) || $snapshot['full_name'] === '') {
+            $maybeFull = trim(($snapshot['first_name'] ?? '') . ' ' . ($snapshot['last_name'] ?? ''));
+            if ($maybeFull !== '') {
+                $snapshot['full_name'] = $maybeFull;
+            }
+        }
+
+        return $snapshot;
+    }
+
+    private function enrichPetSnapshot(array $snapshot, ?Patient $pet = null): array
+    {
+        if ($pet) {
+            $snapshot['name'] = $snapshot['name'] ?? $pet->display_name;
+            $snapshot['species'] = $snapshot['species'] ?? $pet->species?->name;
+            $snapshot['breed'] = $snapshot['breed'] ?? $pet->breed?->name;
+            $snapshot['sex'] = $snapshot['sex'] ?? $pet->sexo;
+            $snapshot['age'] = $snapshot['age'] ?? $pet->edad;
+            $snapshot['weight'] = $snapshot['weight'] ?? $pet->peso_actual;
+            $snapshot['color'] = $snapshot['color'] ?? $pet->color;
+            $snapshot['microchip'] = $snapshot['microchip'] ?? $pet->microchip;
+        }
+
+        return $snapshot;
     }
 }

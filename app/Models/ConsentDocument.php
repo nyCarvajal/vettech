@@ -39,6 +39,16 @@ class ConsentDocument extends BaseModel
         return $this->belongsTo(ConsentTemplate::class, 'template_id');
     }
 
+    public function owner()
+    {
+        return $this->belongsTo(Owner::class, 'owner_id');
+    }
+
+    public function pet()
+    {
+        return $this->belongsTo(Patient::class, 'pet_id');
+    }
+
     public function signatures()
     {
         return $this->hasMany(ConsentSignature::class);
