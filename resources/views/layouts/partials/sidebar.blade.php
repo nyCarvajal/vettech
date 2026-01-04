@@ -68,6 +68,15 @@
                          <span class="nav-text"> Agenda </span>
                     </a>
                </li>
+
+               <li class="nav-item">
+                    <a class="nav-link" href="{{ route('consent-templates.create') }}">
+                         <span class="nav-icon">
+                              <i class="bx bx-edit-alt"></i>
+                         </span>
+                         <span class="nav-text"> Nueva plantilla de consentimiento </span>
+                    </a>
+               </li>
 			     
 			   
 			   <li class="menu-title">Configuración</li>
@@ -89,6 +98,10 @@
                               <li class="sub-nav-item">
                                    <a class="sub-nav-link" href="{{ route('tipo-identificaciones.index') }}">
                                         Tipos de identificaciones</a>
+                              </li>
+                              <li class="sub-nav-item">
+                                   <a class="sub-nav-link" href="{{ route('consent-templates.index') }}">
+                                        Consentimientos informados</a>
                               </li>
                               <li class="sub-nav-item">
                                    <a class="sub-nav-link" href="{{ route('areas.index') }}">
