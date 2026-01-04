@@ -15,14 +15,6 @@
     @else
         <!-- Fallback CSS y JS para cuando Vite no está disponible -->
         <link rel="stylesheet" href="{{ asset('css/app-fallback.css') }}">
-        <script>
-            window.tailwind = window.tailwind || {};
-            window.tailwind.config = {
-                corePlugins: {
-                    preflight: false,
-                },
-            };
-        </script>
         <script src="https://cdn.tailwindcss.com"></script>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" defer></script>
     @endif
