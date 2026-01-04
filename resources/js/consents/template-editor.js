@@ -31,7 +31,7 @@ const initConsentTemplateEditor = () => {
 
     const getPlaceholderChipHtml = (key) => {
         const label = placeholders?.[key]?.label || key;
-        return `<span class="placeholder-chip" contenteditable="false" data-placeholder-key="${key}" data-placeholder-label="${label}"><span class="placeholder-chip-key">${label}</span></span>`;
+        return `<span class="placeholder-chip" contenteditable="false" data-placeholder-key="${key}" data-placeholder-label="${label}"><span class="placeholder-chip-label">${label}</span><span class="placeholder-chip-key">${key}</span></span>`;
     };
 
     const convertChipsToPlaceholders = (html) => {
