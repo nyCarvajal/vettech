@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\ChangeProcedureStatusRequest;
 use App\Http\Requests\StoreProcedureRequest;
 use App\Http\Requests\UpdateProcedureRequest;
+use App\Models\ConsentDocument;
 use App\Models\Owner;
 use App\Models\Patient;
 use App\Models\Procedure;
@@ -61,6 +62,9 @@ class ProcedureController extends Controller
             'responsibleUsers' => $this->clinicUsers($request->user()),
             'defaultResponsibleName' => $this->responsibleDisplayName($request->user()),
             'defaultResponsibleLicense' => $this->resolveUserLicense($request->user()),
+            'recentPatientConsents' => $patient
+                ? ConsentDocument::with('template')->where('pet_id', $patient->id)->latest()->take(5)->get()
+                : collect(),
         ]);
     }
 
@@ -128,6 +132,9 @@ class ProcedureController extends Controller
             'responsibleUsers' => $this->clinicUsers($request->user()),
             'defaultResponsibleName' => $this->responsibleDisplayName($request->user()),
             'defaultResponsibleLicense' => $this->resolveUserLicense($request->user()),
+            'recentPatientConsents' => $patient
+                ? ConsentDocument::with('template')->where('pet_id', $patient->id)->latest()->take(5)->get()
+                : collect(),
         ]);
     }
 
