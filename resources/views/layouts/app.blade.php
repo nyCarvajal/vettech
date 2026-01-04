@@ -10,12 +10,52 @@
     @php
         $hasViteAssets = file_exists(public_path('hot')) || file_exists(public_path('build/manifest.json'));
     @endphp
+    <script>
+        window.tailwind = window.tailwind || {};
+        window.tailwind.config = {
+            corePlugins: {
+                preflight: false,
+            },
+            theme: {
+                extend: {
+                    colors: {
+                        mint: {
+                            50: 'var(--mint-50)',
+                            100: 'var(--mint-100)',
+                            200: 'var(--mint-200)',
+                            500: 'var(--mint-500)',
+                            600: 'var(--mint-600)',
+                            700: 'var(--mint-700)',
+                        },
+                        gray: {
+                            50: 'var(--gray-50)',
+                            100: 'var(--gray-100)',
+                            200: 'var(--gray-200)',
+                            500: 'var(--gray-500)',
+                            700: 'var(--gray-700)',
+                        },
+                        danger: {
+                            500: 'var(--danger-500)',
+                        },
+                        warning: {
+                            500: 'var(--warning-500)',
+                        },
+                    },
+                    fontFamily: {
+                        sans: ['var(--font-sans)', 'Inter', 'Nunito', 'ui-sans-serif', 'system-ui', '-apple-system', 'Segoe UI', 'sans-serif'],
+                    },
+                },
+            },
+        };
+    </script>
     @if($hasViteAssets)
         @vite(['resources/css/app.css', 'resources/js/app.js', 'resources/scss/icons.scss', 'resources/scss/style.scss', 'resources/sass/app.scss'])
     @else
         <!-- Fallback CSS y JS para cuando Vite no está disponible -->
         <link rel="stylesheet" href="{{ asset('css/app-fallback.css') }}">
+        <script id="tailwind-cdn-primary" src="https://cdn.tailwindcss.com"></script>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" defer></script>
+        <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
     @endif
 
     <!-- Fallback CSS para cuando Vite no está disponible o el bundle no carga -->
@@ -24,16 +64,50 @@
         <link rel="stylesheet" href="{{ asset('css/app-fallback.css') }}">
     </noscript>
     <script>
-        window.addEventListener('load', function () {
+        function ensureFallbackStyles() {
+            const ensureFallbackCss = () => {
+                const alreadyLoaded = Array.from(document.querySelectorAll('link[rel="stylesheet"]'))
+                    .some((link) => link.getAttribute('href')?.includes('app-fallback.css'));
+                if (!alreadyLoaded) {
+                    const fallbackLink = document.createElement('link');
+                    fallbackLink.rel = 'stylesheet';
+                    fallbackLink.href = '{{ asset('css/app-fallback.css') }}';
+                    document.head.appendChild(fallbackLink);
+                }
+            };
+
+            const loadTailwindCdn = () => {
+                if (document.getElementById('tailwind-cdn-primary') || document.getElementById('tailwind-cdn-fallback')) {
+                    return;
+                }
+                const script = document.createElement('script');
+                script.id = 'tailwind-cdn-fallback';
+                script.src = 'https://cdn.tailwindcss.com';
+                document.head.appendChild(script);
+            };
+
             const mint600 = getComputedStyle(document.documentElement).getPropertyValue('--mint-600');
-            const hasMint = mint600 && mint600.trim().length > 0;
-            if (!hasMint) {
-                const fallbackLink = document.createElement('link');
-                fallbackLink.rel = 'stylesheet';
-                fallbackLink.href = '{{ asset('css/app-fallback.css') }}';
-                document.head.appendChild(fallbackLink);
+            if (!mint600 || mint600.trim().length === 0) {
+                ensureFallbackCss();
             }
-        });
+
+            const probe = document.createElement('div');
+            probe.className = 'bg-mint-600 text-white px-2 py-1 rounded';
+            probe.style.position = 'absolute';
+            probe.style.opacity = '0';
+            document.body.appendChild(probe);
+
+            const bgColor = getComputedStyle(probe).backgroundColor;
+            const hasBackground = bgColor && bgColor !== 'rgba(0, 0, 0, 0)' && bgColor !== 'transparent';
+            probe.remove();
+
+            if (!hasBackground) {
+                ensureFallbackCss();
+                loadTailwindCdn();
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', ensureFallbackStyles);
     </script>
 
     @stack('styles')
