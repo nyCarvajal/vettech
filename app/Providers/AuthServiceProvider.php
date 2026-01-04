@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use App\Models\TravelCertificate;
 use App\Policies\TravelCertificatePolicy;
+use App\Models\Procedure;
+use App\Policies\ProcedurePolicy;
 
 class AuthServiceProvider extends ServiceProvider
 {
@@ -18,6 +20,7 @@ class AuthServiceProvider extends ServiceProvider
      */
     protected $policies = [
         TravelCertificate::class => TravelCertificatePolicy::class,
+        Procedure::class => ProcedurePolicy::class,
     ];
 
     /**
