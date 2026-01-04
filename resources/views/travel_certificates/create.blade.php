@@ -1,13 +1,69 @@
 @extends('layouts.app')
 
+@push('styles')
+<style>
+    .gradient-surface {
+        background: radial-gradient(circle at top left, #e0f2ff 0%, #f8faff 35%, #ffffff 70%);
+    }
+</style>
+@endpush
+
 @section('content')
-<div class="max-w-5xl mx-auto p-6">
-    <h1 class="text-2xl font-semibold mb-4">Nuevo Certificado de Viaje</h1>
-    <form method="POST" action="{{ route('travel-certificates.store') }}" enctype="multipart/form-data">
-        @include('travel_certificates._form', ['prefill' => $prefill ?? [], 'patient' => $patient ?? null])
-        <div class="mt-4 flex space-x-2">
-            <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded">Guardar</button>
+<div class="-mx-6 -my-8 px-6 py-8 gradient-surface min-h-[calc(100vh-10rem)]">
+    <div class="w-full space-y-6">
+        <div class="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+            <div>
+                <p class="text-sm font-semibold text-blue-700 uppercase tracking-wide">Certificados de viaje</p>
+                <h1 class="text-3xl font-bold text-gray-900">Nuevo certificado</h1>
+                <p class="text-sm text-gray-600 mt-1">Completa la información del tutor, paciente y viaje en una sola vista amplia.</p>
+            </div>
+            <div class="flex gap-2">
+                <a href="{{ route('travel-certificates.index') }}" class="inline-flex items-center px-3 py-2 text-sm font-semibold text-gray-800 bg-white border border-gray-200 rounded-lg shadow-sm hover:bg-gray-50 hover:border-gray-300">
+                    Volver al listado
+                </a>
+                <button form="travel-certificate-form" type="submit" class="inline-flex items-center px-4 py-2 text-sm font-semibold text-white bg-blue-700 rounded-lg shadow-md hover:bg-blue-800 focus:ring-2 focus:ring-offset-1 focus:ring-blue-500">
+                    Guardar certificado
+                </button>
+            </div>
         </div>
-    </form>
+
+        <div class="grid grid-cols-1 xl:grid-cols-12 gap-6">
+            <div class="xl:col-span-8">
+                <div class="bg-white shadow-soft rounded-2xl border border-gray-100 p-6 h-full">
+                    <h2 class="text-lg font-semibold text-gray-900 mb-4">Detalles del certificado</h2>
+                    <form id="travel-certificate-form" method="POST" action="{{ route('travel-certificates.store') }}" enctype="multipart/form-data" class="space-y-6">
+                        @include('travel_certificates._form', ['prefill' => $prefill ?? [], 'patient' => $patient ?? null])
+                    </form>
+                </div>
+            </div>
+
+            <div class="xl:col-span-4 space-y-4">
+                <div class="bg-white border border-gray-100 rounded-2xl shadow-soft p-5 h-full">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="h-10 w-10 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center text-lg font-semibold">✈️</div>
+                        <div>
+                            <p class="text-sm text-gray-500">Atajo rápido</p>
+                            <p class="text-base font-semibold text-gray-900">Formulario en pantalla completa</p>
+                        </div>
+                    </div>
+                    <p class="text-sm text-gray-600 leading-relaxed">Los campos están organizados en tarjetas de ancho completo para que completes la información sin tener que desplazarte por columnas angostas. El fondo suave resalta las secciones principales.</p>
+                    @if(!empty($prefill['pet_name']) || ($patient ?? null))
+                        <div class="mt-4 grid grid-cols-1 gap-3">
+                            <div class="p-3 rounded-xl border border-blue-100 bg-blue-50 text-blue-800">
+                                <p class="text-xs uppercase font-semibold">Paciente</p>
+                                <p class="text-sm font-medium">{{ $prefill['pet_name'] ?? ($patient->name ?? 'Paciente') }}</p>
+                            </div>
+                            @if(!empty($prefill['owner_name']))
+                                <div class="p-3 rounded-xl border border-emerald-100 bg-emerald-50 text-emerald-800">
+                                    <p class="text-xs uppercase font-semibold">Tutor</p>
+                                    <p class="text-sm font-medium">{{ $prefill['owner_name'] }}</p>
+                                </div>
+                            @endif
+                        </div>
+                    @endif
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 @endsection
