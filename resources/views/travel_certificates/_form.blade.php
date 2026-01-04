@@ -70,9 +70,7 @@
         </div>
     </div>
 
-    <div class="grid lg:grid-cols-3 gap-6">
-        <div class="lg:col-span-2 space-y-6">
-            <div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
+    <div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
                 <div class="flex items-center justify-between mb-4">
                     <div>
                         <p class="text-xs uppercase tracking-wide text-indigo-500 font-semibold">Clínica y MV</p>
@@ -107,6 +105,10 @@
                     </div>
                 </div>
             </div>
+
+    <div class="grid lg:grid-cols-2 gap-2">
+        
+            
 
             <div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
                 <div class="flex items-center justify-between mb-4">
@@ -151,7 +153,12 @@
                 </div>
             </div>
 
-            <div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-6" x-cloak>
+           
+
+            
+            
+        </div>
+         <div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-6" x-cloak>
                 <div class="flex items-center justify-between mb-4">
                     <div>
                         <p class="text-xs uppercase tracking-wide text-indigo-500 font-semibold">Viaje</p>
@@ -238,8 +245,7 @@
                     <input type="text" name="flight_number" placeholder="Vuelo" value="{{ old('flight_number', $certificate->flight_number ?? '') }}" class="rounded-lg border-slate-200 focus:border-indigo-500 focus:ring-indigo-200">
                 </div>
             </div>
-
-            <div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
+        <div class="bg-white rounded-2xl border border-slate-100 shadow-sm bg-white border border-slate-100 shadow-sm p-6">
                 <div class="flex items-center justify-between mb-4">
                     <div>
                         <p class="text-xs uppercase tracking-wide text-rose-500 font-semibold">Evaluación</p>
@@ -258,27 +264,8 @@
                     <label class="text-xs uppercase tracking-wide text-slate-500 font-semibold">Declaración</label>
                     <textarea name="declaration_text" class="mt-2 w-full rounded-lg border-slate-200 focus:border-indigo-500 focus:ring-indigo-200" rows="3">{{ old('declaration_text', $declaration ?? '') }}</textarea>
                 </div>
-            </div>
-        </div>
 
-        <div class="space-y-6">
-            <div class="bg-gradient-to-br from-indigo-600 to-teal-500 text-white rounded-2xl shadow-lg p-6">
-                <h3 class="text-lg font-bold">Acciones rápidas</h3>
-                <p class="text-sm text-indigo-100">Guarda como borrador o continúa editando.</p>
-                <div class="mt-4 space-y-2">
-                    <button type="submit" class="w-full bg-white text-indigo-700 font-semibold rounded-xl py-2 shadow hover:shadow-md transition">Guardar</button>
-                    <button type="submit" name="save_and_continue" value="1" class="w-full bg-indigo-800/30 border border-white/30 text-white font-semibold rounded-xl py-2 hover:bg-indigo-800/50 transition">Guardar y seguir</button>
-                </div>
-            </div>
-            <div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
-                <h4 class="text-sm font-semibold text-slate-900">Recordatorios</h4>
-                <ul class="mt-3 text-sm text-slate-600 space-y-2 list-disc list-inside">
-                    <li>Adjunta documentos desde la vista de edición una vez guardado.</li>
-                    <li>Los datos del tutor y mascota se fijan cuando vienes desde un paciente.</li>
-                    <li>Selecciona un médico para completar nombre y licencia automáticamente.</li>
-                </ul>
-            </div>
-        </div>
+       
     </div>
 </div>
 
