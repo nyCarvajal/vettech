@@ -63,7 +63,7 @@
         >Consentimiento</button>
     </div>
 
-    <div x-show="section==='basics'" data-section="basics" class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-white p-4 rounded shadow">
+    <div x-show="section==='basics'" data-section="basics" x-cloak class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-white p-4 rounded shadow">
         <div>
             <label class="block text-sm font-medium">Tipo *</label>
             <select name="type" class="input input-bordered w-full" required>
@@ -163,7 +163,7 @@
         </div>
     </div>
 
-    <div x-show="section==='schedule'" data-section="schedule" class="grid grid-cols-1 md:grid-cols-3 gap-4 bg-white p-4 rounded shadow">
+    <div x-show="section==='schedule'" data-section="schedule" x-cloak class="grid grid-cols-1 md:grid-cols-3 gap-4 bg-white p-4 rounded shadow">
         <div>
             <label class="block text-sm font-medium">Programado para</label>
             <input type="datetime-local" name="scheduled_at" value="{{ old('scheduled_at', optional($procedure->scheduled_at)->format('Y-m-d\TH:i')) }}" class="input input-bordered w-full">
@@ -206,7 +206,7 @@
         </div>
     </div>
 
-    <div x-show="section==='anesthesia'" data-section="anesthesia" class="space-y-4 bg-white p-4 rounded shadow">
+    <div x-show="section==='anesthesia'" data-section="anesthesia" x-cloak class="space-y-4 bg-white p-4 rounded shadow">
         <div>
             <label class="block text-sm font-medium">Plan anestésico</label>
             <textarea name="anesthesia_plan" rows="3" class="input input-bordered w-full">{{ old('anesthesia_plan', $procedure->anesthesia_plan) }}</textarea>
@@ -242,7 +242,7 @@
         </div>
     </div>
 
-    <div x-show="section==='notes'" data-section="notes" class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-white p-4 rounded shadow">
+    <div x-show="section==='notes'" data-section="notes" x-cloak class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-white p-4 rounded shadow">
         <div>
             <label class="block text-sm font-medium">Preoperatorio</label>
             <textarea name="preop_notes" rows="3" class="input input-bordered w-full">{{ old('preop_notes', $procedure->preop_notes) }}</textarea>
@@ -269,7 +269,7 @@
         </div>
     </div>
 
-    <div x-show="section==='consent'" data-section="consent" class="bg-white p-4 rounded shadow space-y-4">
+    <div x-show="section==='consent'" data-section="consent" x-cloak class="bg-white p-4 rounded shadow space-y-4">
         <div>
             <label class="block text-sm font-medium">Consentimiento firmado</label>
             <input
@@ -317,6 +317,8 @@
                 const buttons = Array.from(wrapper.querySelectorAll('[data-section-button]'));
                 const sections = Array.from(wrapper.querySelectorAll('[data-section]'));
                 if (!buttons.length || !sections.length) return;
+
+                sections.forEach((section) => section.removeAttribute('x-cloak'));
 
                 const toggleSection = (target) => {
                     buttons.forEach((btn) => {
