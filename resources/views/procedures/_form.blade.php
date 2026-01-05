@@ -11,6 +11,7 @@
     $defaultResponsibleLicense = $defaultResponsibleLicense ?? null;
     $selectedResponsibleName = old('responsible_vet_name', $procedure->responsible_vet_name ?: $defaultResponsibleName);
     $initialLicense = old('responsible_vet_license', $procedure->responsible_vet_license ?: $defaultResponsibleLicense);
+    $recentPatientConsents = $recentPatientConsents ?? collect();
 @endphp
 
 <input type="hidden" name="patient_id" value="{{ old('patient_id', $procedure->patient_id ?? optional($patient ?? null)->id) }}">
@@ -271,9 +272,30 @@
     <div x-show="section==='consent'" data-section="consent" x-cloak class="bg-white p-4 rounded shadow space-y-4">
         <div>
             <label class="block text-sm font-medium">Consentimiento firmado</label>
-            <input type="text" name="consent_document_id" value="{{ old('consent_document_id', $procedure->consent_document_id)}}" class="input input-bordered w-full" placeholder="ID de documento firmado">
+            <input
+                type="text"
+                name="consent_document_id"
+                value="{{ old('consent_document_id', $procedure->consent_document_id)}}"
+                class="input input-bordered w-full"
+                placeholder="ID de documento firmado"
+                data-consent-input
+            >
             <p class="text-xs text-gray-500 mt-1">Ingresa el ID de un consentimiento firmado o usa los botones de la vista para generarlo.</p>
         </div>
+        @if($recentPatientConsents->isNotEmpty())
+            <div class="space-y-1">
+                <label class="block text-sm font-medium">Últimos consentimientos del paciente</label>
+                <select class="input input-bordered w-full" data-consent-select>
+                    <option value="">Selecciona un consentimiento reciente</option>
+                    @foreach($recentPatientConsents as $consent)
+                        <option value="{{ $consent->id }}">
+                            #{{ $consent->id }} • {{ $consent->template->name ?? 'Sin plantilla' }} ({{ $consent->status }})
+                        </option>
+                    @endforeach
+                </select>
+                <p class="text-xs text-gray-500">Se muestran los últimos cinco consentimientos generados para este paciente.</p>
+            </div>
+        @endif
         <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm text-gray-700">
             <p>Vincula un consentimiento firmado existente para este paciente/tutor.</p>
             <p>También puedes generar uno nuevo desde plantilla y firmarlo sin salir.</p>
@@ -315,6 +337,8 @@
 
                 const responsibleSelect = wrapper.querySelector('[data-responsible-select]');
                 const licenseInput = wrapper.querySelector('[data-responsible-license]');
+                const consentSelect = wrapper.querySelector('[data-consent-select]');
+                const consentInput = wrapper.querySelector('[data-consent-input]');
 
                 const syncLicense = (force = false) => {
                     if (!responsibleSelect || !licenseInput) return;
@@ -329,6 +353,12 @@
 
                 syncLicense(true);
                 responsibleSelect?.addEventListener('change', () => syncLicense(true));
+
+                if (consentSelect && consentInput) {
+                    consentSelect.addEventListener('change', (event) => {
+                        consentInput.value = event.target.value;
+                    });
+                }
             });
         </script>
     @endpush
