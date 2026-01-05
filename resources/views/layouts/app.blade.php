@@ -108,7 +108,15 @@
             }
         }
 
-        window.addEventListener('DOMContentLoaded', ensureFallbackStyles);
+        window.ensureFallbackStyles = ensureFallbackStyles;
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', ensureFallbackStyles, { once: true });
+        } else {
+            ensureFallbackStyles();
+        }
+
+        window.addEventListener('load', ensureFallbackStyles, { once: true });
     </script>
 
     @stack('styles')
