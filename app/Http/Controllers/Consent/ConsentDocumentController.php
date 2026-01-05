@@ -119,26 +119,29 @@ class ConsentDocumentController extends Controller
             'owner'
         );
 
+        $originalOwnerSnapshot = $consent->owner_snapshot ?? [];
+        $originalPetSnapshot = $consent->pet_snapshot ?? [];
+
         $ownerSnapshot = $this->enrichOwnerSnapshot(
-            $consent->owner_snapshot ?? [],
+            $originalOwnerSnapshot,
             $consent->owner ?? $consent->pet?->owner
         );
 
         $petSnapshot = $this->enrichPetSnapshot(
-            $consent->pet_snapshot ?? [],
+            $originalPetSnapshot,
             $consent->pet
         );
-
-        // Ensure the view and subsequent logic see the enriched data
-        $consent->owner_snapshot = $ownerSnapshot;
-        $consent->pet_snapshot = $petSnapshot;
 
         // If the stored HTML is missing, still has placeholders, or we just enriched the snapshots, rebuild it
         $stillHasPlaceholders = empty($consent->merged_body_html)
             || preg_match('/\{\{\s*[a-zA-Z0-9_\.]+\s*\}\}/', $consent->merged_body_html);
 
-        $snapshotsImproved = $consent->owner_snapshot !== $ownerSnapshot
-            || $consent->pet_snapshot !== $petSnapshot;
+        $snapshotsImproved = $ownerSnapshot !== $originalOwnerSnapshot
+            || $petSnapshot !== $originalPetSnapshot;
+
+        // Ensure the view and subsequent logic see the enriched data
+        $consent->owner_snapshot = $ownerSnapshot;
+        $consent->pet_snapshot = $petSnapshot;
 
         if (($stillHasPlaceholders || $snapshotsImproved) && $consent->template?->body_html) {
             $context = [
