@@ -21,7 +21,7 @@ class VitalsRequest extends FormRequest
             'spo2' => ['nullable', 'numeric'],
             'bp' => ['nullable', 'string', 'max:30'],
             'weight' => ['nullable', 'numeric'],
-            'pain_scale' => ['nullable', 'integer'],
+            'pain_scale' => ['nullable', 'string', 'max:30'],
             'hydration' => ['nullable', 'string', 'max:30'],
             'mucous' => ['nullable', 'string', 'max:30'],
             'crt' => ['nullable', 'string', 'max:30'],
