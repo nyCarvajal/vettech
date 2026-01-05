@@ -49,7 +49,7 @@
         <ul class="space-y-2">
             @foreach($consent->signatures as $signature)
                 <li class="flex items-center space-x-2">
-                    <img src="{{ Storage::disk('public')->url($signature->signature_image_path) }}" class="h-16 border" alt="firma">
+                        <img src="{{ Storage::disk('consents')->url($signature->signature_image_path) }}" class="h-16 border" alt="firma">
                     <div>
                         <p>{{ $signature->signer_name }} ({{ $signature->signer_role }})</p>
                         <p class="text-xs text-gray-600">{{ $signature->signed_at }} · {{ $signature->method }} · {{ $signature->ip_address }}</p>

@@ -20,8 +20,11 @@ class SignatureService
             throw new \InvalidArgumentException('Firma inválida');
         }
 
-        $filename = 'consents/signatures/' . ($tenantId ? $tenantId . '/' : '') . Str::uuid() . '.png';
-        if (! Storage::disk('public')->put($filename, $binary)) {
+        $directory = 'signatures/' . ($tenantId ? $tenantId . '/' : '');
+        Storage::disk('consents')->makeDirectory($directory);
+
+        $filename = $directory . Str::uuid() . '.png';
+        if (! Storage::disk('consents')->put($filename, $binary)) {
             throw new \RuntimeException('No se pudo guardar la firma');
         }
 

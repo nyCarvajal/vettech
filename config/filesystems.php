@@ -45,6 +45,14 @@ return [
             'throw' => false,
         ],
 
+        'consents' => [
+            'driver' => 'local',
+            'root' => storage_path('consents'),
+            'url' => env('APP_URL').'/storage/consents',
+            'visibility' => 'public',
+            'throw' => false,
+        ],
+
         's3' => [
             'driver' => 's3',
             'key' => env('AWS_ACCESS_KEY_ID'),
@@ -83,6 +91,7 @@ return [
 
     'links' => [
         public_path('storage') => storage_path('app/public'),
+        public_path('storage/consents') => storage_path('consents'),
     ],
 
 ];
