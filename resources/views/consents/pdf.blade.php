@@ -26,7 +26,7 @@
             <div style="margin-bottom:12px;">
                 <p><strong>{{ $signature->signer_name }}</strong> ({{ $signature->signer_role }})</p>
                 <p>{{ $signature->signed_at }} · {{ $signature->ip_address }} · {{ $signature->method }}</p>
-                <img src="{{ public_path('storage/'.$signature->signature_image_path) }}" alt="firma">
+                <img src="{{ Storage::disk('consents')->path($signature->signature_image_path) }}" alt="firma">
             </div>
         @endforeach
     </div>

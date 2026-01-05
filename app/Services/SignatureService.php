@@ -14,10 +14,19 @@ class SignatureService
         }
 
         [$meta, $data] = explode(',', $base64, 2);
-        $binary = base64_decode($data);
+        $binary = base64_decode(trim($data), true);
 
-        $filename = 'consents/signatures/' . ($tenantId ? $tenantId . '/' : '') . Str::uuid() . '.png';
-        Storage::disk('public')->put($filename, $binary);
+        if ($binary === false) {
+            throw new \InvalidArgumentException('Firma inválida');
+        }
+
+        $directory = 'signatures/' . ($tenantId ? $tenantId . '/' : '');
+        Storage::disk('consents')->makeDirectory($directory);
+
+        $filename = $directory . Str::uuid() . '.png';
+        if (! Storage::disk('consents')->put($filename, $binary)) {
+            throw new \RuntimeException('No se pudo guardar la firma');
+        }
 
         return $filename;
     }
