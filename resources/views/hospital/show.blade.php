@@ -58,8 +58,8 @@
                             <p class="text-sm text-gray-500">{{ $day->notes }}</p>
                         </div>
 
-                        <div class="grid md:grid-cols-2 gap-4">
-                            <x-card class="bg-white border border-emerald-100">
+                        <div class="grid md:grid-cols-3 gap-4">
+                            <x-card class="bg-white border border-emerald-100 md:col-span-2">
                                 <div class="flex items-center justify-between mb-2">
                                     <h4 class="font-semibold text-emerald-700">Tratamiento / Órdenes</h4>
                                     @php($firstOrder = $day->orders->first())
@@ -106,7 +106,12 @@
                                             </x-select>
                                         </div>
                                         <div class="grid grid-cols-2 gap-2">
-                                            <x-input name="product_id" label="Producto (id)" />
+                                            <x-select name="product_id" label="Producto">
+                                                <option value="">Selecciona producto</option>
+                                                @foreach($products as $product)
+                                                    <option value="{{ $product->id }}">{{ $product->name }}</option>
+                                                @endforeach
+                                            </x-select>
                                             <x-input name="manual_name" label="Nombre manual" />
                                         </div>
                                         <div class="grid grid-cols-3 gap-2">

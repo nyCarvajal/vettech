@@ -15,7 +15,6 @@ class OrderRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'stay_id' => ['required', 'exists:hospital_stays,id'],
             'day_id' => ['nullable', 'exists:hospital_days,id'],
             'type' => ['required', Rule::in(['medication', 'procedure', 'feeding', 'fluid', 'other'])],
             'source' => ['required', Rule::in(['inventory', 'manual'])],
