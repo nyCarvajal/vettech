@@ -236,9 +236,8 @@ class ProcedureController extends Controller
     {
         return User::query()
             ->when($user?->clinica_id, fn ($query, $clinicId) => $query->where('clinica_id', $clinicId))
-            ->orderBy('nombre')
-            ->orderBy('apellidos')
-            ->get(['id', 'nombre', 'apellidos', 'numero_identificacion', 'firma_medica_texto']);
+            ->orderBy('nombres')
+            ->get(['id', 'nombres',  'numero_identificacion', 'firma_medica_texto']);
     }
 
     private function responsibleDisplayName(?User $user): ?string

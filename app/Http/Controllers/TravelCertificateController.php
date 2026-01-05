@@ -81,14 +81,9 @@ class TravelCertificateController extends Controller
             $defaultClinic['vet_license'] = $user->firma_medica_texto ?? $user->numero_identificacion ?? $defaultClinic['vet_license'];
         }
         $vets = User::query()
+            ->when($clinic, fn ($query) => $query->where('clinica_id', $clinic->id))
             ->orderBy('nombres')
             ->get(['id', 'nombres', 'numero_identificacion', 'firma_medica_texto']);
-
-        if ($user) {
-            $vets = $vets
-                ->sortBy(fn ($vet) => $vet->id === $user->id ? 0 : 1)
-                ->values();
-        }
         $declaration = config('travel_certificates.default_declaration');
         $patient = $request->filled('patient_id')
             ? Patient::with(['owner.departamento', 'owner.municipio', 'species', 'breed'])->find($request->integer('patient_id'))
@@ -106,7 +101,9 @@ class TravelCertificateController extends Controller
         $data['origin_type'] = $data['type'] === 'national_co' ? 'co' : 'international';
         $data['status'] = 'draft';
 
-        $certificate = TravelCertificate::create($data);
+        $certificateAttributes = $this->extractCertificateAttributes($data, $request);
+
+        $certificate = TravelCertificate::create($certificateAttributes);
 
         $this->syncRelations($certificate, $data, $request);
 
@@ -142,13 +139,13 @@ class TravelCertificateController extends Controller
             $defaultClinic['city'] = $clinic->municipio ?? $defaultClinic['city'];
         }
         if ($user) {
-            $defaultClinic['vet_name'] = trim(($user->nombre ?? '') . ' ' . ($user->apellidos ?? '')) ?: $defaultClinic['vet_name'];
+            $defaultClinic['vet_name'] = trim(($user->nombres ?? '')) ?: $defaultClinic['vet_name'];
             $defaultClinic['vet_license'] = $user->firma_medica_texto ?? $user->numero_identificacion ?? $defaultClinic['vet_license'];
         }
         $vets = User::query()
             ->when($clinic, fn ($query) => $query->where('clinica_id', $clinic->id))
-            ->orderBy('nombre')
-            ->get(['id', 'nombre', 'apellidos', 'numero_identificacion', 'firma_medica_texto']);
+            ->orderBy('nombres')
+            ->get(['id', 'nombres', 'numero_identificacion', 'firma_medica_texto']);
 
         return view('travel_certificates.edit', [
             'certificate' => $travel_certificate->load(['vaccinations', 'dewormings', 'attachments']),
@@ -166,7 +163,9 @@ class TravelCertificateController extends Controller
         $data = $request->validated();
         $data['origin_type'] = $data['type'] === 'national_co' ? 'co' : 'international';
 
-        $travel_certificate->update($data);
+        $certificateAttributes = $this->extractCertificateAttributes($data, $request, $travel_certificate);
+
+        $travel_certificate->update($certificateAttributes);
         $this->syncRelations($travel_certificate, $data, $request);
 
         return redirect()->route('travel-certificates.show', $travel_certificate)->with('status', 'Certificado actualizado');
@@ -230,6 +229,19 @@ class TravelCertificateController extends Controller
 
         $pdf = Pdf::loadView('travel_certificates.pdf', ['certificate' => $travel_certificate->load(['vaccinations', 'dewormings', 'attachments'])]);
         return $pdf->download($travel_certificate->code . '.pdf');
+    }
+
+    protected function extractCertificateAttributes(array $data, Request $request, ?TravelCertificate $existing = null): array
+    {
+        $model = $existing ?? new TravelCertificate();
+
+        $attributes = Arr::only($data, $model->getFillable());
+
+        if (! $existing) {
+            $attributes['tenant_id'] = $request->user()->tenant_id ?? null;
+        }
+
+        return $attributes;
     }
 
     protected function syncRelations(TravelCertificate $certificate, array $data, Request $request): void

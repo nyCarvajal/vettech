@@ -11,7 +11,6 @@
     $defaultResponsibleLicense = $defaultResponsibleLicense ?? null;
     $selectedResponsibleName = old('responsible_vet_name', $procedure->responsible_vet_name ?: $defaultResponsibleName);
     $initialLicense = old('responsible_vet_license', $procedure->responsible_vet_license ?: $defaultResponsibleLicense);
-    $recentPatientConsents = $recentPatientConsents ?? collect();
 @endphp
 
 <input type="hidden" name="patient_id" value="{{ old('patient_id', $procedure->patient_id ?? optional($patient ?? null)->id) }}">
@@ -63,7 +62,7 @@
         >Consentimiento</button>
     </div>
 
-    <div x-show="section==='basics'" data-section="basics" class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-white p-4 rounded shadow">
+    <div x-show="section==='basics'" data-section="basics" x-cloak class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-white p-4 rounded shadow">
         <div>
             <label class="block text-sm font-medium">Tipo *</label>
             <select name="type" class="input input-bordered w-full" required>
@@ -163,7 +162,7 @@
         </div>
     </div>
 
-    <div x-show="section==='schedule'" data-section="schedule" class="grid grid-cols-1 md:grid-cols-3 gap-4 bg-white p-4 rounded shadow">
+    <div x-show="section==='schedule'" data-section="schedule" x-cloak class="grid grid-cols-1 md:grid-cols-3 gap-4 bg-white p-4 rounded shadow">
         <div>
             <label class="block text-sm font-medium">Programado para</label>
             <input type="datetime-local" name="scheduled_at" value="{{ old('scheduled_at', optional($procedure->scheduled_at)->format('Y-m-d\TH:i')) }}" class="input input-bordered w-full">
@@ -190,7 +189,7 @@
                 @endif
                 @foreach($responsibleUsersList as $user)
                     @php
-                        $fullName = trim(($user->nombre ?? '') . ' ' . ($user->apellidos ?? ''));
+                        $fullName = trim(($user->nombres ?? ''));
                         $license = $user->firma_medica_texto ?? $user->numero_identificacion;
                     @endphp
                     @continue($defaultResponsibleName && $fullName === $defaultResponsibleName)
@@ -206,7 +205,7 @@
         </div>
     </div>
 
-    <div x-show="section==='anesthesia'" data-section="anesthesia" class="space-y-4 bg-white p-4 rounded shadow">
+    <div x-show="section==='anesthesia'" data-section="anesthesia" x-cloak class="space-y-4 bg-white p-4 rounded shadow">
         <div>
             <label class="block text-sm font-medium">Plan anestésico</label>
             <textarea name="anesthesia_plan" rows="3" class="input input-bordered w-full">{{ old('anesthesia_plan', $procedure->anesthesia_plan) }}</textarea>
@@ -242,7 +241,7 @@
         </div>
     </div>
 
-    <div x-show="section==='notes'" data-section="notes" class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-white p-4 rounded shadow">
+    <div x-show="section==='notes'" data-section="notes" x-cloak class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-white p-4 rounded shadow">
         <div>
             <label class="block text-sm font-medium">Preoperatorio</label>
             <textarea name="preop_notes" rows="3" class="input input-bordered w-full">{{ old('preop_notes', $procedure->preop_notes) }}</textarea>
@@ -269,37 +268,12 @@
         </div>
     </div>
 
-    <div x-show="section==='consent'" data-section="consent" class="bg-white p-4 rounded shadow space-y-4">
+    <div x-show="section==='consent'" data-section="consent" x-cloak class="bg-white p-4 rounded shadow space-y-4">
         <div>
             <label class="block text-sm font-medium">Consentimiento firmado</label>
-            <input
-                type="text"
-                name="consent_document_id"
-                value="{{ old('consent_document_id', $procedure->consent_document_id)}}"
-                class="input input-bordered w-full"
-                placeholder="ID de documento firmado"
-                data-consent-input
-            >
+            <input type="text" name="consent_document_id" value="{{ old('consent_document_id', $procedure->consent_document_id)}}" class="input input-bordered w-full" placeholder="ID de documento firmado">
             <p class="text-xs text-gray-500 mt-1">Ingresa el ID de un consentimiento firmado o usa los botones de la vista para generarlo.</p>
         </div>
-        @if($recentPatientConsents->isNotEmpty())
-            <div>
-                <label class="block text-sm font-medium">Consentimientos recientes del paciente</label>
-                <select class="input input-bordered w-full" data-consent-select>
-                    <option value="">Selecciona uno (opcional)</option>
-                    @foreach($recentPatientConsents as $consent)
-                        <option
-                            value="{{ $consent->id }}"
-                            data-code="{{ $consent->code }}"
-                            @selected(old('consent_document_id', $procedure->consent_document_id) == $consent->id)
-                        >
-                            #{{ $consent->code }} — {{ optional($consent->template)->name ?? 'Plantilla' }}
-                        </option>
-                    @endforeach
-                </select>
-                <p class="text-xs text-gray-500 mt-1">Se muestran los últimos 5 consentimientos creados para este paciente. Puedes dejarlos en blanco si vas a generar uno nuevo.</p>
-            </div>
-        @endif
         <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm text-gray-700">
             <p>Vincula un consentimiento firmado existente para este paciente/tutor.</p>
             <p>También puedes generar uno nuevo desde plantilla y firmarlo sin salir.</p>
@@ -317,6 +291,8 @@
                 const buttons = Array.from(wrapper.querySelectorAll('[data-section-button]'));
                 const sections = Array.from(wrapper.querySelectorAll('[data-section]'));
                 if (!buttons.length || !sections.length) return;
+
+                sections.forEach((section) => section.removeAttribute('x-cloak'));
 
                 const toggleSection = (target) => {
                     buttons.forEach((btn) => {
@@ -339,8 +315,6 @@
 
                 const responsibleSelect = wrapper.querySelector('[data-responsible-select]');
                 const licenseInput = wrapper.querySelector('[data-responsible-license]');
-                const consentSelect = wrapper.querySelector('[data-consent-select]');
-                const consentInput = wrapper.querySelector('[data-consent-input]');
 
                 const syncLicense = (force = false) => {
                     if (!responsibleSelect || !licenseInput) return;
@@ -355,23 +329,6 @@
 
                 syncLicense(true);
                 responsibleSelect?.addEventListener('change', () => syncLicense(true));
-
-                const syncConsent = () => {
-                    if (!consentSelect || !consentInput) return;
-                    const selected = consentSelect.selectedOptions[0];
-                    if (!selected || !selected.value) return;
-                    if (!consentInput.value || consentInput.value === selected.value) {
-                        consentInput.value = selected.value;
-                    }
-                };
-
-                syncConsent();
-
-                consentSelect?.addEventListener('change', (event) => {
-                    if (!consentInput) return;
-                    const selected = event.target.selectedOptions[0];
-                    consentInput.value = selected?.value ?? '';
-                });
             });
         </script>
     @endpush
