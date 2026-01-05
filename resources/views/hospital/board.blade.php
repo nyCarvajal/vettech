@@ -21,8 +21,8 @@
                 <div class="bg-gradient-to-r from-emerald-600 via-emerald-500 to-teal-500 text-white px-4 py-3 flex items-center justify-between">
                     <div>
                         <p class="text-xs uppercase tracking-wider text-emerald-100">Jaula</p>
-                        <p class="text-lg font-semibold">{{ $cage->name }}</p>
-                        <p class="text-xs text-emerald-100">{{ $cage->location }}</p>
+                        <p class="text-lg font-semibold break-words">{{ $cage->name }}</p>
+                        <p class="text-xs text-emerald-100 break-words">{{ $cage->location }}</p>
                     </div>
                     <div class="flex items-center gap-2 bg-white/10 px-3 py-1 rounded-full text-sm">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -51,12 +51,12 @@
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6v6l3 3m4 3H5a1 1 0 01-1-1V6a1 1 0 011-1h4l2-2h2l2 2h4a1 1 0 011 1v11a1 1 0 01-1 1z" />
                                         </svg>
                                     </div>
-                                    <div class="flex-1">
+                                    <div class="flex-1 min-w-0">
                                         <div class="flex items-center justify-between gap-3">
-                                            <div>
+                                            <div class="min-w-0">
                                                 <p class="text-xs text-emerald-700 font-semibold uppercase">Paciente</p>
-                                                <p class="text-lg font-bold text-gray-900">{{ $stay->patient->display_name ?? 'Paciente #' . $stay->patient_id }}</p>
-                                                <p class="text-sm text-gray-600 flex items-center gap-2 mt-1">
+                                                <p class="text-lg font-bold text-gray-900 break-words">{{ $stay->patient->display_name ?? 'Paciente #' . $stay->patient_id }}</p>
+                                                <p class="text-sm text-gray-600 flex flex-wrap items-center gap-2 mt-1 break-words">
                                                     <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-100">
                                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 13V7a2 2 0 00-2-2h-3l-1-2H9L8 5H5a2 2 0 00-2 2v10a2 2 0 002 2h5" />
@@ -83,31 +83,31 @@
                                         </div>
 
                                         <div class="mt-3 grid grid-cols-2 gap-2 text-sm text-gray-700">
-                                            <div class="flex items-center gap-2">
+                                            <div class="flex items-center gap-2 break-words">
                                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7V3m8 4V3m-9 8h10m-6 4h6M6 21h12a2 2 0 002-2V7a2 2 0 00-2-2h-2V3H8v2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                                 </svg>
                                                 <span>Ingreso: {{ optional($stay->admitted_at)->format('d/m H:i') }}</span>
                                             </div>
-                                            <div class="flex items-center gap-2">
+                                            <div class="flex items-center gap-2 break-words">
                                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8.5 19h7a4.5 4.5 0 004.5-4.5V9a4.5 4.5 0 00-4.5-4.5h-7A4.5 4.5 0 004 9v5.5A4.5 4.5 0 008.5 19z" />
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6" />
                                                 </svg>
                                                 <span>{{ $stay->tasks->count() }} tareas pendientes</span>
                                             </div>
-                                            <div class="flex items-center gap-2">
+                                            <div class="flex items-center gap-2 break-words">
                                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 18.75a6.75 6.75 0 100-13.5 6.75 6.75 0 000 13.5z" />
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.75 12h4.5m-2.25-2.25v4.5" />
                                                 </svg>
-                                                <span>Plan: {{ $stay->plan ?: 'No definido' }}</span>
+                                                <span class="break-words">Plan: {{ $stay->plan ?: 'No definido' }}</span>
                                             </div>
-                                            <div class="flex items-center gap-2">
+                                            <div class="flex items-center gap-2 break-words">
                                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 6h16M9 6v12m6-12v12M4 10h16M4 14h16M4 18h16" />
                                                 </svg>
-                                                <span>Dx: {{ $stay->primary_dx ?: 'Pendiente' }}</span>
+                                                <span class="break-words">Dx: {{ $stay->primary_dx ?: 'Pendiente' }}</span>
                                             </div>
                                         </div>
                                     </div>
@@ -119,10 +119,10 @@
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8c-1.657 0-3 1.567-3 3.5S10.343 15 12 15s3-1.567 3-3.5S13.657 8 12 8z" />
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 11.5c0 4.694-3.134 8.5-7 8.5s-7-3.806-7-8.5S8.134 3 12 3s7 3.806 7 8.5z" />
                                         </svg>
-                                        <div>
+                                        <div class="min-w-0">
                                             <p class="text-xs uppercase tracking-wide text-emerald-700">Tutor</p>
-                                            <p class="font-semibold">{{ $stay->owner->name ?? 'Sin registrar' }}</p>
-                                            <p class="text-xs text-emerald-700 flex flex-wrap gap-2 mt-1">
+                                            <p class="font-semibold break-words">{{ $stay->owner->name ?? 'Sin registrar' }}</p>
+                                            <p class="text-xs text-emerald-700 flex flex-wrap gap-2 mt-1 break-words">
                                                 @if($stay->owner?->phone)
                                                     <span class="inline-flex items-center gap-1"><svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 5a2 2 0 012-2h2.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-1.272.636a11.042 11.042 0 005.516 5.516l.636-1.272a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.82 21 3 14.18 3 6V5z"/></svg>{{ $stay->owner->phone }}</span>
                                                 @endif
@@ -136,10 +136,10 @@
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                         </svg>
-                                        <div>
+                                        <div class="min-w-0">
                                             <p class="text-xs uppercase tracking-wide text-cyan-700">Seguimiento</p>
-                                            <p>{{ $stay->tasks->count() }} tareas pendientes</p>
-                                            <p class="text-xs text-cyan-700">Plan: {{ $stay->plan ?: 'No definido' }} • Dx: {{ $stay->primary_dx ?: 'Pendiente' }}</p>
+                                            <p class="break-words">{{ $stay->tasks->count() }} tareas pendientes</p>
+                                            <p class="text-xs text-cyan-700 break-words">Plan: {{ $stay->plan ?: 'No definido' }} • Dx: {{ $stay->primary_dx ?: 'Pendiente' }}</p>
                                         </div>
                                     </div>
                                 </div>
