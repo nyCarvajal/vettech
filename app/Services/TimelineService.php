@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Dispensation;
 use App\Models\Encounter;
+use App\Models\Followup;
 use App\Models\Grooming;
 use App\Models\HistoriaClinica;
 use App\Models\HospitalStay;
@@ -51,6 +52,28 @@ class TimelineService
                         'peso' => $encounter->peso,
                         'temperatura' => $encounter->temperatura,
                         'profesional' => $encounter->professional,
+                    ],
+                ];
+            }));
+        }
+
+        if (! $typeFilter || $typeFilter === 'control') {
+            $followups = Followup::where('patient_id', $patient->id)
+                ->when($from, fn ($q) => $q->whereDate('followup_at', '>=', $from))
+                ->when($to, fn ($q) => $q->whereDate('followup_at', '<=', $to))
+                ->orderByDesc('followup_at')
+                ->get();
+
+            $events = $events->merge($followups->map(function (Followup $followup) {
+                return [
+                    'type' => 'control',
+                    'occurred_at' => $followup->followup_at,
+                    'title' => $followup->code,
+                    'summary' => $followup->reason ?? 'Control posterior',
+                    'url' => route('followups.show', $followup),
+                    'meta' => [
+                        'mejoró' => $followup->improved_status,
+                        'responsable' => $followup->performed_by,
                     ],
                 ];
             }));
