@@ -179,5 +179,22 @@
 </div>
 @push('styles')
     <link rel="stylesheet" href="{{ asset('css/app-fallback.css') }}">
+    <script>
+        (function ensureStylesImmediately() {
+            const hasFallback = Array.from(document.querySelectorAll('link[rel="stylesheet"]'))
+                .some((link) => (link.getAttribute('href') || '').includes('app-fallback.css'));
+
+            if (!hasFallback) {
+                const fallbackLink = document.createElement('link');
+                fallbackLink.rel = 'stylesheet';
+                fallbackLink.href = '{{ asset('css/app-fallback.css') }}';
+                document.head.appendChild(fallbackLink);
+            }
+
+            if (typeof window.ensureFallbackStyles === 'function') {
+                window.ensureFallbackStyles();
+            }
+        })();
+    </script>
 @endpush
 @endsection
