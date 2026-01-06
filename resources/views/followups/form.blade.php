@@ -63,9 +63,9 @@
                 </div>
 
                 <div class="grid gap-3">
-                    <div class="flex gap-3 flex-wrap">
+                    <div class="flex gap-3 flex-wrap" id="improved-group">
                         @foreach(['yes' => 'Sí', 'partial' => 'Parcial', 'no' => 'No', 'unknown' => 'No sabe'] as $key => $label)
-                            <label class="inline-flex items-center gap-2 rounded-full border border-gray-200 px-3 py-2 cursor-pointer">
+                            <label class="inline-flex items-center gap-2 rounded-full border border-gray-200 px-3 py-2 cursor-pointer bg-gray-50 hover:border-mint-200 transition w-full sm:w-auto">
                                 <input type="radio" name="improved_status" value="{{ $key }}" x-model="status" @checked(old('improved_status', $followup->improved_status ?? 'unknown') === $key)>
                                 <span class="font-semibold text-gray-800">{{ $label }}</span>
                             </label>
@@ -168,4 +168,7 @@
         </div>
     </form>
 </div>
+@push('styles')
+    <link rel="stylesheet" href="{{ asset('css/app-fallback.css') }}">
+@endpush
 @endsection
