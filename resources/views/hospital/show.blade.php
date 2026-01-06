@@ -58,7 +58,7 @@
                             <p class="text-sm text-gray-500">{{ $day->notes }}</p>
                         </div>
 
-                        <div class="grid md:grid-cols-3 gap-4">
+                        <div class="grid gap-4 md:grid-cols-[7fr_3fr]">
                             <x-card class="bg-white border border-emerald-100 md:col-span-2">
                                 <div class="flex items-center justify-between mb-2">
                                     <h4 class="font-semibold text-emerald-700">Tratamiento / Órdenes</h4>
