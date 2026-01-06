@@ -481,12 +481,16 @@
                     <h3 class="section-title mb-1">Historial de visitas</h3>
                     <p class="section-subtitle">Consultas, peluquería, hospitalización y ventas recientes.</p>
                 </div>
-                <div class="d-flex flex-wrap gap-2">
+                <div class="d-flex flex-wrap gap-2 align-items-center">
+                    <a href="{{ route('followups.create', ['patient_id' => $patient->id]) }}" class="pill-action">
+                        Crear control
+                    </a>
                     @php
                         $tabs = [
                             'timeline' => 'Todo',
                             'historia' => 'Historias clínicas',
                             'consulta' => 'Consultas',
+                            'control' => 'Controles',
                             'banio' => 'Peluquería',
                             'procedimiento' => 'Cirugías y procedimientos',
                             'vacunacion' => 'Vacunaciones',
