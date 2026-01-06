@@ -179,20 +179,38 @@
 </div>
 @push('styles')
     <link rel="stylesheet" href="{{ asset('css/app-fallback.css') }}">
+    <style>
+        html[data-followup-style-init="pending"] body {
+            visibility: hidden;
+        }
+    </style>
     <script>
-        (function ensureStylesImmediately() {
-            const hasFallback = Array.from(document.querySelectorAll('link[rel="stylesheet"]'))
-                .some((link) => (link.getAttribute('href') || '').includes('app-fallback.css'));
+        (function ensureStylesBeforeRender() {
+            const root = document.documentElement;
+            root.setAttribute('data-followup-style-init', 'pending');
 
-            if (!hasFallback) {
-                const fallbackLink = document.createElement('link');
-                fallbackLink.rel = 'stylesheet';
-                fallbackLink.href = '{{ asset('css/app-fallback.css') }}';
-                document.head.appendChild(fallbackLink);
-            }
+            const loadStyles = () => {
+                const hasFallback = Array.from(document.querySelectorAll('link[rel="stylesheet"]'))
+                    .some((link) => (link.getAttribute('href') || '').includes('app-fallback.css'));
 
-            if (typeof window.ensureFallbackStyles === 'function') {
-                window.ensureFallbackStyles();
+                if (!hasFallback) {
+                    const fallbackLink = document.createElement('link');
+                    fallbackLink.rel = 'stylesheet';
+                    fallbackLink.href = '{{ asset('css/app-fallback.css') }}';
+                    document.head.appendChild(fallbackLink);
+                }
+
+                if (typeof window.ensureFallbackStyles === 'function') {
+                    window.ensureFallbackStyles();
+                }
+
+                root.removeAttribute('data-followup-style-init');
+            };
+
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', loadStyles, { once: true });
+            } else {
+                loadStyles();
             }
         })();
     </script>
