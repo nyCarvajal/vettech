@@ -1,6 +1,15 @@
 @extends('layouts.app')
 
 @section('content')
+@push('scripts')
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            if (typeof window.ensureFallbackStyles === 'function') {
+                window.ensureFallbackStyles();
+            }
+        }, { once: true });
+    </script>
+@endpush
 <div class="space-y-6" x-data="{ status: '{{ $followup->improved_status ?? 'unknown' }}' }">
     <div class="flex items-center justify-between flex-wrap gap-3">
         <div>
