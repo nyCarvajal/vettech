@@ -2,6 +2,11 @@
      <div class="container-fluid">
           <div class="navbar-header">
                <div class="d-flex align-items-center gap-2">
+                    <div class="topbar-item">
+                         <a href="{{ route('dashboard') }}" class="d-inline-flex align-items-center">
+                              <img src="{{ asset('images/logo-dark.png') }}" alt="VetTech" height="32">
+                         </a>
+                    </div>
                     <!-- Menu Toggle Button -->
                     <div class="topbar-item">
                          <button type="button" class="button-toggle-menu topbar-button">
@@ -51,6 +56,11 @@
                     </div>
 
                     <!-- User -->
+                    <div class="topbar-item">
+                         <button type="button" class="topbar-button position-relative">
+                              <iconify-icon icon="solar:bell-outline" class="fs-22 align-middle"></iconify-icon>
+                         </button>
+                    </div>
                     <div class="dropdown topbar-item">
                          <a type="button" class="topbar-button" id="page-header-user-dropdown" data-bs-toggle="dropdown"
                               aria-haspopup="true" aria-expanded="false">
