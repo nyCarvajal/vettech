@@ -31,6 +31,8 @@ use App\Http\Controllers\GroomingBillingController;
 use App\Http\Controllers\GroomingController;
 use App\Http\Controllers\GroomingReportController;
 use App\Http\Controllers\GroomingStatusController;
+use App\Http\Controllers\FollowupAttachmentController;
+use App\Http\Controllers\FollowupController;
 use App\Http\Controllers\Consent\ConsentTemplateController;
 use App\Http\Controllers\Consent\ConsentDocumentController;
 use App\Http\Controllers\Consent\ConsentSignatureController;
@@ -124,6 +126,10 @@ Route::post('patients/{patient}/dewormings', [\App\Http\Controllers\PatientDewor
 Route::get('patients/{patient}/dewormings/{deworming}/edit', [\App\Http\Controllers\PatientDewormingController::class, 'edit'])->name('patients.dewormings.edit');
 Route::put('patients/{patient}/dewormings/{deworming}', [\App\Http\Controllers\PatientDewormingController::class, 'update'])->name('patients.dewormings.update');
 Route::delete('patients/{patient}/dewormings/{deworming}', [\App\Http\Controllers\PatientDewormingController::class, 'destroy'])->name('patients.dewormings.destroy');
+
+Route::resource('followups', FollowupController::class);
+Route::post('followups/{followup}/attachments', [FollowupAttachmentController::class, 'store'])->name('followups.attachments.store');
+Route::delete('followups/{followup}/attachments/{attachment}', [FollowupAttachmentController::class, 'destroy'])->name('followups.attachments.destroy');
 
 Route::get('geo/departments/{department}/municipalities', [GeoController::class, 'municipalities'])->name('geo.departments.municipalities');
 Route::post('travel-certificates/{travel_certificate}/issue', [TravelCertificateController::class, 'issue'])->name('travel-certificates.issue');
