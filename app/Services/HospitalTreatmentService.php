@@ -14,6 +14,7 @@ class HospitalTreatmentService
 {
     public function createOrder(array $data): HospitalOrder
     {
+        $data = $this->normalizeSource($data);
         $this->validateSource($data);
 
         return DB::transaction(function () use ($data) {
@@ -63,6 +64,15 @@ class HospitalTreatmentService
             ['date' => $date->toDateString()],
             ['day_number' => $dayNumber]
         );
+    }
+
+    protected function normalizeSource(array $data): array
+    {
+        if (($data['source'] ?? null) === 'inventory' && empty($data['product_id']) && ! empty($data['manual_name'])) {
+            $data['source'] = 'manual';
+        }
+
+        return $data;
     }
 
     protected function validateSource(array $data): void
