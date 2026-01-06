@@ -18,8 +18,16 @@ class OrderRequest extends FormRequest
             'day_id' => ['nullable', 'exists:hospital_days,id'],
             'type' => ['required', Rule::in(['medication', 'procedure', 'feeding', 'fluid', 'other'])],
             'source' => ['required', Rule::in(['inventory', 'manual'])],
-            'product_id' => ['nullable', 'required_if:source,inventory', 'exists:products,id'],
-            'manual_name' => ['nullable', 'required_if:source,manual', 'string'],
+            'product_id' => [
+                'nullable',
+                Rule::requiredIf(fn () => $this->input('source') === 'inventory' && blank($this->input('manual_name'))),
+                'exists:products,id',
+            ],
+            'manual_name' => [
+                'nullable',
+                Rule::requiredIf(fn () => $this->input('source') === 'manual' || ($this->input('source') === 'inventory' && blank($this->input('product_id')))),
+                'string',
+            ],
             'dose' => ['nullable', 'string', 'max:80'],
             'route' => ['nullable', 'string', 'max:50'],
             'frequency' => ['nullable', 'string', 'max:50'],
