@@ -44,42 +44,43 @@
                             $severityClass = $severityColors[$stay->severity] ?? 'bg-slate-100 text-slate-700 border-slate-200';
                         @endphp
                         <a href="{{ route('hospital.show', $stay) }}" class="block rounded-xl border border-emerald-200 bg-white/90 hover:bg-white shadow-sm hover:shadow-md transition">
-                            <div class="flex flex-col gap-4 p-4">
+                            <div class="p-4 space-y-4">
                                 <div class="flex items-start gap-3">
                                     <div class="shrink-0 w-12 h-12 rounded-full bg-gradient-to-br from-emerald-600 to-teal-500 text-white flex items-center justify-center shadow-inner">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6v6l3 3m4 3H5a1 1 0 01-1-1V6a1 1 0 011-1h4l2-2h2l2 2h4a1 1 0 011 1v11a1 1 0 01-1 1z" />
                                         </svg>
                                     </div>
-                                    <div class="flex-1 min-w-0 space-y-2">
-                                        <div class="flex flex-wrap items-start gap-3">
-                                            <div class="min-w-0 flex-1">
+                                    <div class="flex-1 min-w-0 space-y-3">
+                                        <div class="flex items-start justify-between gap-3">
+                                            <div class="min-w-0 space-y-1">
                                                 <p class="text-xs text-emerald-700 font-semibold uppercase">Paciente</p>
                                                 <p class="text-lg font-bold text-gray-900 leading-tight break-words">{{ $stay->patient->display_name ?? 'Paciente #' . $stay->patient_id }}</p>
-                                                <div class="mt-2 flex flex-wrap items-center gap-2 text-xs text-gray-700">
-                                                    <span class="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-100">
-                                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 13V7a2 2 0 00-2-2h-3l-1-2H9L8 5H5a2 2 0 00-2 2v10a2 2 0 002 2h5" />
-                                                        </svg>
-                                                        <span class="min-w-0 break-words">{{ optional($stay->patient->species)->name ?? 'Especie' }}</span>
-                                                    </span>
-                                                    @if($stay->patient?->breed)
-                                                        <span class="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-cyan-50 text-cyan-700 border border-cyan-100 break-words">{{ $stay->patient->breed->name }}</span>
-                                                    @endif
-                                                    @if($stay->patient?->edad)
-                                                        <span class="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-amber-50 text-amber-700 border border-amber-100 break-words">{{ $stay->patient->edad }}</span>
-                                                    @endif
-                                                    @if($stay->patient?->peso_formateado)
-                                                        <span class="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-rose-50 text-rose-700 border border-rose-100 break-words">{{ $stay->patient->peso_formateado }}</span>
-                                                    @endif
-                                                </div>
                                             </div>
-                                            <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold border {{ $severityClass }} shadow-inner">
+                                            <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold border {{ $severityClass }} shadow-inner shrink-0">
                                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 0 0118 0z" />
                                                 </svg>
                                                 {{ $severityLabel ?: 'Sin severidad' }}
                                             </span>
+                                        </div>
+
+                                        <div class="flex flex-wrap items-center gap-2 text-xs text-gray-700">
+                                            <span class="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-100">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 13V7a2 2 0 00-2-2h-3l-1-2H9L8 5H5a2 2 0 00-2 2v10a2 2 0 002 2h5" />
+                                                </svg>
+                                                <span class="min-w-0 break-words">{{ optional($stay->patient->species)->name ?? 'Especie' }}</span>
+                                            </span>
+                                            @if($stay->patient?->breed)
+                                                <span class="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-cyan-50 text-cyan-700 border border-cyan-100 break-words">{{ $stay->patient->breed->name }}</span>
+                                            @endif
+                                            @if($stay->patient?->edad)
+                                                <span class="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-amber-50 text-amber-700 border border-amber-100 break-words">{{ $stay->patient->edad }}</span>
+                                            @endif
+                                            @if($stay->patient?->peso_formateado)
+                                                <span class="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-rose-50 text-rose-700 border border-rose-100 break-words">{{ $stay->patient->peso_formateado }}</span>
+                                            @endif
                                         </div>
 
                                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm text-gray-700">
@@ -100,8 +101,8 @@
                                     </div>
                                 </div>
 
-                                <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-                                    <div class="rounded-lg border border-emerald-100 bg-emerald-50/70 px-3 py-3 text-sm text-emerald-800 flex items-start gap-2 shadow-inner min-w-0">
+                                <div class="grid grid-cols-1 gap-3 text-sm">
+                                    <div class="rounded-lg border border-emerald-100 bg-emerald-50/70 px-3 py-3 text-emerald-800 flex items-start gap-2 shadow-inner min-w-0">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8c-1.657 0-3 1.567-3 3.5S10.343 15 12 15s3-1.567 3-3.5S13.657 8 12 8z" />
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 11.5c0 4.694-3.134 8.5-7 8.5s-7-3.806-7-8.5S8.134 3 12 3s7 3.806 7 8.5z" />
@@ -119,7 +120,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="rounded-lg border border-cyan-100 bg-cyan-50/70 px-3 py-3 text-sm text-cyan-800 flex items-start gap-2 shadow-inner min-w-0">
+                                    <div class="rounded-lg border border-cyan-100 bg-cyan-50/70 px-3 py-3 text-cyan-800 flex items-start gap-2 shadow-inner min-w-0">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 0 0118 0z" />
                                         </svg>
@@ -129,7 +130,7 @@
                                             <p class="text-xs text-cyan-700 break-words">Plan: {{ $stay->plan ?: 'No definido' }}</p>
                                         </div>
                                     </div>
-                                    <div class="rounded-lg border border-amber-100 bg-amber-50/70 px-3 py-3 text-sm text-amber-800 flex items-start gap-2 shadow-inner min-w-0">
+                                    <div class="rounded-lg border border-amber-100 bg-amber-50/70 px-3 py-3 text-amber-800 flex items-start gap-2 shadow-inner min-w-0">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 6h16M9 6v12m6-12v12M4 10h16M4 14h16M4 18h16" />
                                         </svg>
