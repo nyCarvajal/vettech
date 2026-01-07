@@ -12,6 +12,8 @@ use App\Models\ConsentTemplate;
 use App\Models\ConsentDocument;
 use App\Policies\ConsentTemplatePolicy;
 use App\Policies\ConsentDocumentPolicy;
+use App\Models\Followup;
+use App\Policies\FollowupPolicy;
 
 class AuthServiceProvider extends ServiceProvider
 {
@@ -24,6 +26,7 @@ class AuthServiceProvider extends ServiceProvider
         TravelCertificate::class => TravelCertificatePolicy::class,
         ConsentTemplate::class => ConsentTemplatePolicy::class,
         ConsentDocument::class => ConsentDocumentPolicy::class,
+        Followup::class => FollowupPolicy::class,
     ];
 
     /**

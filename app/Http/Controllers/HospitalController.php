@@ -12,6 +12,7 @@ use App\Http\Requests\VitalsRequest;
 use App\Models\HospitalDay;
 use App\Models\HospitalOrder;
 use App\Models\HospitalStay;
+use App\Models\Product;
 use App\Models\Clinica;
 use App\Models\Patient;
 use App\Services\HospitalBillingService;
@@ -72,9 +73,22 @@ class HospitalController extends Controller
         $this->ensureTenantConnection();
 
         $this->stayService->ensureDays($stay);
-        $stay->load(['patient', 'owner', 'cage', 'days.orders', 'days.administrations', 'days.vitals', 'days.progressNotes', 'charges']);
+        $stay->load([
+            'patient',
+            'owner',
+            'cage',
+            'charges',
+            'days' => function ($query) {
+                $query
+                    ->orderByDesc('date')
+                    ->orderByDesc('day_number')
+                    ->with(['orders', 'administrations', 'vitals', 'progressNotes']);
+            },
+        ]);
 
-        return view('hospital.show', compact('stay'));
+        $products = Product::orderBy('name')->get();
+
+        return view('hospital.show', compact('stay', 'products'));
     }
 
     public function addOrder(OrderRequest $request, HospitalStay $stay): RedirectResponse
