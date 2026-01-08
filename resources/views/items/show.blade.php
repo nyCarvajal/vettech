@@ -84,9 +84,9 @@
                 }
             }">
                 <div class="flex flex-wrap gap-2">
-                    <button type="button" @click="type='entry'; open=true" class="rounded-lg border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-600">Entrada</button>
-                    <button type="button" @click="type='exit'; open=true" class="rounded-lg border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-600">Salida</button>
-                    <button type="button" @click="type='adjust'; open=true" class="rounded-lg border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-600">Ajuste</button>
+                    <button type="button" @click="type='entry'; open=true" class="rounded-lg border border-mint-200 bg-mint-50 px-4 py-2 text-sm font-semibold text-mint-700 hover:border-mint-600 hover:bg-mint-100">Entrada</button>
+                    <button type="button" @click="type='exit'; open=true" class="rounded-lg border border-violet-200 bg-violet-50 px-4 py-2 text-sm font-semibold text-violet-700 hover:border-violet-400 hover:bg-violet-100">Salida</button>
+                    <button type="button" @click="type='adjust'; open=true" class="rounded-lg border border-mint-200 bg-mint-50 px-4 py-2 text-sm font-semibold text-mint-700 hover:border-mint-600 hover:bg-mint-100">Ajuste</button>
                 </div>
 
                 <div x-show="open" x-cloak class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
@@ -107,7 +107,7 @@
                                 <textarea name="notes" rows="2" class="mt-2 w-full rounded-lg border-slate-200 px-3 py-2 text-sm"></textarea>
                             </div>
                             <div class="flex justify-end gap-2">
-                                <button type="button" @click="open=false" class="rounded-lg border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-600">Cancelar</button>
+                                <button type="button" @click="open=false" class="rounded-lg border border-slate-200 bg-slate-50 px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-100">Cancelar</button>
                                 <button type="submit" class="rounded-lg bg-mint-600 px-4 py-2 text-sm font-semibold text-white">Guardar</button>
                             </div>
                         </form>
