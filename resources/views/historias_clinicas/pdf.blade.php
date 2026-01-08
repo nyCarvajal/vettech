@@ -51,7 +51,40 @@
             <div>
                 <div class="pill">Historial Clínico</div>
                 <h1>Ficha #{{ $historiaClinica->id }}</h1>
-                <p class="muted">Paciente: {{ trim(($historiaClinica->paciente->nombres ?? '') . ' ' . ($historiaClinica->paciente->apellidos ?? '')) }}</p>
+                @php
+                    $paciente = $historiaClinica->paciente;
+                    $owner = $paciente?->owner;
+                    $pacienteNombre = trim(($paciente->nombres ?? '') . ' ' . ($paciente->apellidos ?? ''));
+                    $pacienteDocumento = trim(($paciente->tipo_documento ?? '') . ' ' . ($paciente->numero_documento ?? ''));
+                    $tutorDocumento = trim(($owner->document_type ?? '') . ' ' . ($owner->document ?? ''));
+                    $fechaNacimiento = optional($paciente?->fecha_nacimiento)->format('d/m/Y');
+                    $edad = $paciente?->edad;
+                    $fechaNacimientoLabel = $fechaNacimiento ?: '';
+                    if ($fechaNacimiento && $edad) {
+                        $fechaNacimientoLabel .= ' (' . $edad . ')';
+                    }
+                    if (! $fechaNacimientoLabel && $edad) {
+                        $fechaNacimientoLabel = $edad;
+                    }
+                @endphp
+                <div class="grid" style="margin-top:8px;">
+                    <div class="tag"><strong>Paciente:</strong> {{ $pacienteNombre ?: 'N/D' }}</div>
+                    <div class="tag"><strong>Documento:</strong> {{ $pacienteDocumento ?: 'N/D' }}</div>
+                    <div class="tag"><strong>Sexo:</strong> {{ $paciente?->sexo ?: 'N/D' }}</div>
+                    <div class="tag"><strong>Nacimiento / edad:</strong> {{ $fechaNacimientoLabel ?: 'N/D' }}</div>
+                    <div class="tag"><strong>Especie:</strong> {{ $paciente?->species?->name ?: 'N/D' }}</div>
+                    <div class="tag"><strong>Raza:</strong> {{ $paciente?->breed?->name ?: 'N/D' }}</div>
+                    <div class="tag"><strong>Dirección:</strong> {{ $paciente?->direccion ?: 'N/D' }}</div>
+                    <div class="tag"><strong>Ciudad:</strong> {{ $paciente?->ciudad ?: 'N/D' }}</div>
+                    <div class="tag"><strong>WhatsApp:</strong> {{ $paciente?->whatsapp ?: 'N/D' }}</div>
+                    <div class="tag"><strong>Email:</strong> {{ $paciente?->email ?: 'N/D' }}</div>
+                    <div class="tag"><strong>Tutor:</strong> {{ $owner?->name ?: 'N/D' }}</div>
+                    <div class="tag"><strong>Doc. tutor:</strong> {{ $tutorDocumento ?: 'N/D' }}</div>
+                    <div class="tag"><strong>Tel. tutor:</strong> {{ $owner?->phone ?: 'N/D' }}</div>
+                    <div class="tag"><strong>WhatsApp tutor:</strong> {{ $owner?->whatsapp ?: 'N/D' }}</div>
+                    <div class="tag"><strong>Email tutor:</strong> {{ $owner?->email ?: 'N/D' }}</div>
+                    <div class="tag"><strong>Dirección tutor:</strong> {{ $owner?->address ?: 'N/D' }}</div>
+                </div>
             </div>
         </div>
         <div class="meta">
@@ -87,22 +120,6 @@
                 <td>{{ $historiaClinica->antecedentes_patologicos ?: 'N/D' }}</td>
             </tr>
         </table>
-    </div>
-
-    <div class="card">
-        <div class="section-title">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M8 11a4 4 0 1 1 8 0c0 4-4 7-4 7s-4-3-4-7" />
-                <path d="M12 11a1 1 0 1 1 2 0 1 1 0 0 1-2 0" />
-            </svg>
-            <h3>Tutor</h3>
-        </div>
-        <p class="muted" style="margin-bottom:6px;">{{ optional($historiaClinica->paciente?->owner)->name }}</p>
-        <div class="grid">
-            <div class="tag"><strong>Tel:</strong> {{ optional($historiaClinica->paciente?->owner)->phone ?: 'N/D' }}</div>
-            <div class="tag"><strong>WhatsApp:</strong> {{ optional($historiaClinica->paciente?->owner)->whatsapp ?: 'N/D' }}</div>
-            <div class="tag"><strong>Correo:</strong> {{ optional($historiaClinica->paciente?->owner)->email ?: 'N/D' }}</div>
-        </div>
     </div>
 
     <div class="card">
