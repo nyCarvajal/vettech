@@ -39,7 +39,7 @@ class StoreInvoiceRequest extends FormRequest
             $lines = $this->input('lines', []);
             foreach ($lines as $index => $line) {
                 if (empty($line['item_id']) && empty($line['description'])) {
-                    $validator->errors()->add(\"lines.{$index}.description\", 'Debe indicar una descripción para la línea manual.');
+                    $validator->errors()->add("lines.{$index}.description", 'Debe indicar una descripción para la línea manual.');
                 }
             }
 

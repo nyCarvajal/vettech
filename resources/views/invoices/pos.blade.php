@@ -29,7 +29,7 @@
         <form method="POST" action="{{ route('invoices.store') }}" class="grid gap-6 xl:grid-cols-[minmax(0,2fr)_minmax(360px,1fr)]">
             @csrf
             <div class="space-y-6">
-                <div class="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+                <div class="rounded-2xl border border-mint-100 bg-mint-50/60 p-5 shadow-sm">
                     <div class="flex items-center justify-between">
                         <h2 class="text-lg font-semibold text-gray-900">Cliente</h2>
                         <button type="button" class="rounded-lg bg-mint-600 px-3 py-1.5 text-xs text-white shadow-sm hover:bg-mint-700" style="background-color: var(--mint-600);">Crear cliente rápido</button>
@@ -45,7 +45,7 @@
                     </div>
                 </div>
 
-                <div class="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+                <div class="rounded-2xl border border-mint-100 bg-white p-5 shadow-sm">
                     <div class="flex items-center justify-between">
                         <h2 class="text-lg font-semibold text-gray-900">Ítems</h2>
                         <button type="button" @click="addEmptyLine()" class="inline-flex items-center gap-2 rounded-lg bg-mint-600 px-3 py-2 text-sm text-white shadow-sm hover:bg-mint-700" style="background-color: var(--mint-600);">
@@ -130,7 +130,7 @@
             </div>
 
             <aside class="space-y-6">
-                <div class="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm sticky top-6">
+                <div class="rounded-2xl border border-mint-100 bg-gradient-to-br from-white via-white to-mint-50 p-5 shadow-sm sticky top-6">
                     <h2 class="text-lg font-semibold text-gray-900">Resumen</h2>
                     <div class="mt-4 space-y-3 text-sm">
                         <div class="flex items-center justify-between">
@@ -161,7 +161,7 @@
                             <button type="button" @click="addPayment()" class="text-xs text-mint-700 hover:text-mint-900">Agregar método</button>
                         </div>
                         <template x-for="(payment, index) in payments" :key="payment.uid">
-                            <div class="rounded-xl border border-gray-100 p-4 space-y-3">
+                            <div class="rounded-xl border border-mint-100 bg-white p-4 space-y-3">
                                 <div class="flex flex-wrap items-center justify-between gap-2">
                                     <select class="min-w-[160px] rounded-md border border-gray-200 px-2 py-2 text-sm" x-model="payment.method" :name="`payments[${index}][method]`">
                                         <option value="cash">Efectivo</option>
@@ -171,7 +171,7 @@
                                     </select>
                                     <button type="button" @click="removePayment(index)" class="rounded-md bg-red-50 px-2 py-1 text-xs text-red-600 hover:bg-red-100">Quitar</button>
                                 </div>
-                                <div class="grid grip-columns-1 gap-3">
+                                <div class="grid gap-3">
                                     <div>
                                         <label class="text-xs text-gray-500">Monto aplicado</label>
                                         <input type="number" step="0.01" min="0" class="mt-1 w-full rounded-md border border-gray-200 px-3 py-2 text-sm" x-model.number="payment.amount" :name="`payments[${index}][amount]`">
@@ -190,7 +190,7 @@
                                 </div>
                             </div>
                         </template>
-                        <div class="rounded-xl bg-gray-50 p-3 text-sm">
+                        <div class="rounded-xl bg-mint-50 p-3 text-sm">
                             <div class="flex items-center justify-between">
                                 <span class="text-gray-500">Pagado</span>
                                 <span class="font-semibold" x-text="formatCurrency(paidTotal)"></span>
@@ -203,8 +203,8 @@
                     </div>
 
                     <div class="mt-6 space-y-2">
-                        <button type="submit" class="w-full rounded-xl bg-mint-600 px-4 py-3 text-sm font-semibold text-white shadow hover:bg-mint-700">Cobrar / Finalizar</button>
-                        <button type="button" class="w-full rounded-xl bg-gray-900 px-4 py-3 text-sm text-white hover:bg-gray-800">Guardar borrador</button>
+                        <button type="submit" class="w-full rounded-xl bg-mint-600 px-4 py-3 text-sm font-semibold text-white shadow hover:bg-mint-700" style="background-color: var(--mint-600);">Cobrar / Finalizar</button>
+                        <button type="button" class="w-full rounded-xl bg-mint-500/90 px-4 py-3 text-sm text-white shadow-sm hover:bg-mint-600" style="background-color: var(--mint-500);">Guardar borrador</button>
                     </div>
                 </div>
             </aside>
