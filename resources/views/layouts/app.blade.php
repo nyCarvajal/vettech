@@ -167,6 +167,7 @@
                         ['label' => 'Agenda', 'route' => 'reservas.index'],
                         ['label' => 'Hospitalización 24/7', 'route' => 'hospital.board'],
                         ['label' => 'Dispensación', 'route' => 'dispensations.index'],
+                        ['label' => 'Facturación POS', 'route' => 'invoices.pos'],
                         ['label' => 'Ventas', 'route' => 'sales.index'],
                         ['label' => 'Caja', 'route' => 'cash.sessions.index'],
                         ['label' => 'Reportes', 'route' => 'kardex.index'],
