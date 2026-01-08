@@ -39,15 +39,15 @@ class CloudinaryAttachmentService
             'overwrite' => false,
         ]);
 
-        $upload = Cloudinary::upload($file->getRealPath(), $options);
+        $upload = Cloudinary::uploadApi()->upload($file->getRealPath(), $options);
 
-        return $upload->getResult();
+        return $upload;
     }
 
     public function delete(string $publicId, string $resourceType = 'image'): void
     {
         try {
-            Cloudinary::destroy($publicId, ['resource_type' => $resourceType]);
+            Cloudinary::uploadApi()->destroy($publicId, ['resource_type' => $resourceType]);
         } catch (Throwable $exception) {
             report($exception);
         }
