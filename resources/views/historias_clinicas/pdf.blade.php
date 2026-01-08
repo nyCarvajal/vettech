@@ -27,11 +27,13 @@
         .muted { color: var(--muted); }
         .grid { display:grid; grid-template-columns: repeat(2, 1fr); gap:8px; }
         .tag { background: linear-gradient(135deg, rgba(181,168,255,.25), rgba(141,227,196,.25)); padding:8px 10px; border-radius:10px; font-size:12px; border:1px solid var(--border); }
+        .field-label { background: var(--mint); border-radius: 999px; padding: 2px 8px; display:inline-block; font-weight:600; color: #0b1021; }
         .list { margin:0; padding:0; list-style:none; }
         .list-item { padding:8px 0; border-bottom:1px solid var(--border); }
         .list-item:last-child { border-bottom:none; }
         .table { width:100%; border-collapse: collapse; }
         .table th { background: linear-gradient(135deg, rgba(181,168,255,.35), rgba(141,227,196,.35)); color: var(--deep-purple); padding:8px; text-align:left; font-size:12px; }
+        .table th.field-label { display: table-cell; }
         .table td { padding:8px; border-bottom:1px solid var(--border); font-size:12px; }
         .badge { display:inline-block; padding:4px 8px; border-radius:8px; background: rgba(90,75,168,.12); color: var(--deep-purple); font-size:11px; font-weight:700; text-transform: uppercase; letter-spacing:.4px; }
     </style>
@@ -71,19 +73,19 @@
         </div>
         <table class="table">
             <tr>
-                <th style="width:35%">Motivo de consulta</th>
+                <th class="field-label" style="width:35%">Motivo de consulta</th>
                 <td>{{ $historiaClinica->motivo_consulta ?: 'Sin registrar' }}</td>
             </tr>
             <tr>
-                <th>Enfermedad actual</th>
+                <th class="field-label">Enfermedad actual</th>
                 <td>{{ $historiaClinica->enfermedad_actual ?: 'Sin registrar' }}</td>
             </tr>
             <tr>
-                <th>Antecedentes farmacológicos</th>
+                <th class="field-label">Antecedentes farmacológicos</th>
                 <td>{{ $historiaClinica->antecedentes_farmacologicos ?: 'N/D' }}</td>
             </tr>
             <tr>
-                <th>Antecedentes patológicos</th>
+                <th class="field-label">Antecedentes patológicos</th>
                 <td>{{ $historiaClinica->antecedentes_patologicos ?: 'N/D' }}</td>
             </tr>
         </table>
@@ -99,9 +101,9 @@
         </div>
         <p class="muted" style="margin-bottom:6px;">{{ optional($historiaClinica->paciente?->owner)->name }}</p>
         <div class="grid">
-            <div class="tag"><strong>Tel:</strong> {{ optional($historiaClinica->paciente?->owner)->phone ?: 'N/D' }}</div>
-            <div class="tag"><strong>WhatsApp:</strong> {{ optional($historiaClinica->paciente?->owner)->whatsapp ?: 'N/D' }}</div>
-            <div class="tag"><strong>Correo:</strong> {{ optional($historiaClinica->paciente?->owner)->email ?: 'N/D' }}</div>
+            <div class="tag"><strong class="field-label">Tel:</strong> {{ optional($historiaClinica->paciente?->owner)->phone ?: 'N/D' }}</div>
+            <div class="tag"><strong class="field-label">WhatsApp:</strong> {{ optional($historiaClinica->paciente?->owner)->whatsapp ?: 'N/D' }}</div>
+            <div class="tag"><strong class="field-label">Correo:</strong> {{ optional($historiaClinica->paciente?->owner)->email ?: 'N/D' }}</div>
         </div>
     </div>
 
@@ -197,15 +199,15 @@
         </div>
         <table class="table">
             <tr>
-                <th style="width:30%">Análisis</th>
+                <th class="field-label" style="width:30%">Análisis</th>
                 <td>{{ $historiaClinica->analisis ?: 'N/D' }}</td>
             </tr>
             <tr>
-                <th>Procedimientos</th>
+                <th class="field-label">Procedimientos</th>
                 <td>{{ $historiaClinica->plan_procedimientos ?: 'N/D' }}</td>
             </tr>
             <tr>
-                <th>Medicamentos</th>
+                <th class="field-label">Medicamentos</th>
                 <td>{{ $historiaClinica->plan_medicamentos ?: 'N/D' }}</td>
             </tr>
         </table>
