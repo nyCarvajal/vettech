@@ -46,15 +46,11 @@
         <div class="logo">
             <div class="logo-mark">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M4 12a8 8 0 0 1 16 0c0 4.418-4 8-8 8-1.53 0-2.964-.43-4.18-1.18" />
-                    <path d="M9 14h6" />
-                    <path d="M12 11v6" />
-                    <path d="M7.5 10.5h.01" />
-                    <path d="M16.5 10.5h.01" />
+                    
                 </svg>
             </div>
             <div>
-                <div class="pill">Historial Clínico</div>
+                <div class="">Historial Clínico</div>
                 <h1>Ficha #{{ $historiaClinica->id }}</h1>
             </div>
         </div>
@@ -62,6 +58,83 @@
             <strong>Fecha de emisión</strong><br>
             {{ now()->format('d/m/Y H:i') }}
         </div>
+    </div>
+
+    
+
+    <div class="card">
+        <div class="section-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M8 11a4 4 0 1 1 8 0c0 4-4 7-4 7s-4-3-4-7" />
+                <path d="M12 11a1 1 0 1 1 2 0 1 1 0 0 1-2 0" />
+            </svg>
+            <h3>Paciente</h3>
+        </div>
+        @php
+            $paciente = $historiaClinica->paciente;
+            $owner = $paciente?->owner;
+            $pacienteNombre = trim(($paciente->nombres ?? '') . ' ' . ($paciente->apellidos ?? ''));
+            $fechaNacimiento = optional($paciente?->fecha_nacimiento)->format('d/m/Y');
+            $edad = $paciente?->edad;
+            $fechaNacimientoLabel = $fechaNacimiento ?: '';
+            if ($fechaNacimiento && $edad) {
+                $fechaNacimientoLabel .= ' (' . $edad . ')';
+            }
+            if (! $fechaNacimientoLabel && $edad) {
+                $fechaNacimientoLabel = $edad;
+            }
+        @endphp
+        <p class="muted" style="margin-bottom:6px;">{{ $pacienteNombre ?: 'N/D' }}</p>
+
+            <table width="100%" cellspacing="0" cellpadding="0" style="border-collapse: collapse;">
+  <tr>
+    <td width="30%" style="padding:6px; vertical-align:top;">
+      <div class="info-row"><span class="info-label"># Historia Clínica:</span> {{ $paciente->id ?: 'N/D' }}</div>
+    </td>
+    <td width="30%" style="padding:6px; vertical-align:top;">
+      <div class="info-row"><span class="info-label">Sexo:</span> {{ $paciente?->sexo ?: 'N/D' }}</div>
+    </td>
+    <td width="30%" style="padding:6px; vertical-align:top;">
+      <div class="info-row"><span class="info-label">Peso:</span> {{ $paciente?->peso_formateado ?: 'N/D' }}</div>
+    </td>
+  </tr>
+
+  <tr>
+    <td width="33%" style="padding:6px; vertical-align:top;">
+      <div class="info-row"><span class="info-label">Nacimiento / edad:</span> {{ $fechaNacimientoLabel ?: 'N/D' }}</div>
+    </td>
+    <td width="33%" style="padding:6px; vertical-align:top;">
+      <div class="info-row"><span class="info-label">Especie:</span> {{ $paciente?->species?->name ?: 'N/D' }}</div>
+    </td>
+ 
+    <td width="33%" style="padding:6px; vertical-align:top;">
+      <div class="info-row"><span class="info-label">Raza:</span> {{ $paciente?->breed?->name ?: 'N/D' }}</div>
+    </td>
+    
+  </tr>
+</table>
+
+
+
+    <div class="card">
+        <div class="section-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M8 11a4 4 0 1 1 8 0c0 4-4 7-4 7s-4-3-4-7" />
+                <path d="M12 11a1 1 0 1 1 2 0 1 1 0 0 1-2 0" />
+            </svg>
+            <h3>Tutor</h3>
+        </div>
+        <p class="muted" style="margin-bottom:6px;">{{ $owner?->name ?: 'N/D' }} <br> {{ $owner?->document_type ?: 'N/D' }}{{ $owner?->document  ?: 'N/D' }}</p>
+         <table width="100%" cellspacing="0" cellpadding="0" style="border-collapse: collapse;">
+  <tr>   
+    <td width="50%" style="padding:6px; vertical-align:top;">
+        <div class="info-row"><span class="info-label">Tel:</span> {{ $owner?->phone ?: 'N/D' }}</div> </td>
+     <td width="50%" style="padding:6px; vertical-align:top;">
+        <div class="info-row"><span class="info-label">WhatsApp:</span> {{ $owner?->whatsapp ?: 'N/D' }}</div> </td>
+     <td width="50%" style="padding:6px; vertical-align:top;">
+        <div class="info-row"><span class="info-label">Correo:</span> {{ $owner?->email ?: 'N/D' }}</div> </td>
+        </tr>
+        </table>
     </div>
 
     <div class="card">
@@ -91,56 +164,6 @@
                 <td>{{ $historiaClinica->antecedentes_patologicos ?: 'N/D' }}</td>
             </tr>
         </table>
-    </div>
-
-    <div class="card">
-        <div class="section-title">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M8 11a4 4 0 1 1 8 0c0 4-4 7-4 7s-4-3-4-7" />
-                <path d="M12 11a1 1 0 1 1 2 0 1 1 0 0 1-2 0" />
-            </svg>
-            <h3>Paciente</h3>
-        </div>
-        @php
-            $paciente = $historiaClinica->paciente;
-            $owner = $paciente?->owner;
-            $pacienteNombre = trim(($paciente->nombres ?? '') . ' ' . ($paciente->apellidos ?? ''));
-            $pacienteDocumento = trim(($paciente->tipo_documento ?? '') . ' ' . ($paciente->numero_documento ?? ''));
-            $fechaNacimiento = optional($paciente?->fecha_nacimiento)->format('d/m/Y');
-            $edad = $paciente?->edad;
-            $fechaNacimientoLabel = $fechaNacimiento ?: '';
-            if ($fechaNacimiento && $edad) {
-                $fechaNacimientoLabel .= ' (' . $edad . ')';
-            }
-            if (! $fechaNacimientoLabel && $edad) {
-                $fechaNacimientoLabel = $edad;
-            }
-        @endphp
-        <p class="muted" style="margin-bottom:6px;">{{ $pacienteNombre ?: 'N/D' }}</p>
-        <div class="info-row"><span class="info-label">Documento:</span> {{ $pacienteDocumento ?: 'N/D' }}</div>
-        <div class="info-row"><span class="info-label">Sexo:</span> {{ $paciente?->sexo ?: 'N/D' }}</div>
-        <div class="info-row"><span class="info-label">Nacimiento / edad:</span> {{ $fechaNacimientoLabel ?: 'N/D' }}</div>
-        <div class="info-row"><span class="info-label">Especie:</span> {{ $paciente?->species?->name ?: 'N/D' }}</div>
-        <div class="info-row"><span class="info-label">Raza:</span> {{ $paciente?->breed?->name ?: 'N/D' }}</div>
-        <div class="info-row"><span class="info-label">Peso:</span> {{ $paciente?->peso_formateado ?: 'N/D' }}</div>
-        <div class="info-row"><span class="info-label">Dirección:</span> {{ $paciente?->direccion ?: 'N/D' }}</div>
-        <div class="info-row"><span class="info-label">Ciudad:</span> {{ $paciente?->ciudad ?: 'N/D' }}</div>
-        <div class="info-row"><span class="info-label">WhatsApp:</span> {{ $paciente?->whatsapp ?: 'N/D' }}</div>
-        <div class="info-row"><span class="info-label">Correo:</span> {{ $paciente?->email ?: 'N/D' }}</div>
-    </div>
-
-    <div class="card">
-        <div class="section-title">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M8 11a4 4 0 1 1 8 0c0 4-4 7-4 7s-4-3-4-7" />
-                <path d="M12 11a1 1 0 1 1 2 0 1 1 0 0 1-2 0" />
-            </svg>
-            <h3>Tutor</h3>
-        </div>
-        <p class="muted" style="margin-bottom:6px;">{{ $owner?->name ?: 'N/D' }}</p>
-        <div class="info-row"><span class="info-label">Tel:</span> {{ $owner?->phone ?: 'N/D' }}</div>
-        <div class="info-row"><span class="info-label">WhatsApp:</span> {{ $owner?->whatsapp ?: 'N/D' }}</div>
-        <div class="info-row"><span class="info-label">Correo:</span> {{ $owner?->email ?: 'N/D' }}</div>
     </div>
 
     <div class="card">
