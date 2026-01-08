@@ -39,7 +39,7 @@ class CloudinaryAttachmentService
             'overwrite' => false,
         ]);
 
-        $upload = Cloudinary::uploadFile($file->getRealPath(), $options);
+        $upload = Cloudinary::upload($file->getRealPath(), $options);
 
         return $upload->getResult();
     }

@@ -244,7 +244,7 @@ class UsuarioController extends Controller
             return $existingData;
         }
 
-        $upload = Cloudinary::uploadFile($file->getRealPath(), [
+        $upload = Cloudinary::upload($file->getRealPath(), [
             'folder' => sprintf('clinicas/%s/firmas', Auth::user()->clinica_id ?? 'general'),
             'resource_type' => 'image',
             'transformation' => [['quality' => 'auto', 'fetch_format' => 'auto', 'width' => 1600, 'crop' => 'limit']],
