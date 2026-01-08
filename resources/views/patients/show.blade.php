@@ -490,7 +490,8 @@
                         <h3 class="h4 mb-2">{{ $patient->lastEncounter ? optional($patient->lastEncounter->occurred_at)->format('d M Y') : 'Sin consultas' }}</h3>
                         <p class="mb-0" style="opacity: 0.9;">{{ $patient->lastEncounter->motivo ?? 'Aún no hay motivo registrado' }}</p>
                     </div>
-                    <div class="d-flex flex-column gap-2">
+                    <div class="d-flex flex-row flex-wrap gap-2">
+
                         <a href="#" class="pill-action" style="border-color: rgba(255,255,255,0.5); color: #fff; background: rgba(255,255,255,0.12);">Ver historia</a>
                         <a
                             href="{{ route('historias-clinicas.create', ['paciente_id' => $patient->id]) }}"
