@@ -18,6 +18,8 @@ class CloudinaryAttachmentService
 
     public function upload(UploadedFile $file, string $folder, string $fileType, ?string $publicId = null): array
     {
+        $this->ensureCloudinaryConfigured();
+
         $resourceType = $this->resourceTypeFromFileType($fileType);
 
         $transformation = null;
@@ -47,9 +49,23 @@ class CloudinaryAttachmentService
     public function delete(string $publicId, string $resourceType = 'image'): void
     {
         try {
+            $this->ensureCloudinaryConfigured();
             Cloudinary::uploadApi()->destroy($publicId, ['resource_type' => $resourceType]);
         } catch (Throwable $exception) {
             report($exception);
+        }
+    }
+
+    private function ensureCloudinaryConfigured(): void
+    {
+        $cloudConfig = config('cloudinary.cloud');
+
+        if (! is_array($cloudConfig)) {
+            throw new \RuntimeException('Cloudinary configuration missing. Set CLOUDINARY_URL or CLOUDINARY_API_KEY/SECRET.');
+        }
+
+        if (empty($cloudConfig['cloud_name']) || empty($cloudConfig['api_key']) || empty($cloudConfig['api_secret'])) {
+            throw new \RuntimeException('Cloudinary credentials missing. Set CLOUDINARY_URL or CLOUDINARY_API_KEY/SECRET.');
         }
     }
 
