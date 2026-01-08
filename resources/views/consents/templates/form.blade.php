@@ -80,6 +80,7 @@
 
 @php($requiredSigners = ['owner' => 'Tutor', 'vet' => 'Veterinario', 'witness' => 'Testigo'])
 @php($bodyHtml = old('body_html', $template->body_html))
+@php($bodyHtml = $bodyHtml ?: '<p>{{owner.first_name}}</p>')
 @php($groupedPlaceholders = [
     'Datos del tutor' => array_filter($placeholders, fn ($_, $key) => str_starts_with($key, 'owner.'), ARRAY_FILTER_USE_BOTH),
     'Datos del paciente' => array_filter($placeholders, fn ($_, $key) => str_starts_with($key, 'pet.'), ARRAY_FILTER_USE_BOTH),
@@ -120,7 +121,7 @@
     <div class="bg-gray-50 border rounded p-4 space-y-4">
         <div class="flex items-start justify-between gap-4">
             <div>
-                <p class="font-semibold text-base">Etiquetas disponibles</p>
+                <p class="font-semibold text-base">Etiquetas disponibles <span class="text-sm text-gray-500">(Ejemplo: Nombre.tutor)</span></p>
                 <p class="text-sm text-gray-600">Selecciona y activa solo las etiquetas que necesites. Haz clic en “Insertar” para agregarlas al cuerpo del consentimiento.</p>
             </div>
             <div class="text-right text-xs text-gray-500">Todas las etiquetas están en español y mostrarán datos reales al generar el documento.</div>
@@ -144,10 +145,10 @@
                                             @endif
                                             <p class="text-[11px] text-indigo-700 font-semibold flex items-center gap-1">
                                                 <span class="inline-flex items-center rounded-full bg-indigo-50 px-2 py-0.5 border border-indigo-100">Etiqueta</span>
-                                                <span class="text-gray-600">{{ $key }}</span>
+                                                <span class="text-gray-600">{{ $meta['display'] ?? $key }}</span>
                                             </p>
                                         </div>
-                                        <button type="button" class="inline-flex items-center gap-2 rounded-full bg-indigo-50 px-3 py-1.5 text-xs font-semibold text-indigo-700 border border-indigo-100 hover:bg-indigo-100 shadow-sm" data-placeholder-key="{{ $key }}" data-placeholder-label="{{ $meta['label'] }}">
+                                        <button type="button" class="inline-flex items-center gap-2 rounded-full bg-indigo-50 px-3 py-1.5 text-xs font-semibold text-indigo-700 border border-indigo-100 hover:bg-indigo-100 shadow-sm" data-placeholder-key="{{ $key }}" data-placeholder-label="{{ $meta['label'] }}" data-placeholder-display="{{ $meta['display'] ?? $key }}">
                                             <span>Insertar en el cuerpo</span>
                                         </button>
                                     </div>
