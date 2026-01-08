@@ -53,7 +53,40 @@
             <div>
                 <div class="pill">Historial Clínico</div>
                 <h1>Ficha #{{ $historiaClinica->id }}</h1>
-                <p class="muted">Paciente: {{ trim(($historiaClinica->paciente->nombres ?? '') . ' ' . ($historiaClinica->paciente->apellidos ?? '')) }}</p>
+                @php
+                    $paciente = $historiaClinica->paciente;
+                    $owner = $paciente?->owner;
+                    $pacienteNombre = trim(($paciente->nombres ?? '') . ' ' . ($paciente->apellidos ?? ''));
+                    $pacienteDocumento = trim(($paciente->tipo_documento ?? '') . ' ' . ($paciente->numero_documento ?? ''));
+                    $tutorDocumento = trim(($owner->document_type ?? '') . ' ' . ($owner->document ?? ''));
+                    $fechaNacimiento = optional($paciente?->fecha_nacimiento)->format('d/m/Y');
+                    $edad = $paciente?->edad;
+                    $fechaNacimientoLabel = $fechaNacimiento ?: '';
+                    if ($fechaNacimiento && $edad) {
+                        $fechaNacimientoLabel .= ' (' . $edad . ')';
+                    }
+                    if (! $fechaNacimientoLabel && $edad) {
+                        $fechaNacimientoLabel = $edad;
+                    }
+                @endphp
+                <div class="grid" style="margin-top:8px;">
+                    <div class="tag"><strong>Paciente:</strong> {{ $pacienteNombre ?: 'N/D' }}</div>
+                    <div class="tag"><strong>Documento:</strong> {{ $pacienteDocumento ?: 'N/D' }}</div>
+                    <div class="tag"><strong>Sexo:</strong> {{ $paciente?->sexo ?: 'N/D' }}</div>
+                    <div class="tag"><strong>Nacimiento / edad:</strong> {{ $fechaNacimientoLabel ?: 'N/D' }}</div>
+                    <div class="tag"><strong>Especie:</strong> {{ $paciente?->species?->name ?: 'N/D' }}</div>
+                    <div class="tag"><strong>Raza:</strong> {{ $paciente?->breed?->name ?: 'N/D' }}</div>
+                    <div class="tag"><strong>Dirección:</strong> {{ $paciente?->direccion ?: 'N/D' }}</div>
+                    <div class="tag"><strong>Ciudad:</strong> {{ $paciente?->ciudad ?: 'N/D' }}</div>
+                    <div class="tag"><strong>WhatsApp:</strong> {{ $paciente?->whatsapp ?: 'N/D' }}</div>
+                    <div class="tag"><strong>Email:</strong> {{ $paciente?->email ?: 'N/D' }}</div>
+                    <div class="tag"><strong>Tutor:</strong> {{ $owner?->name ?: 'N/D' }}</div>
+                    <div class="tag"><strong>Doc. tutor:</strong> {{ $tutorDocumento ?: 'N/D' }}</div>
+                    <div class="tag"><strong>Tel. tutor:</strong> {{ $owner?->phone ?: 'N/D' }}</div>
+                    <div class="tag"><strong>WhatsApp tutor:</strong> {{ $owner?->whatsapp ?: 'N/D' }}</div>
+                    <div class="tag"><strong>Email tutor:</strong> {{ $owner?->email ?: 'N/D' }}</div>
+                    <div class="tag"><strong>Dirección tutor:</strong> {{ $owner?->address ?: 'N/D' }}</div>
+                </div>
             </div>
         </div>
         <div class="meta">
