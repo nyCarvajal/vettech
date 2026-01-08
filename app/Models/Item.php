@@ -44,11 +44,21 @@ class Item extends Model
         'valor',
         'tipo',
         'area',
+        'type',
+        'sku',
+        'stock',
+        'track_inventory',
+        'sale_price',
+        'cost_price',
     ];
 
     protected $casts = [
         'valor' => 'decimal:2',
         'costo' => 'decimal:2',
+        'stock' => 'decimal:3',
+        'track_inventory' => 'boolean',
+        'sale_price' => 'decimal:2',
+        'cost_price' => 'decimal:2',
     ];
 
     public function movimientos()
