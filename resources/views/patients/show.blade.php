@@ -75,6 +75,33 @@
         box-shadow: 0 10px 30px rgba(124, 111, 242, 0.18);
     }
 
+    .dashboard-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        align-items: flex-start;
+    }
+
+    .action-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.65rem;
+    }
+
+    .action-group-label {
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--ink-600);
+    }
+
+    .action-links {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
     .grid-panels {
         display: grid;
         grid-template-columns: 1.65fr 1fr;
