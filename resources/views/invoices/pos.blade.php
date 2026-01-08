@@ -26,13 +26,13 @@
             </div>
         @endif
 
-        <form method="POST" action="{{ route('invoices.store') }}" class="grid gap-6 lg:grid-cols-[2fr_1fr]">
+        <form method="POST" action="{{ route('invoices.store') }}" class="grid gap-6 xl:grid-cols-[minmax(0,2fr)_minmax(360px,1fr)]">
             @csrf
             <div class="space-y-6">
                 <div class="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
                     <div class="flex items-center justify-between">
                         <h2 class="text-lg font-semibold text-gray-900">Cliente</h2>
-                        <button type="button" class="rounded-lg border border-gray-200 px-3 py-1.5 text-xs text-gray-600 hover:bg-gray-50">Crear cliente rápido</button>
+                        <button type="button" class="rounded-lg bg-gray-900 px-3 py-1.5 text-xs text-white hover:bg-gray-800">Crear cliente rápido</button>
                     </div>
                     <div class="mt-4">
                         <label class="text-xs font-semibold uppercase tracking-wide text-gray-500">Selecciona un cliente</label>
@@ -69,7 +69,8 @@
                     </div>
 
                     <div class="mt-6 overflow-hidden rounded-xl border border-gray-100">
-                        <table class="min-w-full text-sm">
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full text-sm">
                             <thead class="bg-gray-50 text-xs uppercase text-gray-500">
                                 <tr>
                                     <th class="px-3 py-2 text-left">Descripción</th>
@@ -122,7 +123,8 @@
                                     <td colspan="8" class="px-4 py-6 text-center text-gray-500">Agrega productos o servicios para empezar.</td>
                                 </tr>
                             </tbody>
-                        </table>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -159,28 +161,32 @@
                             <button type="button" @click="addPayment()" class="text-xs text-mint-700 hover:text-mint-900">Agregar método</button>
                         </div>
                         <template x-for="(payment, index) in payments" :key="payment.uid">
-                            <div class="rounded-xl border border-gray-100 p-3">
-                                <div class="flex items-center justify-between">
-                                    <select class="rounded-md border border-gray-200 px-2 py-1 text-sm" x-model="payment.method" :name="`payments[${index}][method]`">
+                            <div class="rounded-xl border border-gray-100 p-4 space-y-3">
+                                <div class="flex flex-wrap items-center justify-between gap-2">
+                                    <select class="min-w-[160px] rounded-md border border-gray-200 px-2 py-2 text-sm" x-model="payment.method" :name="`payments[${index}][method]`">
                                         <option value="cash">Efectivo</option>
                                         <option value="card">Tarjeta</option>
                                         <option value="transfer">Transferencia</option>
                                         <option value="mixed">Mixto</option>
                                     </select>
-                                    <button type="button" @click="removePayment(index)" class="text-xs text-red-500">Quitar</button>
+                                    <button type="button" @click="removePayment(index)" class="rounded-md bg-red-50 px-2 py-1 text-xs text-red-600 hover:bg-red-100">Quitar</button>
                                 </div>
-                                <div class="mt-3 grid gap-2">
-                                    <label class="text-xs text-gray-500">Monto aplicado</label>
-                                    <input type="number" step="0.01" min="0" class="w-full rounded-md border border-gray-200 px-2 py-1 text-sm" x-model.number="payment.amount" :name="`payments[${index}][amount]`">
+                                <div class="grid gap-3">
+                                    <div>
+                                        <label class="text-xs text-gray-500">Monto aplicado</label>
+                                        <input type="number" step="0.01" min="0" class="mt-1 w-full rounded-md border border-gray-200 px-3 py-2 text-sm" x-model.number="payment.amount" :name="`payments[${index}][amount]`">
+                                    </div>
                                     <template x-if="payment.method === 'cash'">
-                                        <div class="space-y-2">
+                                        <div>
                                             <label class="text-xs text-gray-500">Recibido</label>
-                                            <input type="number" step="0.01" min="0" class="w-full rounded-md border border-gray-200 px-2 py-1 text-sm" x-model.number="payment.received" :name="`payments[${index}][received]`">
-                                            <p class="text-xs text-gray-500">Devueltas: <span class="font-semibold" x-text="formatCurrency(paymentChange(payment))"></span></p>
+                                            <input type="number" step="0.01" min="0" class="mt-1 w-full rounded-md border border-gray-200 px-3 py-2 text-sm" x-model.number="payment.received" :name="`payments[${index}][received]`">
+                                            <p class="mt-2 text-xs text-gray-500">Devueltas: <span class="font-semibold" x-text="formatCurrency(paymentChange(payment))"></span></p>
                                         </div>
                                     </template>
-                                    <label class="text-xs text-gray-500">Referencia</label>
-                                    <input type="text" class="w-full rounded-md border border-gray-200 px-2 py-1 text-sm" x-model="payment.reference" :name="`payments[${index}][reference]`">
+                                    <div>
+                                        <label class="text-xs text-gray-500">Referencia</label>
+                                        <input type="text" class="mt-1 w-full rounded-md border border-gray-200 px-3 py-2 text-sm" x-model="payment.reference" :name="`payments[${index}][reference]`">
+                                    </div>
                                 </div>
                             </div>
                         </template>
@@ -198,7 +204,7 @@
 
                     <div class="mt-6 space-y-2">
                         <button type="submit" class="w-full rounded-xl bg-mint-600 px-4 py-3 text-sm font-semibold text-white shadow hover:bg-mint-700">Cobrar / Finalizar</button>
-                        <button type="button" class="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm text-gray-600 hover:bg-gray-50">Guardar borrador</button>
+                        <button type="button" class="w-full rounded-xl bg-gray-900 px-4 py-3 text-sm text-white hover:bg-gray-800">Guardar borrador</button>
                     </div>
                 </div>
             </aside>
