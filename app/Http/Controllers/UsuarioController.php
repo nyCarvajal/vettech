@@ -244,14 +244,14 @@ class UsuarioController extends Controller
             return $existingData;
         }
 
-        $upload = Cloudinary::uploadFile($file->getRealPath(), [
+        $upload = Cloudinary::uploadApi()->upload($file->getRealPath(), [
             'folder' => sprintf('clinicas/%s/firmas', Auth::user()->clinica_id ?? 'general'),
             'resource_type' => 'image',
             'transformation' => [['quality' => 'auto', 'fetch_format' => 'auto', 'width' => 1600, 'crop' => 'limit']],
-        ])->getResult();
+        ]);
 
         if ($user && $user->firma_medica_public_id) {
-            Cloudinary::destroy($user->firma_medica_public_id, ['resource_type' => 'image']);
+            Cloudinary::uploadApi()->destroy($user->firma_medica_public_id, ['resource_type' => 'image']);
         }
 
         return [
