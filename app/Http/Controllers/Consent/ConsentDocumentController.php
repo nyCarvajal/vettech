@@ -176,10 +176,54 @@ class ConsentDocumentController extends Controller
         return back()->with('status', 'Consentimiento cancelado');
     }
 
-    public function pdf(ConsentDocument $consent)
+    public function pdf(ConsentDocument $consent, PlaceholderService $placeholderService)
     {
         $this->authorize('pdf', $consent);
-        $consent->load('signatures');
+        $consent->load('signatures', 'template', 'pet.owner', 'pet.species', 'pet.breed', 'owner');
+
+        $originalOwnerSnapshot = $consent->owner_snapshot ?? [];
+        $originalPetSnapshot = $consent->pet_snapshot ?? [];
+
+        $ownerSnapshot = $this->enrichOwnerSnapshot(
+            $originalOwnerSnapshot,
+            $consent->owner ?? $consent->pet?->owner
+        );
+
+        $petSnapshot = $this->enrichPetSnapshot(
+            $originalPetSnapshot,
+            $consent->pet
+        );
+
+        $stillHasPlaceholders = empty($consent->merged_body_html)
+            || preg_match('/\{\{\s*[a-zA-Z0-9_\.]+\s*\}\}/', $consent->merged_body_html);
+
+        $snapshotsImproved = $ownerSnapshot !== $originalOwnerSnapshot
+            || $petSnapshot !== $originalPetSnapshot;
+
+        $consent->owner_snapshot = $ownerSnapshot;
+        $consent->pet_snapshot = $petSnapshot;
+
+        if (($stillHasPlaceholders || $snapshotsImproved) && $consent->template?->body_html) {
+            $context = [
+                'owner' => $ownerSnapshot,
+                'pet' => $petSnapshot,
+                'clinic' => auth()->user()?->clinic ?? [],
+                'vet' => [
+                    'name' => auth()->user()?->name,
+                    'license' => auth()->user()?->license ?? null,
+                ],
+                'now' => ['date' => now()->toDateString(), 'datetime' => now()->toDateTimeString()],
+            ];
+
+            $mergedHtml = $placeholderService->merge($consent->template->body_html, $context);
+            $consent->forceFill([
+                'owner_snapshot' => $ownerSnapshot,
+                'pet_snapshot' => $petSnapshot,
+                'merged_body_html' => $mergedHtml,
+                'merged_plain_text' => strip_tags($mergedHtml),
+            ])->save();
+        }
+
         $pdf = Pdf::loadView('consents.pdf', ['consent' => $consent]);
         $path = 'consents/pdfs/' . $consent->code . '.pdf';
         Storage::disk('public')->put($path, $pdf->output());
