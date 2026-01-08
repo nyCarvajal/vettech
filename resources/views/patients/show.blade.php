@@ -65,6 +65,27 @@
         transition: all 0.2s ease;
     }
 
+    .pill-action--primary {
+        background: linear-gradient(135deg, #7c6ff2, #9f92ff);
+        color: #fff;
+        border-color: rgba(124, 111, 242, 0.6);
+        box-shadow: 0 8px 20px rgba(124, 111, 242, 0.25);
+    }
+
+    .pill-action--primary:hover {
+        background: linear-gradient(135deg, #6f62f6, #8f82ff);
+        box-shadow: 0 12px 28px rgba(124, 111, 242, 0.35);
+    }
+
+    .pill-action--ghost {
+        background: transparent;
+        color: var(--lavender-600);
+        border-color: rgba(124, 111, 242, 0.4);
+    }
+
+    .pill-action--ghost:hover {
+        background: rgba(124, 111, 242, 0.08);
+        box-shadow: 0 10px 24px rgba(124, 111, 242, 0.16);
     .pill-action--wide {
         flex-basis: 260px;
         max-width: 280px;
@@ -332,7 +353,7 @@
         <div class="dashboard-actions">
             <a
                 href="{{ route('hospital.stays.create', ['patient_id' => $patient->id]) }}"
-                class="pill-action"
+                class="pill-action pill-action--primary"
             >
                 Hospitalizar
             </a>
@@ -345,7 +366,7 @@
             @can('create', \App\Models\Procedure::class)
                 <a
                     href="{{ route('procedures.create', ['patient_id' => $patient->id]) }}"
-                    class="pill-action pill-action--wide"
+                    class="pill-action pill-action--primary"
                 >
                     Nueva cirugía / procedimiento
                 </a>
@@ -376,7 +397,7 @@
             @endcan
             <a href="{{ route('patients.carnet', $patient) }}" class="pill-action">Carnet</a>
             <a href="{{ route('patients.edit', $patient) }}" class="pill-action">Editar ficha</a>
-            <a href="{{ route('patients.index') }}" class="pill-action">Volver al listado</a>
+            <a href="{{ route('patients.index') }}" class="pill-action pill-action--ghost">Volver al listado</a>
         </div>
     </div>
 
