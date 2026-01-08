@@ -32,7 +32,7 @@
                 <div class="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
                     <div class="flex items-center justify-between">
                         <h2 class="text-lg font-semibold text-gray-900">Cliente</h2>
-                        <button type="button" class="rounded-lg bg-gray-900 px-3 py-1.5 text-xs text-white hover:bg-gray-800">Crear cliente rápido</button>
+                        <button type="button" class="rounded-lg bg-mint-600 px-3 py-1.5 text-xs text-white shadow-sm hover:bg-mint-700" style="background-color: var(--mint-600);">Crear cliente rápido</button>
                     </div>
                     <div class="mt-4">
                         <label class="text-xs font-semibold uppercase tracking-wide text-gray-500">Selecciona un cliente</label>
@@ -48,7 +48,7 @@
                 <div class="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
                     <div class="flex items-center justify-between">
                         <h2 class="text-lg font-semibold text-gray-900">Ítems</h2>
-                        <button type="button" @click="addEmptyLine()" class="inline-flex items-center gap-2 rounded-lg bg-mint-600 px-3 py-2 text-sm text-white shadow-sm hover:bg-mint-700">
+                        <button type="button" @click="addEmptyLine()" class="inline-flex items-center gap-2 rounded-lg bg-mint-600 px-3 py-2 text-sm text-white shadow-sm hover:bg-mint-700" style="background-color: var(--mint-600);">
                             <i class="ri-add-line"></i>
                             Línea manual
                         </button>
