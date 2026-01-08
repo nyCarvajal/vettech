@@ -55,6 +55,33 @@
         box-shadow: 0 10px 30px rgba(124, 111, 242, 0.18);
     }
 
+    .dashboard-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        align-items: flex-start;
+    }
+
+    .action-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.65rem;
+    }
+
+    .action-group-label {
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--ink-600);
+    }
+
+    .action-links {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
     .grid-panels {
         display: grid;
         grid-template-columns: 1.65fr 1fr;
@@ -282,54 +309,69 @@
             <p class="dashboard-subtitle mb-1">Paciente / {{ $patient->display_name ?: 'Sin nombre' }}</p>
             <h1 class="dashboard-title">Panel clínico del paciente</h1>
         </div>
-        <div class="flex gap-2">
-            <a
-                href="{{ route('hospital.stays.create', ['patient_id' => $patient->id]) }}"
-                class="pill-action"
-            >
-                Hospitalizar
-            </a>
-            <a
-                href="{{ route('groomings.create', ['patient_id' => $patient->id]) }}"
-                class="pill-action"
-            >
-                Enviar a peluquería
-            </a>
-            @can('create', \App\Models\Procedure::class)
-                <a
-                    href="{{ route('procedures.create', ['patient_id' => $patient->id]) }}"
-                    class="pill-action"
-                >
-                    Nueva cirugía / procedimiento
-                </a>
-            @endcan
-            @can('create', \App\Models\TravelCertificate::class)
-                <a
-                    href="{{ route('travel-certificates.create', ['patient_id' => $patient->id]) }}"
-                    class="pill-action"
-                >
-                    Certificado de viaje
-                </a>
-            @endcan
-            @can('create', \App\Models\ConsentDocument::class)
-                <a
-                    href="{{ route('consents.create', ['patient_id' => $patient->id]) }}"
-                    class="pill-action"
-                >
-                    Consentimiento informado
-                </a>
-            @endcan
-            @can('create', \App\Models\Followup::class)
-                <a
-                    href="{{ route('followups.create', ['patient_id' => $patient->id]) }}"
-                    class="pill-action"
-                >
-                    Nuevo control
-                </a>
-            @endcan
-            <a href="{{ route('patients.carnet', $patient) }}" class="pill-action">Carnet</a>
-            <a href="{{ route('patients.edit', $patient) }}" class="pill-action">Editar ficha</a>
-            <a href="{{ route('patients.index') }}" class="pill-action">Volver al listado</a>
+        <div class="dashboard-actions">
+            <div class="action-group">
+                <span class="action-group-label">Acciones clínicas</span>
+                <div class="action-links">
+                    <a
+                        href="{{ route('hospital.stays.create', ['patient_id' => $patient->id]) }}"
+                        class="pill-action"
+                    >
+                        Hospitalizar
+                    </a>
+                    <a
+                        href="{{ route('groomings.create', ['patient_id' => $patient->id]) }}"
+                        class="pill-action"
+                    >
+                        Enviar a peluquería
+                    </a>
+                    @can('create', \App\Models\Procedure::class)
+                        <a
+                            href="{{ route('procedures.create', ['patient_id' => $patient->id]) }}"
+                            class="pill-action"
+                        >
+                            Nueva cirugía / procedimiento
+                        </a>
+                    @endcan
+                    @can('create', \App\Models\Followup::class)
+                        <a
+                            href="{{ route('followups.create', ['patient_id' => $patient->id]) }}"
+                            class="pill-action"
+                        >
+                            Nuevo control
+                        </a>
+                    @endcan
+                </div>
+            </div>
+            <div class="action-group">
+                <span class="action-group-label">Documentos</span>
+                <div class="action-links">
+                    @can('create', \App\Models\TravelCertificate::class)
+                        <a
+                            href="{{ route('travel-certificates.create', ['patient_id' => $patient->id]) }}"
+                            class="pill-action"
+                        >
+                            Certificado de viaje
+                        </a>
+                    @endcan
+                    @can('create', \App\Models\ConsentDocument::class)
+                        <a
+                            href="{{ route('consents.create', ['patient_id' => $patient->id]) }}"
+                            class="pill-action"
+                        >
+                            Consentimiento informado
+                        </a>
+                    @endcan
+                    <a href="{{ route('patients.carnet', $patient) }}" class="pill-action">Carnet</a>
+                </div>
+            </div>
+            <div class="action-group">
+                <span class="action-group-label">Gestión</span>
+                <div class="action-links">
+                    <a href="{{ route('patients.edit', $patient) }}" class="pill-action">Editar ficha</a>
+                    <a href="{{ route('patients.index') }}" class="pill-action">Volver al listado</a>
+                </div>
+            </div>
         </div>
     </div>
 
