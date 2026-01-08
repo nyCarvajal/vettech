@@ -25,6 +25,14 @@
         gap: 1rem;
     }
 
+    .dashboard-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        justify-content: flex-end;
+        align-items: center;
+    }
+
     .dashboard-title {
         color: var(--ink-900);
         margin: 0;
@@ -39,6 +47,7 @@
     .pill-action {
         display: inline-flex;
         align-items: center;
+        justify-content: center;
         gap: 0.5rem;
         padding: 0.55rem 1rem;
         border-radius: 9999px;
@@ -47,7 +56,18 @@
         background: linear-gradient(135deg, #f8f7ff, #eef3ff);
         text-decoration: none;
         font-weight: 600;
+        text-align: center;
+        white-space: normal;
+        line-height: 1.2;
+        flex: 1 1 210px;
+        min-width: 190px;
+        max-width: 240px;
         transition: all 0.2s ease;
+    }
+
+    .pill-action--wide {
+        flex-basis: 260px;
+        max-width: 280px;
     }
 
     .pill-action:hover {
@@ -282,7 +302,7 @@
             <p class="dashboard-subtitle mb-1">Paciente / {{ $patient->display_name ?: 'Sin nombre' }}</p>
             <h1 class="dashboard-title">Panel clínico del paciente</h1>
         </div>
-        <div class="flex gap-2">
+        <div class="dashboard-actions">
             <a
                 href="{{ route('hospital.stays.create', ['patient_id' => $patient->id]) }}"
                 class="pill-action"
@@ -298,7 +318,7 @@
             @can('create', \App\Models\Procedure::class)
                 <a
                     href="{{ route('procedures.create', ['patient_id' => $patient->id]) }}"
-                    class="pill-action"
+                    class="pill-action pill-action--wide"
                 >
                     Nueva cirugía / procedimiento
                 </a>
@@ -314,7 +334,7 @@
             @can('create', \App\Models\ConsentDocument::class)
                 <a
                     href="{{ route('consents.create', ['patient_id' => $patient->id]) }}"
-                    class="pill-action"
+                    class="pill-action pill-action--wide"
                 >
                     Consentimiento informado
                 </a>
