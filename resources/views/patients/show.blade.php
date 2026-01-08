@@ -86,6 +86,8 @@
     .pill-action--ghost:hover {
         background: rgba(124, 111, 242, 0.08);
         box-shadow: 0 10px 24px rgba(124, 111, 242, 0.16);
+    }
+
     .pill-action--wide {
         flex-basis: 260px;
         max-width: 280px;
@@ -94,13 +96,6 @@
     .pill-action:hover {
         transform: translateY(-1px);
         box-shadow: 0 10px 30px rgba(124, 111, 242, 0.18);
-    }
-
-    .dashboard-actions {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 1rem;
-        align-items: flex-start;
     }
 
     .action-group {
