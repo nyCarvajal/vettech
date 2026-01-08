@@ -71,3 +71,24 @@ Menta se usa solo como acento: borde superior de KPIs, resaltado de sidebar acti
 3. Flujo de estados: Agendado → En proceso → Finalizado (guardar informe finaliza automáticamente). Cancelación disponible hasta antes del cierre.
 4. Informe de baño con flags (pulgas, garrapatas, piel, oído) y observaciones/recomendaciones.
 5. Cobro opcional: si hay módulo de ventas y un producto de servicio asociado, el botón “Cobrar” crea el ítem con `ref_entity=grooming`.
+
+## Módulo de Facturación POS (Colombia)
+
+1. Ejecuta las migraciones del tenant:
+   ```bash
+   php artisan migrate --path=database/migrations/tenant
+   ```
+2. Rutas clave:
+   - `/invoices/pos`: pantalla POS.
+   - `/invoices`: listado y filtros.
+   - `/invoices/{invoice}`: detalle.
+   - `/invoices/{invoice}/print`: ticket imprimible.
+3. APIs de búsqueda (para autocomplete):
+   - `/api/items/search?q=`
+   - `/api/owners/search?q=`
+4. Configuración rápida:
+   - `config/billing.php` define prefijo POS, IVA/comisión por defecto y moneda.
+5. Inventario:
+   - Se descuenta automáticamente si `items.track_inventory = true` y `items.type = 'product'`.
+6. Preparación DIAN:
+   - Campos electrónicos en `invoices` y tabla `dian_resolutions` lista para usar.
