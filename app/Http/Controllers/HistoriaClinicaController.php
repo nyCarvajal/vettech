@@ -122,6 +122,8 @@ class HistoriaClinicaController extends Controller
             'paraclinicos',
             'diagnosticos',
             'paciente.owner',
+            'paciente.species',
+            'paciente.breed',
             'adjuntos' => function ($query) {
                 $query->whereIn('file_type', ['image', 'pdf']);
             },
