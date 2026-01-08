@@ -10,13 +10,15 @@
         }, { once: true });
     </script>
 @endpush
-<div class="space-y-6" x-data="{ status: '{{ $followup->improved_status ?? 'unknown' }}' }">
+<div class="space-y-6 bg-gradient-to-b from-slate-50 via-white to-white p-4 sm:p-6 rounded-3xl shadow-inner border border-slate-100" x-data="{ status: '{{ $followup->improved_status ?? 'unknown' }}' }">
     <div class="flex items-center justify-between flex-wrap gap-3">
         <div>
             <p class="text-sm text-gray-500">Control posterior</p>
             <h1 class="text-2xl font-bold text-gray-900">{{ $mode === 'create' ? 'Nuevo control' : 'Editar control ' . $followup->code }}</h1>
         </div>
-        <a href="{{ route('followups.index') }}" class="pill-action">Volver</a>
+        <a href="{{ route('followups.index') }}" class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-200 text-slate-800 font-semibold shadow-sm hover:bg-slate-300 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-mint-300 transition">
+            ← Volver
+        </a>
     </div>
 
     <form method="post" action="{{ $mode === 'create' ? route('followups.store') : route('followups.update', $followup) }}" class="space-y-6">
@@ -26,7 +28,7 @@
         @endif
 
         <div class="grid gap-4 md:grid-cols-2">
-            <div class="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm space-y-4">
+            <div class="rounded-2xl border border-mint-50 bg-white/95 p-5 shadow-md space-y-4 ring-1 ring-slate-50">
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-xs uppercase tracking-[0.2em] text-mint-700">Datos básicos</p>
@@ -65,7 +67,7 @@
                 </div>
             </div>
 
-            <div class="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm space-y-4">
+            <div class="rounded-2xl border border-mint-50 bg-white/95 p-5 shadow-md space-y-4 ring-1 ring-slate-50">
                 <div>
                     <p class="text-xs uppercase tracking-[0.2em] text-mint-700">Evolución</p>
                     <h2 class="text-lg font-semibold text-gray-900">¿Mejoró?</h2>
@@ -74,7 +76,7 @@
                 <div class="grid gap-3">
                     <div class="flex gap-3 flex-wrap" id="improved-group">
                         @foreach(['yes' => 'Sí', 'partial' => 'Parcial', 'no' => 'No', 'unknown' => 'No sabe'] as $key => $label)
-                            <label class="inline-flex items-center gap-2 rounded-full border border-gray-200 px-3 py-2 cursor-pointer bg-gray-50 hover:border-mint-200 transition w-full sm:w-auto">
+                            <label class="inline-flex items-center gap-2 rounded-full border border-gray-200 px-3 py-2 cursor-pointer bg-gradient-to-r from-white to-mint-50/50 hover:border-mint-200 hover:shadow-sm transition w-full sm:w-auto">
                                 <input type="radio" name="improved_status" value="{{ $key }}" x-model="status" @checked(old('improved_status', $followup->improved_status ?? 'unknown') === $key)>
                                 <span class="font-semibold text-gray-800">{{ $label }}</span>
                             </label>
@@ -100,7 +102,7 @@
             </div>
         </div>
 
-        <div class="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm space-y-4">
+        <div class="rounded-2xl border border-mint-50 bg-white/95 p-5 shadow-md space-y-4 ring-1 ring-slate-50">
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-xs uppercase tracking-[0.2em] text-mint-700">Signos vitales</p>
@@ -173,7 +175,9 @@
         </div>
 
         <div class="flex justify-end">
-            <button type="submit" class="pill-action">{{ $mode === 'create' ? 'Guardar control' : 'Actualizar' }}</button>
+            <button type="submit" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-mint-600 text-white font-semibold shadow-md hover:bg-mint-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-mint-300 transition">
+                {{ $mode === 'create' ? 'Guardar control' : 'Actualizar' }}
+            </button>
         </div>
     </form>
 </div>
