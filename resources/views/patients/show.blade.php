@@ -25,6 +25,14 @@
         gap: 1rem;
     }
 
+    .dashboard-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        justify-content: flex-end;
+        align-items: center;
+    }
+
     .dashboard-title {
         color: var(--ink-900);
         margin: 0;
@@ -39,6 +47,7 @@
     .pill-action {
         display: inline-flex;
         align-items: center;
+        justify-content: center;
         gap: 0.5rem;
         padding: 0.55rem 1rem;
         border-radius: 9999px;
@@ -47,7 +56,18 @@
         background: linear-gradient(135deg, #f8f7ff, #eef3ff);
         text-decoration: none;
         font-weight: 600;
+        text-align: center;
+        white-space: normal;
+        line-height: 1.2;
+        flex: 1 1 210px;
+        min-width: 190px;
+        max-width: 240px;
         transition: all 0.2s ease;
+    }
+
+    .pill-action--wide {
+        flex-basis: 260px;
+        max-width: 280px;
     }
 
     .pill-action:hover {
@@ -310,68 +330,53 @@
             <h1 class="dashboard-title">Panel clínico del paciente</h1>
         </div>
         <div class="dashboard-actions">
-            <div class="action-group">
-                <span class="action-group-label">Acciones clínicas</span>
-                <div class="action-links">
-                    <a
-                        href="{{ route('hospital.stays.create', ['patient_id' => $patient->id]) }}"
-                        class="pill-action"
-                    >
-                        Hospitalizar
-                    </a>
-                    <a
-                        href="{{ route('groomings.create', ['patient_id' => $patient->id]) }}"
-                        class="pill-action"
-                    >
-                        Enviar a peluquería
-                    </a>
-                    @can('create', \App\Models\Procedure::class)
-                        <a
-                            href="{{ route('procedures.create', ['patient_id' => $patient->id]) }}"
-                            class="pill-action"
-                        >
-                            Nueva cirugía / procedimiento
-                        </a>
-                    @endcan
-                    @can('create', \App\Models\Followup::class)
-                        <a
-                            href="{{ route('followups.create', ['patient_id' => $patient->id]) }}"
-                            class="pill-action"
-                        >
-                            Nuevo control
-                        </a>
-                    @endcan
-                </div>
-            </div>
-            <div class="action-group">
-                <span class="action-group-label">Documentos</span>
-                <div class="action-links">
-                    @can('create', \App\Models\TravelCertificate::class)
-                        <a
-                            href="{{ route('travel-certificates.create', ['patient_id' => $patient->id]) }}"
-                            class="pill-action"
-                        >
-                            Certificado de viaje
-                        </a>
-                    @endcan
-                    @can('create', \App\Models\ConsentDocument::class)
-                        <a
-                            href="{{ route('consents.create', ['patient_id' => $patient->id]) }}"
-                            class="pill-action"
-                        >
-                            Consentimiento informado
-                        </a>
-                    @endcan
-                    <a href="{{ route('patients.carnet', $patient) }}" class="pill-action">Carnet</a>
-                </div>
-            </div>
-            <div class="action-group">
-                <span class="action-group-label">Gestión</span>
-                <div class="action-links">
-                    <a href="{{ route('patients.edit', $patient) }}" class="pill-action">Editar ficha</a>
-                    <a href="{{ route('patients.index') }}" class="pill-action">Volver al listado</a>
-                </div>
-            </div>
+            <a
+                href="{{ route('hospital.stays.create', ['patient_id' => $patient->id]) }}"
+                class="pill-action"
+            >
+                Hospitalizar
+            </a>
+            <a
+                href="{{ route('groomings.create', ['patient_id' => $patient->id]) }}"
+                class="pill-action"
+            >
+                Enviar a peluquería
+            </a>
+            @can('create', \App\Models\Procedure::class)
+                <a
+                    href="{{ route('procedures.create', ['patient_id' => $patient->id]) }}"
+                    class="pill-action pill-action--wide"
+                >
+                    Nueva cirugía / procedimiento
+                </a>
+            @endcan
+            @can('create', \App\Models\TravelCertificate::class)
+                <a
+                    href="{{ route('travel-certificates.create', ['patient_id' => $patient->id]) }}"
+                    class="pill-action"
+                >
+                    Certificado de viaje
+                </a>
+            @endcan
+            @can('create', \App\Models\ConsentDocument::class)
+                <a
+                    href="{{ route('consents.create', ['patient_id' => $patient->id]) }}"
+                    class="pill-action pill-action--wide"
+                >
+                    Consentimiento informado
+                </a>
+            @endcan
+            @can('create', \App\Models\Followup::class)
+                <a
+                    href="{{ route('followups.create', ['patient_id' => $patient->id]) }}"
+                    class="pill-action"
+                >
+                    Nuevo control
+                </a>
+            @endcan
+            <a href="{{ route('patients.carnet', $patient) }}" class="pill-action">Carnet</a>
+            <a href="{{ route('patients.edit', $patient) }}" class="pill-action">Editar ficha</a>
+            <a href="{{ route('patients.index') }}" class="pill-action">Volver al listado</a>
         </div>
     </div>
 
