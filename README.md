@@ -92,3 +92,19 @@ Menta se usa solo como acento: borde superior de KPIs, resaltado de sidebar acti
    - Se descuenta automáticamente si `items.track_inventory = true` y `items.type = 'product'`.
 6. Preparación DIAN:
    - Campos electrónicos en `invoices` y tabla `dian_resolutions` lista para usar.
+
+## Módulo de Inventario
+
+1. Rutas principales:
+   - `/items`: listado con filtros y panel de detalle.
+   - `/items/create`: creación de ítems.
+   - `/items/{item}`: detalle y movimientos.
+2. Movimientos de inventario:
+   - Entradas: botón “Entrada” (panel derecho o detalle).
+   - Salidas: botón “Salida”.
+   - Ajustes: botón “Ajuste”.
+   - Historial completo: `/items/{item}/movements`.
+3. Reglas clave:
+   - `sale_price` y `cost_price` son fuente principal; se sincronizan con `valor` y `costo`.
+   - `cantidad` es el stock mínimo (alerta) y `stock` el stock actual.
+   - No se permite stock negativo si el ítem es inventariable o controla inventario.
