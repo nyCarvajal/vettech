@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\Validator;
 
 class StoreInvoiceRequest extends FormRequest
@@ -17,6 +18,8 @@ class StoreInvoiceRequest extends FormRequest
         return [
             'owner_id' => ['required', 'exists:owners,id'],
             'notes' => ['nullable', 'string'],
+            'is_credit' => ['nullable', 'boolean'],
+            'credit_days' => ['nullable', Rule::in([5, 10, 15, 30, 60])],
             'lines' => ['required', 'array', 'min:1'],
             'lines.*.item_id' => ['nullable', 'exists:items,id'],
             'lines.*.description' => ['nullable', 'string'],
@@ -25,11 +28,13 @@ class StoreInvoiceRequest extends FormRequest
             'lines.*.discount_rate' => ['nullable', 'numeric', 'min:0', 'max:100'],
             'lines.*.tax_rate' => ['nullable', 'numeric', 'min:0', 'max:100'],
             'lines.*.commission_rate' => ['nullable', 'numeric', 'min:0', 'max:100'],
-            'payments' => ['required', 'array', 'min:1'],
-            'payments.*.method' => ['required', 'in:cash,card,transfer,mixed'],
-            'payments.*.amount' => ['required', 'numeric', 'min:0.01'],
+            'payments' => [Rule::requiredIf(fn () => ! $this->boolean('is_credit')), 'array'],
+            'payments.*.method' => ['required_with:payments', 'in:cash,card,transfer,mixed'],
+            'payments.*.amount' => ['required_with:payments.*.method', 'numeric', 'min:0.01'],
             'payments.*.received' => ['nullable', 'numeric', 'min:0'],
             'payments.*.reference' => ['nullable', 'string'],
+            'payments.*.card_type' => ['nullable', Rule::in(['credit', 'debit'])],
+            'payments.*.bank_id' => ['nullable', 'exists:bancos,id'],
         ];
     }
 
@@ -43,7 +48,15 @@ class StoreInvoiceRequest extends FormRequest
                 }
             }
 
+            $isCredit = $this->boolean('is_credit');
+            if ($isCredit && empty($this->input('credit_days'))) {
+                $validator->errors()->add('credit_days', 'Selecciona el plazo del crédito.');
+            }
             $payments = $this->input('payments', []);
+
+            if (! $isCredit && count($payments) === 0) {
+                $validator->errors()->add('payments', 'Debes registrar al menos un pago.');
+            }
 
             foreach ($payments as $index => $payment) {
                 if (($payment['method'] ?? null) !== 'cash') {
@@ -58,6 +71,20 @@ class StoreInvoiceRequest extends FormRequest
 
                 if ((float) $received < (float) ($payment['amount'] ?? 0)) {
                     $validator->errors()->add("payments.{$index}.received", 'El recibido en efectivo no puede ser menor al pago.');
+                }
+            }
+
+            foreach ($payments as $index => $payment) {
+                if (($payment['method'] ?? null) === 'card') {
+                    if (empty($payment['card_type'])) {
+                        $validator->errors()->add("payments.{$index}.card_type", 'Selecciona si es tarjeta crédito o débito.');
+                    }
+                }
+
+                if (in_array(($payment['method'] ?? null), ['card', 'transfer'], true)) {
+                    if (empty($payment['bank_id'])) {
+                        $validator->errors()->add("payments.{$index}.bank_id", 'Selecciona el banco para este pago.');
+                    }
                 }
             }
         });

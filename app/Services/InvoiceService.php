@@ -5,11 +5,11 @@ namespace App\Services;
 use App\Models\BillingSetting;
 use App\Models\InventoryMovement;
 use App\Models\Invoice;
-use App\Models\InvoiceLine;
 use App\Models\InvoicePayment;
 use App\Models\Item;
 use App\Services\Pricing\TaxCalculator;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
@@ -32,6 +32,10 @@ class InvoiceService
             $lines = $this->buildLines($data['lines'] ?? [], $defaults);
             $totals = $this->recalculateTotals($lines);
 
+            $isCredit = (bool) Arr::get($data, 'is_credit', false);
+            $creditDays = $isCredit ? (int) Arr::get($data, 'credit_days', 0) : null;
+            $dueAt = $isCredit && $creditDays > 0 ? Carbon::parse($issuedAt)->addDays($creditDays) : null;
+
             $invoice = Invoice::create([
                 'invoice_type' => $invoiceType,
                 'prefix' => $prefix,
@@ -43,6 +47,9 @@ class InvoiceService
                 'currency' => $defaults['currency'],
                 'issued_at' => $issuedAt,
                 'notes' => Arr::get($data, 'notes'),
+                'is_credit' => $isCredit,
+                'credit_days' => $creditDays,
+                'due_at' => $dueAt,
                 'subtotal' => $totals['subtotal'],
                 'discount_total' => $totals['discount_total'],
                 'tax_total' => $totals['tax_total'],
@@ -54,7 +61,9 @@ class InvoiceService
 
             $invoice->lines()->createMany($lines);
 
-            $paymentTotals = $this->applyPayments($invoice, $data['payments'] ?? []);
+            $paymentTotals = $isCredit
+                ? ['paid_total' => 0, 'change_total' => 0, 'status' => 'issued']
+                : $this->applyPayments($invoice, $data['payments'] ?? []);
 
             $invoice->update([
                 'paid_total' => $paymentTotals['paid_total'],
@@ -208,6 +217,8 @@ class InvoiceService
                 'received' => $received,
                 'change' => $change,
                 'reference' => $payment['reference'] ?? null,
+                'card_type' => $payment['card_type'] ?? null,
+                'bank_id' => $payment['bank_id'] ?? null,
                 'paid_at' => $payment['paid_at'] ?? now(),
                 'meta' => $payment['meta'] ?? null,
             ]);
@@ -233,12 +244,6 @@ class InvoiceService
 
             if (! $item) {
                 continue;
-            }
-
-            if ($item->stock < $line->inventory_qty_out) {
-                throw ValidationException::withMessages([
-                    'inventory' => "Stock insuficiente para {$item->nombre}.",
-                ]);
             }
 
             $item->stock = $item->stock - $line->inventory_qty_out;
