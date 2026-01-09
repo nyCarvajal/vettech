@@ -74,6 +74,10 @@ abstract class ReportRepository
 
     protected function resolveItemNameColumn(): string
     {
+        if ($this->tableHasColumn('items', 'nombres')) {
+            return 'items.nombres';
+        }
+
         if ($this->tableHasColumn('items', 'name')) {
             return 'items.name';
         }
