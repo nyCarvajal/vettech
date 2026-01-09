@@ -32,6 +32,7 @@ use App\Http\Controllers\GroomingController;
 use App\Http\Controllers\GroomingReportController;
 use App\Http\Controllers\GroomingStatusController;
 use App\Http\Controllers\InvoiceController;
+use App\Http\Controllers\CashClosureController;
 use App\Http\Controllers\Api\ItemSearchController;
 use App\Http\Controllers\Api\OwnerSearchController;
 use App\Http\Controllers\ItemMovementController;
@@ -220,6 +221,17 @@ Route::post('/ordenes/{orden}/email', [OrdendecompraController::class, 'sendEmai
 Route::resource('proveedores', ProveedorController::class);
 Route::resource('tipo-identificaciones', TipoIdentificacionController::class)->except(['show']);
 Route::resource('areas', AreaController::class)->except(['show', 'destroy']);
+
+Route::prefix('cash/closures')
+    ->name('cash.closures.')
+    ->group(function () {
+        Route::get('/', [CashClosureController::class, 'index'])->name('index');
+        Route::get('/create', [CashClosureController::class, 'create'])->name('create');
+        Route::get('/summary', [CashClosureController::class, 'summary'])->name('summary');
+        Route::post('/', [CashClosureController::class, 'store'])->name('store');
+        Route::get('/{closure}', [CashClosureController::class, 'show'])->name('show');
+        Route::get('/{closure}/print', [CashClosureController::class, 'print'])->name('print');
+    });
 		 
         Route::get('/dashboard', DashboardRedirectController::class)
             ->name('dashboard');
