@@ -62,11 +62,31 @@
         .signature {
             margin-top: 18px;
         }
+        .signature-grid {
+            display: table;
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .signature-cell {
+            display: table-cell;
+            width: 33%;
+            padding: 8px;
+            vertical-align: top;
+        }
         .signature-card {
             border: 1px solid #e2e8f0;
             padding: 10px 12px;
             border-radius: 8px;
             margin-bottom: 10px;
+            min-height: 120px;
+        }
+        .signature-role {
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+        .signature-line {
+            border-bottom: 1px solid #94a3b8;
+            height: 60px;
         }
         .signature img {
             max-height: 90px;
@@ -169,15 +189,40 @@
 
         <div class="signature">
             <div class="section-title">Firmas</div>
-            @forelse($consent->signatures as $signature)
-                <div class="signature-card">
-                    <div><strong>{{ $signature->signer_name }}</strong> ({{ $signature->signer_role }})</div>
-                    <div class="text-sm">{{ $signature->signed_at }} · {{ $signature->ip_address }} · {{ $signature->method }}</div>
-                    <img src="{{ Storage::disk('consents')->path($signature->signature_image_path) }}" alt="firma">
+            @php
+                $requiredSigners = collect($consent->template->required_signers ?? []);
+                $signerLabels = ['owner' => 'Tutor', 'vet' => 'Médico', 'witness' => 'Testigo'];
+                $signaturesByRole = $consent->signatures->keyBy('signer_role');
+            @endphp
+
+            @if($requiredSigners->isNotEmpty())
+                <div class="signature-grid">
+                    @foreach($requiredSigners as $role)
+                        @php($signature = $signaturesByRole->get($role))
+                        <div class="signature-cell">
+                            <div class="signature-card">
+                                <div class="signature-role">{{ $signerLabels[$role] ?? ucfirst($role) }}</div>
+                                <div class="signature-line">
+                                    @if($signature)
+                                        <img src="{{ Storage::disk('consents')->path($signature->signature_image_path) }}" alt="firma">
+                                    @endif
+                                </div>
+                                <div class="text-sm">{{ $signature?->signer_name ?? '' }}</div>
+                            </div>
+                        </div>
+                    @endforeach
                 </div>
-            @empty
-                <div class="text-sm text-gray-500">Sin firmas registradas.</div>
-            @endforelse
+            @else
+                @forelse($consent->signatures as $signature)
+                    <div class="signature-card">
+                        <div><strong>{{ $signature->signer_name }}</strong> ({{ $signature->signer_role }})</div>
+                        <div class="text-sm">{{ $signature->signed_at }} · {{ $signature->ip_address }} · {{ $signature->method }}</div>
+                        <img src="{{ Storage::disk('consents')->path($signature->signature_image_path) }}" alt="firma">
+                    </div>
+                @empty
+                    <div class="text-sm text-gray-500">Sin firmas registradas.</div>
+                @endforelse
+            @endif
         </div>
     </div>
 </body>
