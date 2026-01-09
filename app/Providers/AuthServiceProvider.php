@@ -14,6 +14,8 @@ use App\Policies\ConsentTemplatePolicy;
 use App\Policies\ConsentDocumentPolicy;
 use App\Models\Followup;
 use App\Policies\FollowupPolicy;
+use App\Models\Invoice;
+use App\Policies\InvoicePolicy;
 
 class AuthServiceProvider extends ServiceProvider
 {
@@ -27,6 +29,7 @@ class AuthServiceProvider extends ServiceProvider
         ConsentTemplate::class => ConsentTemplatePolicy::class,
         ConsentDocument::class => ConsentDocumentPolicy::class,
         Followup::class => FollowupPolicy::class,
+        Invoice::class => InvoicePolicy::class,
     ];
 
     /**
@@ -54,6 +57,18 @@ class AuthServiceProvider extends ServiceProvider
                 ->exists();
 
             return $hasAdminRole ? true : null;
+        });
+
+        Gate::define('manage-clinic-settings', function ($user) {
+            if (! empty($user->role) && strtolower($user->role) === 'admin') {
+                return true;
+            }
+
+            if (method_exists($user, 'hasRole') && $user->hasRole('admin')) {
+                return true;
+            }
+
+            return false;
         });
 
         foreach ([

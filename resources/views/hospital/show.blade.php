@@ -80,9 +80,9 @@
                                                     <x-button type="submit" size="sm" color="danger">Detener</x-button>
                                                 </form>
                                             </div>
-                                            <form method="POST" action="{{ route('hospital.orders.administrations', ['order' => $order->id]) }}" class="mt-2 flex items-center gap-2">
+                                            <form method="POST" action="{{ route('hospital.orders.administrations', ['order' => $order->id]) }}" class="mt-2 flex flex-col items-center gap-2">
                                                 @csrf
-                                                <x-input name="administered_at" type="datetime-local" class="w-48" />
+                                                <x-input name="administered_at" type="datetime-local"  value="{{ now()->format('Y-m-d\TH:i') }}" class="w-48" /> 
                                                 <x-input name="dose_given" placeholder="Dosis" class="w-32" />
                                                 <input type="hidden" name="status" value="done" />
                                                 <x-input type="hidden" name="administered_by" value="{{ auth()->id() }}" />

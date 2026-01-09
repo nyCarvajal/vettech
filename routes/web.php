@@ -31,6 +31,10 @@ use App\Http\Controllers\GroomingBillingController;
 use App\Http\Controllers\GroomingController;
 use App\Http\Controllers\GroomingReportController;
 use App\Http\Controllers\GroomingStatusController;
+use App\Http\Controllers\InvoiceController;
+use App\Http\Controllers\Api\ItemSearchController;
+use App\Http\Controllers\Api\OwnerSearchController;
+use App\Http\Controllers\ItemMovementController;
 use App\Http\Controllers\FollowupAttachmentController;
 use App\Http\Controllers\FollowupController;
 use App\Http\Controllers\Consent\ConsentTemplateController;
@@ -38,12 +42,24 @@ use App\Http\Controllers\Consent\ConsentDocumentController;
 use App\Http\Controllers\Consent\ConsentSignatureController;
 use App\Http\Controllers\Consent\ConsentPublicLinkController;
 use App\Http\Controllers\Consent\PublicConsentController;
+use App\Http\Controllers\Settings\ClinicSettingsController;
 use App\Http\Controllers\HospitalController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\ClinicalAttachmentController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\AdministrativeReportController;
 use App\Http\Controllers\AdminDashboardController;
+use App\Http\Controllers\ExpenseController;
+use App\Http\Controllers\Reports\CashReportController;
+use App\Http\Controllers\Reports\ExpensesReportController;
+use App\Http\Controllers\Reports\GroomingReportController as ReportsGroomingReportController;
+use App\Http\Controllers\Reports\InventoryReportController;
+use App\Http\Controllers\Reports\OperationsReportController;
+use App\Http\Controllers\Reports\PaymentsReportController;
+use App\Http\Controllers\Reports\QuickReportsController;
+use App\Http\Controllers\Reports\ReportExportController;
+use App\Http\Controllers\Reports\ReportsHomeController;
+use App\Http\Controllers\Reports\SalesReportController;
 use App\Http\Middleware\ConnectTenantDB;
 use App\Http\Controllers\ContadorDashboardController;
 use App\Http\Controllers\DashboardRedirectController;
@@ -113,7 +129,50 @@ Route::middleware([
          ->group(function () {
 
 Route::resource('owners', OwnersController::class);
+Route::get('api/items/search', ItemSearchController::class)->name('api.items.search');
+Route::get('api/owners/search', OwnerSearchController::class)->name('api.owners.search');
+Route::get('invoices/pos', [InvoiceController::class, 'create'])->name('invoices.pos');
+Route::post('invoices/{invoice}/void', [InvoiceController::class, 'void'])->name('invoices.void');
+Route::get('invoices/{invoice}/print', [InvoiceController::class, 'print'])->name('invoices.print');
+Route::resource('invoices', InvoiceController::class);
+Route::prefix('settings')
+    ->name('settings.')
+    ->middleware('ensureRole:admin')
+    ->group(function () {
+        Route::get('clinica', [ClinicSettingsController::class, 'edit'])->name('clinica.edit');
+        Route::put('clinica', [ClinicSettingsController::class, 'update'])->name('clinica.update');
+        Route::post('clinica/logo', [ClinicSettingsController::class, 'uploadLogo'])->name('clinica.logo.store');
+        Route::delete('clinica/logo', [ClinicSettingsController::class, 'removeLogo'])->name('clinica.logo.destroy');
+    });
 Route::resource('patients', PatientsController::class);
+
+Route::get('reports/quick', [QuickReportsController::class, 'index'])->name('reports.quick');
+Route::get('reports/quick/data', [QuickReportsController::class, 'data'])->name('reports.quick.data');
+
+Route::middleware('ensureRole:admin')
+    ->prefix('reports')
+    ->name('reports.')
+    ->group(function () {
+        Route::get('/', [ReportsHomeController::class, 'index'])->name('home');
+        Route::get('/sales', [SalesReportController::class, 'index'])->name('sales');
+        Route::get('/sales/data', [SalesReportController::class, 'data'])->name('sales.data');
+        Route::get('/payments', [PaymentsReportController::class, 'index'])->name('payments');
+        Route::get('/payments/data', [PaymentsReportController::class, 'data'])->name('payments.data');
+        Route::get('/expenses', [ExpensesReportController::class, 'index'])->name('expenses');
+        Route::get('/expenses/data', [ExpensesReportController::class, 'data'])->name('expenses.data');
+        Route::get('/cash', [CashReportController::class, 'index'])->name('cash');
+        Route::get('/cash/data', [CashReportController::class, 'data'])->name('cash.data');
+        Route::post('/cash/closures', [CashReportController::class, 'storeClosure'])->name('cash.closures.store');
+        Route::get('/operations', [OperationsReportController::class, 'index'])->name('operations');
+        Route::get('/operations/data', [OperationsReportController::class, 'data'])->name('operations.data');
+        Route::get('/grooming', [ReportsGroomingReportController::class, 'index'])->name('grooming');
+        Route::get('/grooming/data', [ReportsGroomingReportController::class, 'data'])->name('grooming.data');
+        Route::get('/inventory', [InventoryReportController::class, 'index'])->name('inventory');
+        Route::get('/inventory/data', [InventoryReportController::class, 'data'])->name('inventory.data');
+        Route::get('/export', [ReportExportController::class, 'export'])->name('export');
+    });
+
+Route::resource('expenses', ExpenseController::class)->except(['show']);
 Route::get('patients/{patient}/carnet', [\App\Http\Controllers\PatientVaccineCardController::class, 'show'])->name('patients.carnet');
 Route::get('pacientes/{patient}/carnet/pdf', [\App\Http\Controllers\PatientVaccineCardController::class, 'pdf'])->name('patients.carnet.pdf');
 Route::get('patients/{patient}/immunizations/create', [\App\Http\Controllers\PatientImmunizationController::class, 'create'])->name('patients.immunizations.create');
@@ -217,6 +276,12 @@ Route::get('clinica/perfil', [ClinicaController::class,'showOwn'])
       return redirect()->route('items.index');
   });
   Route::resource('items', ItemController::class);
+  Route::prefix('items/{item}/movements')->name('items.movements.')->group(function () {
+      Route::get('/', [ItemMovementController::class, 'index'])->name('index');
+      Route::post('/entry', [ItemMovementController::class, 'entry'])->name('entry');
+      Route::post('/exit', [ItemMovementController::class, 'exit'])->name('exit');
+      Route::post('/adjust', [ItemMovementController::class, 'adjust'])->name('adjust');
+  });
   Route::post('historias-clinicas/autoguardado', [HistoriaClinicaController::class, 'autoSave'])
        ->name('historias-clinicas.autosave');
   Route::get('historias-clinicas/{historiaClinica}/pdf', [HistoriaClinicaController::class, 'pdf'])
@@ -244,8 +309,6 @@ Route::get('clinica/perfil', [ClinicaController::class,'showOwn'])
   ]);
   Route::delete('adjuntos/{attachment}', [ClinicalAttachmentController::class, 'destroy'])
         ->name('historias-clinicas.adjuntos.destroy');
-  Route::get('items/{item}/agregar-unidades', [ItemController::class, 'addUnitsForm'])->name('items.add-units-form');
-  Route::post('items/{item}/agregar-unidades', [ItemController::class, 'addUnits'])->name('items.add-units');
 Route::get('/calendar', [ReservaController::class, 'calendar'])->name('reservas.calendar');
 Route::get('/reservas.json', [ReservaController::class, 'events'])
      ->name('reservas.events');
