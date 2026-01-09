@@ -31,6 +31,9 @@ use App\Http\Controllers\GroomingBillingController;
 use App\Http\Controllers\GroomingController;
 use App\Http\Controllers\GroomingReportController;
 use App\Http\Controllers\GroomingStatusController;
+use App\Http\Controllers\InvoiceController;
+use App\Http\Controllers\Api\ItemSearchController;
+use App\Http\Controllers\Api\OwnerSearchController;
 use App\Http\Controllers\FollowupAttachmentController;
 use App\Http\Controllers\FollowupController;
 use App\Http\Controllers\Consent\ConsentTemplateController;
@@ -113,6 +116,12 @@ Route::middleware([
          ->group(function () {
 
 Route::resource('owners', OwnersController::class);
+Route::get('api/items/search', ItemSearchController::class)->name('api.items.search');
+Route::get('api/owners/search', OwnerSearchController::class)->name('api.owners.search');
+Route::get('invoices/pos', [InvoiceController::class, 'create'])->name('invoices.pos');
+Route::post('invoices/{invoice}/void', [InvoiceController::class, 'void'])->name('invoices.void');
+Route::get('invoices/{invoice}/print', [InvoiceController::class, 'print'])->name('invoices.print');
+Route::resource('invoices', InvoiceController::class);
 Route::resource('patients', PatientsController::class);
 Route::get('patients/{patient}/carnet', [\App\Http\Controllers\PatientVaccineCardController::class, 'show'])->name('patients.carnet');
 Route::get('pacientes/{patient}/carnet/pdf', [\App\Http\Controllers\PatientVaccineCardController::class, 'pdf'])->name('patients.carnet.pdf');
