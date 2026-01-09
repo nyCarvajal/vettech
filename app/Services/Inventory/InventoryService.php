@@ -138,7 +138,7 @@ class InventoryService
                 $columnType = $columns[0]->Type ?? '';
                 if (preg_match("/^enum\\((.*)\\)$/", $columnType, $matches)) {
                     $supported = array_map(
-                        fn ($value) => trim($value, \"'\"),
+                        fn ($value) => trim($value, "'"),
                         explode(',', $matches[1])
                     );
                 }
