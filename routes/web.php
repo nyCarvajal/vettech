@@ -226,6 +226,12 @@ Route::get('clinica/perfil', [ClinicaController::class,'showOwn'])
       return redirect()->route('items.index');
   });
   Route::resource('items', ItemController::class);
+  Route::prefix('items/{item}/movements')->name('items.movements.')->group(function () {
+      Route::get('/', [ItemMovementController::class, 'index'])->name('index');
+      Route::post('/entry', [ItemMovementController::class, 'entry'])->name('entry');
+      Route::post('/exit', [ItemMovementController::class, 'exit'])->name('exit');
+      Route::post('/adjust', [ItemMovementController::class, 'adjust'])->name('adjust');
+  });
   Route::post('historias-clinicas/autoguardado', [HistoriaClinicaController::class, 'autoSave'])
        ->name('historias-clinicas.autosave');
   Route::get('historias-clinicas/{historiaClinica}/pdf', [HistoriaClinicaController::class, 'pdf'])
@@ -253,8 +259,6 @@ Route::get('clinica/perfil', [ClinicaController::class,'showOwn'])
   ]);
   Route::delete('adjuntos/{attachment}', [ClinicalAttachmentController::class, 'destroy'])
         ->name('historias-clinicas.adjuntos.destroy');
-  Route::get('items/{item}/agregar-unidades', [ItemController::class, 'addUnitsForm'])->name('items.add-units-form');
-  Route::post('items/{item}/agregar-unidades', [ItemController::class, 'addUnits'])->name('items.add-units');
 Route::get('/calendar', [ReservaController::class, 'calendar'])->name('reservas.calendar');
 Route::get('/reservas.json', [ReservaController::class, 'events'])
      ->name('reservas.events');

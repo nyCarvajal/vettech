@@ -244,14 +244,17 @@ class UsuarioController extends Controller
             return $existingData;
         }
 
-        $upload = Cloudinary::upload($file->getRealPath(), [
+        $this->ensureCloudinaryConfigured();
+
+        $upload = Cloudinary::uploadApi()->upload($file->getRealPath(), [
             'folder' => sprintf('clinicas/%s/firmas', Auth::user()->clinica_id ?? 'general'),
             'resource_type' => 'image',
             'transformation' => [['quality' => 'auto', 'fetch_format' => 'auto', 'width' => 1600, 'crop' => 'limit']],
-        ])->getResult();
+        ]);
 
         if ($user && $user->firma_medica_public_id) {
-            Cloudinary::destroy($user->firma_medica_public_id, ['resource_type' => 'image']);
+            $this->ensureCloudinaryConfigured();
+            Cloudinary::uploadApi()->destroy($user->firma_medica_public_id, ['resource_type' => 'image']);
         }
 
         return [
@@ -259,5 +262,18 @@ class UsuarioController extends Controller
             'firma_medica_url' => $upload['secure_url'] ?? ($upload['url'] ?? null),
             'firma_medica_public_id' => $upload['public_id'] ?? $existingData['firma_medica_public_id'],
         ];
+    }
+
+    private function ensureCloudinaryConfigured(): void
+    {
+        $cloudConfig = config('cloudinary.cloud');
+
+        if (! is_array($cloudConfig)) {
+            throw new \RuntimeException('Cloudinary configuration missing. Set CLOUDINARY_URL or CLOUDINARY_API_KEY/SECRET.');
+        }
+
+        if (empty($cloudConfig['cloud_name']) || empty($cloudConfig['api_key']) || empty($cloudConfig['api_secret'])) {
+            throw new \RuntimeException('Cloudinary credentials missing. Set CLOUDINARY_URL or CLOUDINARY_API_KEY/SECRET.');
+        }
     }
 }
