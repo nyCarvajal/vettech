@@ -34,6 +34,7 @@ use App\Http\Controllers\GroomingStatusController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\Api\ItemSearchController;
 use App\Http\Controllers\Api\OwnerSearchController;
+use App\Http\Controllers\ItemMovementController;
 use App\Http\Controllers\FollowupAttachmentController;
 use App\Http\Controllers\FollowupController;
 use App\Http\Controllers\Consent\ConsentTemplateController;
