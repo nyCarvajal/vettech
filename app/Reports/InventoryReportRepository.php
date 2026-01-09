@@ -132,7 +132,7 @@ class InventoryReportRepository extends ReportRepository
         }
 
         $query = $this->connection()->table('items')
-            ->selectRaw(\"COALESCE(SUM(stock * {$costColumn}), 0) as total\");
+            ->selectRaw("COALESCE(SUM(stock * {$costColumn}), 0) as total");
 
         $this->applyTenant($query, 'items', $filters);
 
