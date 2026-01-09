@@ -59,6 +59,18 @@ class AuthServiceProvider extends ServiceProvider
             return $hasAdminRole ? true : null;
         });
 
+        Gate::define('manage-clinic-settings', function ($user) {
+            if (! empty($user->role) && strtolower($user->role) === 'admin') {
+                return true;
+            }
+
+            if (method_exists($user, 'hasRole') && $user->hasRole('admin')) {
+                return true;
+            }
+
+            return false;
+        });
+
         foreach ([
             'inventory.adjust', 'inventory.batch.manage', 'inventory.dispense',
             'sales.discount', 'sales.void', 'cash.open', 'cash.close', 'cash.expense',

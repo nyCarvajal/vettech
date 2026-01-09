@@ -17,6 +17,13 @@ class Clinica extends Model
 
     protected $guarded = ['id'];
 
+    protected $casts = [
+        'responsable_iva' => 'boolean',
+        'dian_enabled' => 'boolean',
+        'default_tax_rate' => 'decimal:3',
+        'meta' => 'array',
+    ];
+
     public function getRouteKeyName(): string
     {
         return 'slug';
@@ -64,6 +71,10 @@ class Clinica extends Model
 
     public function resolvedLogoUrl(): string
     {
+        if (! empty($this->logo_path)) {
+            return asset('storage/' . $this->logo_path);
+        }
+
         if (! empty($this->logo)) {
             return $this->logo;
         }
