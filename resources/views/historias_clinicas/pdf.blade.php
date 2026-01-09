@@ -27,11 +27,16 @@
         .muted { color: var(--muted); }
         .grid { display:grid; grid-template-columns: repeat(2, 1fr); gap:8px; }
         .tag { background: linear-gradient(135deg, rgba(181,168,255,.25), rgba(141,227,196,.25)); padding:8px 10px; border-radius:10px; font-size:12px; border:1px solid var(--border); }
+        .field-label { background: var(--mint); border-radius: 999px; padding: 2px 8px; display:inline-block; font-weight:600; color: #0b1021; }
+        .info-row { border:1px solid var(--border); border-radius:12px; padding:8px 10px; font-size:12px; display:flex; align-items:center; gap:8px; }
+        .info-row + .info-row { margin-top:8px; }
+        .info-label { background: var(--mint); border-radius:999px; padding:2px 8px; font-weight:700; color:#0b1021; }
         .list { margin:0; padding:0; list-style:none; }
         .list-item { padding:8px 0; border-bottom:1px solid var(--border); }
         .list-item:last-child { border-bottom:none; }
         .table { width:100%; border-collapse: collapse; }
         .table th { background: linear-gradient(135deg, rgba(181,168,255,.35), rgba(141,227,196,.35)); color: var(--deep-purple); padding:8px; text-align:left; font-size:12px; }
+        .table th.field-label { display: table-cell; }
         .table td { padding:8px; border-bottom:1px solid var(--border); font-size:12px; }
         .badge { display:inline-block; padding:4px 8px; border-radius:8px; background: rgba(90,75,168,.12); color: var(--deep-purple); font-size:11px; font-weight:700; text-transform: uppercase; letter-spacing:.4px; }
     </style>
@@ -41,23 +46,95 @@
         <div class="logo">
             <div class="logo-mark">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M4 12a8 8 0 0 1 16 0c0 4.418-4 8-8 8-1.53 0-2.964-.43-4.18-1.18" />
-                    <path d="M9 14h6" />
-                    <path d="M12 11v6" />
-                    <path d="M7.5 10.5h.01" />
-                    <path d="M16.5 10.5h.01" />
+                    
                 </svg>
             </div>
             <div>
-                <div class="pill">Historial Clínico</div>
+                <div class="">Historial Clínico</div>
                 <h1>Ficha #{{ $historiaClinica->id }}</h1>
-                <p class="muted">Paciente: {{ trim(($historiaClinica->paciente->nombres ?? '') . ' ' . ($historiaClinica->paciente->apellidos ?? '')) }}</p>
             </div>
         </div>
         <div class="meta">
             <strong>Fecha de emisión</strong><br>
             {{ now()->format('d/m/Y H:i') }}
         </div>
+    </div>
+
+    
+
+    <div class="card">
+        <div class="section-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M8 11a4 4 0 1 1 8 0c0 4-4 7-4 7s-4-3-4-7" />
+                <path d="M12 11a1 1 0 1 1 2 0 1 1 0 0 1-2 0" />
+            </svg>
+            <h3>Paciente</h3>
+        </div>
+        @php
+            $paciente = $historiaClinica->paciente;
+            $owner = $paciente?->owner;
+            $pacienteNombre = trim(($paciente->nombres ?? '') . ' ' . ($paciente->apellidos ?? ''));
+            $fechaNacimiento = optional($paciente?->fecha_nacimiento)->format('d/m/Y');
+            $edad = $paciente?->edad;
+            $fechaNacimientoLabel = $fechaNacimiento ?: '';
+            if ($fechaNacimiento && $edad) {
+                $fechaNacimientoLabel .= ' (' . $edad . ')';
+            }
+            if (! $fechaNacimientoLabel && $edad) {
+                $fechaNacimientoLabel = $edad;
+            }
+        @endphp
+        <p class="muted" style="margin-bottom:6px;">{{ $pacienteNombre ?: 'N/D' }}</p>
+
+            <table width="100%" cellspacing="0" cellpadding="0" style="border-collapse: collapse;">
+  <tr>
+    <td width="30%" style="padding:6px; vertical-align:top;">
+      <div class="info-row"><span class="info-label"># Historia Clínica:</span> {{ $paciente->id ?: 'N/D' }}</div>
+    </td>
+    <td width="30%" style="padding:6px; vertical-align:top;">
+      <div class="info-row"><span class="info-label">Sexo:</span> {{ $paciente?->sexo ?: 'N/D' }}</div>
+    </td>
+    <td width="30%" style="padding:6px; vertical-align:top;">
+      <div class="info-row"><span class="info-label">Peso:</span> {{ $paciente?->peso_formateado ?: 'N/D' }}</div>
+    </td>
+  </tr>
+
+  <tr>
+    <td width="33%" style="padding:6px; vertical-align:top;">
+      <div class="info-row"><span class="info-label">Nacimiento / edad:</span> {{ $fechaNacimientoLabel ?: 'N/D' }}</div>
+    </td>
+    <td width="33%" style="padding:6px; vertical-align:top;">
+      <div class="info-row"><span class="info-label">Especie:</span> {{ $paciente?->species?->name ?: 'N/D' }}</div>
+    </td>
+ 
+    <td width="33%" style="padding:6px; vertical-align:top;">
+      <div class="info-row"><span class="info-label">Raza:</span> {{ $paciente?->breed?->name ?: 'N/D' }}</div>
+    </td>
+    
+  </tr>
+</table>
+
+
+
+    <div class="card">
+        <div class="section-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M8 11a4 4 0 1 1 8 0c0 4-4 7-4 7s-4-3-4-7" />
+                <path d="M12 11a1 1 0 1 1 2 0 1 1 0 0 1-2 0" />
+            </svg>
+            <h3>Tutor</h3>
+        </div>
+        <p class="muted" style="margin-bottom:6px;">{{ $owner?->name ?: 'N/D' }} <br> {{ $owner?->document_type ?: 'N/D' }}{{ $owner?->document  ?: 'N/D' }}</p>
+         <table width="100%" cellspacing="0" cellpadding="0" style="border-collapse: collapse;">
+  <tr>   
+    <td width="50%" style="padding:6px; vertical-align:top;">
+        <div class="info-row"><span class="info-label">Tel:</span> {{ $owner?->phone ?: 'N/D' }}</div> </td>
+     <td width="50%" style="padding:6px; vertical-align:top;">
+        <div class="info-row"><span class="info-label">WhatsApp:</span> {{ $owner?->whatsapp ?: 'N/D' }}</div> </td>
+     <td width="50%" style="padding:6px; vertical-align:top;">
+        <div class="info-row"><span class="info-label">Correo:</span> {{ $owner?->email ?: 'N/D' }}</div> </td>
+        </tr>
+        </table>
     </div>
 
     <div class="card">
@@ -71,38 +148,22 @@
         </div>
         <table class="table">
             <tr>
-                <th style="width:35%">Motivo de consulta</th>
+                <th class="field-label" style="width:35%">Motivo de consulta</th>
                 <td>{{ $historiaClinica->motivo_consulta ?: 'Sin registrar' }}</td>
             </tr>
             <tr>
-                <th>Enfermedad actual</th>
+                <th class="field-label">Enfermedad actual</th>
                 <td>{{ $historiaClinica->enfermedad_actual ?: 'Sin registrar' }}</td>
             </tr>
             <tr>
-                <th>Antecedentes farmacológicos</th>
+                <th class="field-label">Antecedentes farmacológicos</th>
                 <td>{{ $historiaClinica->antecedentes_farmacologicos ?: 'N/D' }}</td>
             </tr>
             <tr>
-                <th>Antecedentes patológicos</th>
+                <th class="field-label">Antecedentes patológicos</th>
                 <td>{{ $historiaClinica->antecedentes_patologicos ?: 'N/D' }}</td>
             </tr>
         </table>
-    </div>
-
-    <div class="card">
-        <div class="section-title">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M8 11a4 4 0 1 1 8 0c0 4-4 7-4 7s-4-3-4-7" />
-                <path d="M12 11a1 1 0 1 1 2 0 1 1 0 0 1-2 0" />
-            </svg>
-            <h3>Tutor</h3>
-        </div>
-        <p class="muted" style="margin-bottom:6px;">{{ optional($historiaClinica->paciente?->owner)->name }}</p>
-        <div class="grid">
-            <div class="tag"><strong>Tel:</strong> {{ optional($historiaClinica->paciente?->owner)->phone ?: 'N/D' }}</div>
-            <div class="tag"><strong>WhatsApp:</strong> {{ optional($historiaClinica->paciente?->owner)->whatsapp ?: 'N/D' }}</div>
-            <div class="tag"><strong>Correo:</strong> {{ optional($historiaClinica->paciente?->owner)->email ?: 'N/D' }}</div>
-        </div>
     </div>
 
     <div class="card">
@@ -197,15 +258,15 @@
         </div>
         <table class="table">
             <tr>
-                <th style="width:30%">Análisis</th>
+                <th class="field-label" style="width:30%">Análisis</th>
                 <td>{{ $historiaClinica->analisis ?: 'N/D' }}</td>
             </tr>
             <tr>
-                <th>Procedimientos</th>
+                <th class="field-label">Procedimientos</th>
                 <td>{{ $historiaClinica->plan_procedimientos ?: 'N/D' }}</td>
             </tr>
             <tr>
-                <th>Medicamentos</th>
+                <th class="field-label">Medicamentos</th>
                 <td>{{ $historiaClinica->plan_medicamentos ?: 'N/D' }}</td>
             </tr>
         </table>
