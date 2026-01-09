@@ -69,6 +69,14 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    public function getNameAttribute(): ?string
+    {
+        $firstName = $this->nombres ?? $this->nombre ?? '';
+        $name = trim($firstName . ' ' . ($this->apellidos ?? ''));
+
+        return $name !== '' ? $name : null;
+    }
 	// Aquí definimos la relación "item" (o como prefieras nombrarla):
     public function peluqueria()
     {
