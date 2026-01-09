@@ -108,60 +108,62 @@
         <label class="flex items-center space-x-2"><input type="checkbox" name="requires_owner" value="1" {{ old('requires_owner', $template->requires_owner ?? true) ? 'checked' : '' }}> <span>Requiere tutor</span></label>
         <label class="flex items-center space-x-2"><input type="checkbox" name="requires_pet" value="1" {{ old('requires_pet', $template->requires_pet ?? true) ? 'checked' : '' }}> <span>Requiere paciente</span></label>
     </div>
-    <div>
-        <label class="block text-sm font-medium">Cuerpo (HTML)</label>
-        <div class="mt-1 space-y-2">
-            <input type="hidden" name="body_html" value="{{ $bodyHtml }}" data-editor-input>
-            <div data-editor class="bg-white border rounded min-h-[240px] p-3">
-                {!! $bodyHtml !!}
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div>
+            <label class="block text-sm font-medium">Cuerpo (HTML)</label>
+            <div class="mt-1 space-y-2">
+                <input type="hidden" name="body_html" value="{{ $bodyHtml }}" data-editor-input>
+                <div data-editor class="bg-white border rounded min-h-[240px] p-3">
+                    {!! $bodyHtml !!}
+                </div>
+                <p class="text-xs text-gray-500">Usa el editor para personalizar el contenido. Las etiquetas se reemplazarán con los datos del paciente cuando se genere el consentimiento.</p>
             </div>
-            <p class="text-xs text-gray-500">Usa el editor para personalizar el contenido. Las etiquetas se reemplazarán con los datos del paciente cuando se genere el consentimiento.</p>
         </div>
-    </div>
-    <div class="bg-gray-50 border rounded p-4 space-y-4">
-        <div class="flex items-start justify-between gap-4">
-            <div>
-                <p class="font-semibold text-base">Etiquetas disponibles <span class="text-sm text-gray-500">(Ejemplo: Nombre.tutor)</span></p>
-                <p class="text-sm text-gray-600">Selecciona y activa solo las etiquetas que necesites. Haz clic en “Insertar” para agregarlas al cuerpo del consentimiento.</p>
+        <div class="bg-gray-50 border rounded p-4 space-y-4">
+            <div class="flex items-start justify-between gap-4">
+                <div>
+                    <p class="font-semibold text-base">Etiquetas disponibles <span class="text-sm text-gray-500">(Ejemplo: Nombre.tutor)</span></p>
+                    <p class="text-sm text-gray-600">Selecciona y activa solo las etiquetas que necesites. Haz clic en “Insertar” para agregarlas al cuerpo del consentimiento.</p>
+                </div>
+                <div class="text-right text-xs text-gray-500">Todas las etiquetas están en español y mostrarán datos reales al generar el documento.</div>
             </div>
-            <div class="text-right text-xs text-gray-500">Todas las etiquetas están en español y mostrarán datos reales al generar el documento.</div>
-        </div>
-        <div class="space-y-5">
-            @foreach($groupedPlaceholders as $groupLabel => $groupItems)
-                @if(!empty($groupItems))
-                    <div class="space-y-3">
-                        <div class="flex items-center justify-between">
-                            <p class="font-semibold text-sm text-gray-800">{{ $groupLabel }}</p>
-                            <p class="text-xs text-gray-500">Inserta etiquetas con un clic</p>
-                        </div>
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                            @foreach($groupItems as $key => $meta)
-                                <div class="rounded-xl border bg-white p-4 shadow-sm space-y-3">
-                                    <div class="flex items-start justify-between gap-2">
-                                        <div class="space-y-1">
-                                            <p class="font-semibold text-sm text-gray-900">{{ $meta['label'] }}</p>
-                                            @if(!empty($meta['example']))
-                                                <p class="text-xs text-gray-500">Ejemplo: {{ $meta['example'] }}</p>
-                                            @endif
-                                            <p class="text-[11px] text-indigo-700 font-semibold flex items-center gap-1">
-                                                <span class="inline-flex items-center rounded-full bg-indigo-50 px-2 py-0.5 border border-indigo-100">Etiqueta</span>
-                                                <span class="text-gray-600">{{ $meta['display'] ?? $key }}</span>
-                                            </p>
+            <div class="space-y-5">
+                @foreach($groupedPlaceholders as $groupLabel => $groupItems)
+                    @if(!empty($groupItems))
+                        <div class="space-y-3">
+                            <div class="flex items-center justify-between">
+                                <p class="font-semibold text-sm text-gray-800">{{ $groupLabel }}</p>
+                                <p class="text-xs text-gray-500">Inserta etiquetas con un clic</p>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                @foreach($groupItems as $key => $meta)
+                                    <div class="rounded-xl border bg-white p-4 shadow-sm space-y-3">
+                                        <div class="flex items-start justify-between gap-2">
+                                            <div class="space-y-1">
+                                                <p class="font-semibold text-sm text-gray-900">{{ $meta['label'] }}</p>
+                                                @if(!empty($meta['example']))
+                                                    <p class="text-xs text-gray-500">Ejemplo: {{ $meta['example'] }}</p>
+                                                @endif
+                                                <p class="text-[11px] text-indigo-700 font-semibold flex items-center gap-1">
+                                                    <span class="inline-flex items-center rounded-full bg-indigo-50 px-2 py-0.5 border border-indigo-100">Etiqueta</span>
+                                                    <span class="text-gray-600">{{ $meta['display'] ?? $key }}</span>
+                                                </p>
+                                            </div>
+                                            <button type="button" class="inline-flex items-center gap-2 rounded-full bg-indigo-50 px-3 py-1.5 text-xs font-semibold text-indigo-700 border border-indigo-100 hover:bg-indigo-100 shadow-sm" data-placeholder-key="{{ $key }}" data-placeholder-label="{{ $meta['label'] }}" data-placeholder-display="{{ $meta['display'] ?? $key }}">
+                                                <span>Insertar en el cuerpo</span>
+                                            </button>
                                         </div>
-                                        <button type="button" class="inline-flex items-center gap-2 rounded-full bg-indigo-50 px-3 py-1.5 text-xs font-semibold text-indigo-700 border border-indigo-100 hover:bg-indigo-100 shadow-sm" data-placeholder-key="{{ $key }}" data-placeholder-label="{{ $meta['label'] }}" data-placeholder-display="{{ $meta['display'] ?? $key }}">
-                                            <span>Insertar en el cuerpo</span>
-                                        </button>
+                                        <label class="flex items-center gap-2 text-xs text-gray-700">
+                                            <input type="checkbox" name="allowed_placeholders[]" value="{{ $key }}" class="h-4 w-4 text-indigo-600 rounded border-gray-300" {{ in_array($key, old('allowed_placeholders', $template->allowed_placeholders ?? [])) ? 'checked' : '' }}>
+                                            <span>Activar esta etiqueta para el consentimiento</span>
+                                        </label>
                                     </div>
-                                    <label class="flex items-center gap-2 text-xs text-gray-700">
-                                        <input type="checkbox" name="allowed_placeholders[]" value="{{ $key }}" class="h-4 w-4 text-indigo-600 rounded border-gray-300" {{ in_array($key, old('allowed_placeholders', $template->allowed_placeholders ?? [])) ? 'checked' : '' }}>
-                                        <span>Activar esta etiqueta para el consentimiento</span>
-                                    </label>
-                                </div>
-                            @endforeach
+                                @endforeach
+                            </div>
                         </div>
-                    </div>
-                @endif
-            @endforeach
+                    @endif
+                @endforeach
+            </div>
         </div>
     </div>
     <div class="space-y-3">
