@@ -156,12 +156,37 @@
                     </div>
 
                     <div class="mt-6 space-y-4">
+                        <div class="rounded-xl border border-mint-100 bg-white p-4">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-sm font-semibold text-gray-700">Venta a crédito</p>
+                                    <p class="text-xs text-gray-500">Define el plazo de pago.</p>
+                                </div>
+                                <label class="inline-flex items-center gap-2 text-sm text-gray-600">
+                                    <input type="checkbox" name="is_credit" value="1" x-model="is_credit" class="h-4 w-4 rounded border-gray-300 text-mint-600">
+                                    Activar
+                                </label>
+                            </div>
+                            <div class="mt-3" x-show="is_credit">
+                                <label class="text-xs text-gray-500">Plazo</label>
+                                <select name="credit_days" x-model.number="credit_days" class="mt-1 w-full rounded-md border border-gray-200 px-3 py-2 text-sm">
+                                    <option value="5">5 días</option>
+                                    <option value="10">10 días</option>
+                                    <option value="15">15 días</option>
+                                    <option value="30">30 días</option>
+                                    <option value="60">60 días</option>
+                                </select>
+                            </div>
+                        </div>
                         <div class="flex items-center justify-between">
                             <h3 class="text-sm font-semibold text-gray-700">Pagos</h3>
-                            <button type="button" @click="addPayment()" class="text-xs text-mint-700 hover:text-mint-900">Agregar método</button>
+                            <button type="button" @click="addPayment()" class="text-xs text-mint-700 hover:text-mint-900" :disabled="is_credit" :class="is_credit ? 'opacity-50 cursor-not-allowed' : ''">Agregar método</button>
+                        </div>
+                        <div x-show="is_credit" class="rounded-xl border border-mint-100 bg-mint-50 p-3 text-xs text-gray-600">
+                            La factura quedará a crédito. No se registrarán pagos en este momento.
                         </div>
                         <template x-for="(payment, index) in payments" :key="payment.uid">
-                            <div class="rounded-xl border border-mint-100 bg-white p-4 space-y-3">
+                            <div class="rounded-xl border border-mint-100 bg-white p-4 space-y-3" x-show="!is_credit">
                                 <div class="flex flex-wrap items-center justify-between gap-2">
                                     <select class="min-w-[160px] rounded-md border border-gray-200 px-2 py-2 text-sm" x-model="payment.method" :name="`payments[${index}][method]`">
                                         <option value="cash">Efectivo</option>
@@ -176,11 +201,31 @@
                                         <label class="text-xs text-gray-500">Monto aplicado</label>
                                         <input type="number" step="0.01" min="0" class="mt-1 w-full rounded-md border border-gray-200 px-3 py-2 text-sm" x-model.number="payment.amount" :name="`payments[${index}][amount]`">
                                     </div>
+                                    <template x-if="payment.method === 'card'">
+                                        <div>
+                                            <label class="text-xs text-gray-500">Tipo de tarjeta</label>
+                                            <select class="mt-1 w-full rounded-md border border-gray-200 px-3 py-2 text-sm" x-model="payment.card_type" :name="`payments[${index}][card_type]`">
+                                                <option value="debit">Débito</option>
+                                                <option value="credit">Crédito</option>
+                                            </select>
+                                        </div>
+                                    </template>
                                     <template x-if="payment.method === 'cash'">
                                         <div>
                                             <label class="text-xs text-gray-500">Recibido</label>
                                             <input type="number" step="0.01" min="0" class="mt-1 w-full rounded-md border border-gray-200 px-3 py-2 text-sm" x-model.number="payment.received" :name="`payments[${index}][received]`">
                                             <p class="mt-2 text-xs text-gray-500">Devueltas: <span class="font-semibold" x-text="formatCurrency(paymentChange(payment))"></span></p>
+                                        </div>
+                                    </template>
+                                    <template x-if="payment.method === 'card' || payment.method === 'transfer'">
+                                        <div>
+                                            <label class="text-xs text-gray-500">Banco</label>
+                                            <select class="mt-1 w-full rounded-md border border-gray-200 px-3 py-2 text-sm" x-model="payment.bank_id" :name="`payments[${index}][bank_id]`">
+                                                <option value="">Selecciona un banco</option>
+                                                @foreach($banks as $bank)
+                                                    <option value="{{ $bank->id }}">{{ $bank->nombre }}</option>
+                                                @endforeach
+                                            </select>
                                         </div>
                                     </template>
                                     <div>
@@ -224,8 +269,10 @@
                 itemQuery: '',
                 itemResults: [],
                 lines: [],
+                is_credit: false,
+                credit_days: 5,
                 payments: [
-                    { uid: crypto.randomUUID(), method: 'cash', amount: 0, received: 0, reference: '' }
+                    { uid: crypto.randomUUID(), method: 'cash', amount: 0, received: 0, reference: '', card_type: 'debit', bank_id: '' }
                 ],
                 init() {
                     new TomSelect(this.$refs.ownerSelect, {
@@ -252,6 +299,14 @@
                         .then(data => {
                             this.itemResults = data;
                         });
+
+                    this.$watch('is_credit', (value) => {
+                        if (value) {
+                            this.payments = [];
+                        } else if (this.payments.length === 0) {
+                            this.addPayment();
+                        }
+                    });
                 },
                 addItem(item) {
                     this.lines.push({
@@ -314,7 +369,7 @@
                     return (this.subtotal - this.discountTotal) + this.taxTotal + this.commissionTotal;
                 },
                 addPayment() {
-                    this.payments.push({ uid: crypto.randomUUID(), method: 'cash', amount: 0, received: 0, reference: '' });
+                    this.payments.push({ uid: crypto.randomUUID(), method: 'cash', amount: 0, received: 0, reference: '', card_type: 'debit', bank_id: '' });
                 },
                 removePayment(index) {
                     if (this.payments.length === 1) {

@@ -21,6 +21,9 @@ class Invoice extends BaseModel
         'currency',
         'issued_at',
         'notes',
+        'is_credit',
+        'credit_days',
+        'due_at',
         'subtotal',
         'discount_total',
         'tax_total',
@@ -41,6 +44,7 @@ class Invoice extends BaseModel
 
     protected $casts = [
         'issued_at' => 'datetime',
+        'due_at' => 'datetime',
         'sent_at' => 'datetime',
         'accepted_at' => 'datetime',
         'subtotal' => 'decimal:2',
@@ -50,6 +54,7 @@ class Invoice extends BaseModel
         'total' => 'decimal:2',
         'paid_total' => 'decimal:2',
         'change_total' => 'decimal:2',
+        'is_credit' => 'boolean',
         'dian_response' => 'array',
     ];
 

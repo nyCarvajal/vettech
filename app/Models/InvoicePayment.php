@@ -16,6 +16,8 @@ class InvoicePayment extends BaseModel
         'received',
         'change',
         'reference',
+        'card_type',
+        'bank_id',
         'paid_at',
         'meta',
     ];

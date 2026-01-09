@@ -30,8 +30,10 @@ const initConsentTemplateEditor = () => {
     const placeholderPattern = /\{\{\s*([a-zA-Z0-9_.]+)\s*\}\}/g;
 
     const getPlaceholderChipHtml = (key) => {
-        const label = placeholders?.[key]?.label || key;
-        return `<span class="placeholder-chip" contenteditable="false" data-placeholder-key="${key}" data-placeholder-label="${label}"><span class="placeholder-chip-label">${label}</span><span class="placeholder-chip-key">${key}</span></span>`;
+        const meta = placeholders?.[key] || {};
+        const label = meta.label || key;
+        const display = meta.display || key;
+        return `<span class="placeholder-chip" contenteditable="false" data-placeholder-key="${key}" data-placeholder-label="${label}" data-placeholder-display="${display}"><span class="placeholder-chip-label">${label}</span><span class="placeholder-chip-key">${display}</span></span>`;
     };
 
     const convertChipsToPlaceholders = (html) => {
