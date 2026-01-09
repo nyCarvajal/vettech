@@ -159,30 +159,57 @@
         <div class="flex flex-1">
             <aside class="hidden lg:block w-64 bg-white border-r border-gray-200">
                 @php
-                    $navItems = [
-                        ['label' => 'Dashboard', 'route' => 'dashboard'],
-                        ['label' => 'Tutores', 'route' => 'owners.index'],
-                        ['label' => 'Pacientes', 'route' => 'patients.index'],
-                        ['label' => 'Sala de belleza', 'route' => 'groomings.index'],
-                        ['label' => 'Agenda', 'route' => 'reservas.index'],
-                        ['label' => 'Hospitalización 24/7', 'route' => 'hospital.board'],
-                        ['label' => 'Dispensación', 'route' => 'dispensations.index'],
-                        ['label' => 'Facturación POS', 'route' => 'invoices.pos'],
-                        ['label' => 'Ventas', 'route' => 'sales.index'],
-                        ['label' => 'Caja', 'route' => 'cash.sessions.index'],
-                        ['label' => 'Reportes', 'route' => 'reports.quick'],
+                    $navSections = [
+                        [
+                            'title' => 'Principal',
+                            'items' => [
+                                ['label' => 'Dashboard', 'route' => 'dashboard'],
+                                ['label' => 'Tutores', 'route' => 'owners.index'],
+                                ['label' => 'Pacientes', 'route' => 'patients.index'],
+                                ['label' => 'Sala de belleza', 'route' => 'groomings.index'],
+                                ['label' => 'Agenda', 'route' => 'reservas.index'],
+                                ['label' => 'Hospitalización 24/7', 'route' => 'hospital.board'],
+                                ['label' => 'Dispensación', 'route' => 'dispensations.index'],
+                                ['label' => 'Facturación POS', 'route' => 'invoices.pos'],
+                                ['label' => 'Ventas', 'route' => 'sales.index'],
+                                ['label' => 'Caja', 'route' => 'cash.sessions.index'],
+                            ],
+                        ],
+                        [
+                            'title' => 'Reportes',
+                            'items' => [
+                                ['label' => 'Reportes básicos', 'route' => 'reports.quick', 'active' => 'reports.quick*'],
+                                ['label' => 'Reportes avanzados', 'route' => 'reports.home', 'active' => 'reports.*'],
+                            ],
+                        ],
+                        [
+                            'title' => 'Configuración',
+                            'items' => [
+                                ['label' => 'Configuración de clínicas', 'route' => 'clinicas.edit-own'],
+                                ['label' => 'Consentimientos informados', 'route' => 'consent-templates.index'],
+                                ['label' => 'Crear plantilla de consentimientos', 'route' => 'consent-templates.create'],
+                            ],
+                        ],
                     ];
                 @endphp
-                <nav class="p-4 space-y-1">
-                    @foreach($navItems as $item)
-                        @php
-                            $isAvailable = isset($item['route']) && Route::has($item['route']);
-                            $url = $isAvailable ? route($item['route']) : '#';
-                            $active = $isAvailable && request()->routeIs($item['route'] . '*');
-                        @endphp
-                        <a href="{{ $url }}" class="sidebar-link {{ $active ? 'sidebar-link-active' : '' }}">
-                            <span>{{ $item['label'] }}</span>
-                        </a>
+                <nav class="p-4 space-y-4">
+                    @foreach($navSections as $section)
+                        <div class="space-y-1">
+                            <p class="px-3 text-xs font-semibold uppercase tracking-wide text-gray-400">
+                                {{ $section['title'] }}
+                            </p>
+                            @foreach($section['items'] as $item)
+                                @php
+                                    $isAvailable = isset($item['route']) && Route::has($item['route']);
+                                    $url = $isAvailable ? route($item['route']) : '#';
+                                    $activePattern = $item['active'] ?? ($item['route'] . '*');
+                                    $active = $isAvailable && request()->routeIs($activePattern);
+                                @endphp
+                                <a href="{{ $url }}" class="sidebar-link {{ $active ? 'sidebar-link-active' : '' }}">
+                                    <span>{{ $item['label'] }}</span>
+                                </a>
+                            @endforeach
+                        </div>
                     @endforeach
                 </nav>
             </aside>
