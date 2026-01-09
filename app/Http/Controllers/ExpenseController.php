@@ -27,7 +27,7 @@ class ExpenseController extends Controller
     {
         return view('expenses.create', [
             'owners' => Owner::query()->select('id', 'name')->orderBy('name')->get(),
-            'users' => User::query()->select('id', 'nombre')->orderBy('nombre')->get(),
+            'users' => User::query()->select('id', 'nombres')->orderBy('nombres')->get(),
         ]);
     }
 
@@ -47,7 +47,7 @@ class ExpenseController extends Controller
         return view('expenses.edit', [
             'expense' => $expense,
             'owners' => Owner::query()->select('id', 'name')->orderBy('name')->get(),
-            'users' => User::query()->select('id', 'nombre')->orderBy('nombre')->get(),
+            'users' => User::query()->select('id', 'nombres')->orderBy('nombres')->get(),
         ]);
     }
 
