@@ -54,7 +54,6 @@ class Item extends Model
         'track_inventory',
         'sale_price',
         'cost_price',
-        'inventariable',
     ];
 
     protected $casts = [
@@ -64,7 +63,6 @@ class Item extends Model
         'track_inventory' => 'boolean',
         'sale_price' => 'decimal:2',
         'cost_price' => 'decimal:2',
-        'inventariable' => 'boolean',
     ];
 
     public function movimientos()

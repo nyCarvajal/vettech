@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreInvoiceRequest;
 use App\Http\Requests\VoidInvoiceRequest;
 use App\Models\Invoice;
+use App\Models\Banco;
 use App\Models\Owner;
 use App\Services\InvoiceService;
 use Illuminate\Http\Request;
@@ -45,8 +46,9 @@ class InvoiceController extends Controller
     public function create()
     {
         $owners = Owner::query()->orderBy('name')->limit(50)->get();
+        $banks = Banco::query()->orderBy('nombre')->get();
 
-        return view('invoices.pos', compact('owners'));
+        return view('invoices.pos', compact('owners', 'banks'));
     }
 
     public function store(StoreInvoiceRequest $request)
