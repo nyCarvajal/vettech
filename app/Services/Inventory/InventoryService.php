@@ -9,6 +9,8 @@ use Illuminate\Validation\ValidationException;
 
 class InventoryService
 {
+    protected array $movementTypeCache = [];
+
     public function createItemWithInitialStock(array $data): Item
     {
         return DB::connection('tenant')->transaction(function () use ($data) {
@@ -87,9 +89,17 @@ class InventoryService
 
             $movementQuantity = $type === 'adjust' ? $delta : abs($delta);
 
+            $resolvedType = $this->resolveMovementType($connection, $type);
+            $meta = $data['meta'] ?? null;
+            if ($resolvedType !== $type) {
+                $meta = array_merge($meta ?? [], [
+                    'original_movement_type' => $type,
+                ]);
+            }
+
             return InventoryMovement::create([
                 'item_id' => $lockedItem->id,
-                'movement_type' => $type,
+                'movement_type' => $resolvedType,
                 'quantity' => $movementQuantity,
                 'unit_cost' => $lockedItem->cost_price,
                 'before_stock' => $before,
@@ -100,7 +110,7 @@ class InventoryService
                 'related_id' => $data['related_id'] ?? 0,
                 'user_id' => $data['user_id'] ?? auth()->id() ?? 0,
                 'occurred_at' => $data['occurred_at'] ?? now(),
-                'meta' => $data['meta'] ?? null,
+                'meta' => $meta,
             ]);
         });
     }
@@ -113,5 +123,34 @@ class InventoryService
     protected function shouldTrackInventoryData(array $data): bool
     {
         return (bool) (($data['inventariable'] ?? false) || ($data['track_inventory'] ?? false));
+    }
+
+    protected function resolveMovementType(string $connection, string $type): string
+    {
+        $supported = $this->movementTypeCache[$connection] ?? null;
+
+        if (! $supported) {
+            $columns = DB::connection($connection)
+                ->select("SHOW COLUMNS FROM inventory_movements LIKE 'movement_type'");
+
+            $supported = [];
+            if (! empty($columns)) {
+                $columnType = $columns[0]->Type ?? '';
+                if (preg_match("/^enum\\((.*)\\)$/", $columnType, $matches)) {
+                    $supported = array_map(
+                        fn ($value) => trim($value, \"'\"),
+                        explode(',', $matches[1])
+                    );
+                }
+            }
+
+            $this->movementTypeCache[$connection] = $supported;
+        }
+
+        if (in_array($type, $supported, true)) {
+            return $type;
+        }
+
+        return 'adjustment';
     }
 }
