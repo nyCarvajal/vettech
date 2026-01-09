@@ -12,6 +12,23 @@ if ($cloudinaryUrl && preg_match('~^cloudinary://([^:]+):([^@]+)@([^/?]+)~', $cl
         'pass' => rawurldecode($matches[2]),
         'host' => $matches[3],
     ];
+} elseif ($cloudinaryUrl && str_starts_with($cloudinaryUrl, 'cloudinary://')) {
+    $withoutScheme = substr($cloudinaryUrl, strlen('cloudinary://'));
+    $hostSeparator = strrpos($withoutScheme, '@');
+
+    if ($hostSeparator !== false) {
+        $credentialPart = substr($withoutScheme, 0, $hostSeparator);
+        $hostPart = substr($withoutScheme, $hostSeparator + 1);
+        $credentialSeparator = strpos($credentialPart, ':');
+
+        if ($credentialSeparator !== false) {
+            $cloudinaryUrlFallback = [
+                'user' => rawurldecode(substr($credentialPart, 0, $credentialSeparator)),
+                'pass' => rawurldecode(substr($credentialPart, $credentialSeparator + 1)),
+                'host' => $hostPart ?: null,
+            ];
+        }
+    }
 }
 
 $cloudinaryCloudNameFromPath = null;
