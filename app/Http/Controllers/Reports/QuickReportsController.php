@@ -33,7 +33,7 @@ class QuickReportsController extends Controller
             'sales' => $sales,
             'payments' => $payments,
             'expenses' => $expenses,
-            'users' => User::query()->select('id', 'nombre', 'apellidos')->orderBy('nombre')->get(),
+            'users' => User::query()->select('id', 'nombres')->orderBy('nombres')->get(),
             'owners' => Owner::query()->select('id', 'name')->orderBy('name')->get(),
             'paymentMethods' => ['cash', 'card', 'transfer', 'mixed'],
         ]);
