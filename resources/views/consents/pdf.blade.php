@@ -3,32 +3,182 @@
 <head>
     <meta charset="UTF-8">
     <style>
-        body { font-family: DejaVu Sans, sans-serif; font-size: 12px; }
-        .header { text-align: center; margin-bottom: 20px; }
-        .signature { margin-top: 20px; }
-        .signature img { max-height: 80px; }
+        body {
+            font-family: DejaVu Sans, sans-serif;
+            font-size: 12px;
+            color: #0f172a;
+            margin: 0;
+        }
+        .page {
+            padding: 28px 32px;
+        }
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 12px;
+            margin-bottom: 20px;
+        }
+        .header-title {
+            font-size: 20px;
+            font-weight: 700;
+        }
+        .header-meta {
+            font-size: 11px;
+            color: #475569;
+            text-align: right;
+        }
+        .section {
+            margin-bottom: 18px;
+        }
+        .section-title {
+            font-size: 13px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: #1e293b;
+        }
+        .info-grid {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .info-grid td {
+            padding: 6px 8px;
+            border: 1px solid #e2e8f0;
+            vertical-align: top;
+        }
+        .info-label {
+            font-weight: 600;
+            color: #334155;
+            width: 30%;
+            background-color: #f8fafc;
+        }
+        .consent-body {
+            padding: 14px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            background-color: #ffffff;
+        }
+        .signature {
+            margin-top: 18px;
+        }
+        .signature-card {
+            border: 1px solid #e2e8f0;
+            padding: 10px 12px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+        .signature img {
+            max-height: 90px;
+            margin-top: 6px;
+        }
+        .text-sm {
+            font-size: 11px;
+            color: #475569;
+        }
+        .text-gray-500 {
+            color: #64748b;
+        }
     </style>
 </head>
 <body>
-    <div class="header">
-        <h1>Consentimiento {{ $consent->code }}</h1>
-        <p>Firmado: {{ optional($consent->signed_at)->format('Y-m-d H:i') }}</p>
-    </div>
-    <h3>Datos del tutor</h3>
-    <pre>{{ json_encode($consent->owner_snapshot, JSON_PRETTY_PRINT|JSON_UNESCAPED_UNICODE) }}</pre>
-    <h3>Datos del paciente</h3>
-    <pre>{{ json_encode($consent->pet_snapshot, JSON_PRETTY_PRINT|JSON_UNESCAPED_UNICODE) }}</pre>
-    <hr>
-    <div>{!! $consent->merged_body_html !!}</div>
-    <div class="signature">
-        <h3>Firmas</h3>
-        @foreach($consent->signatures as $signature)
-            <div style="margin-bottom:12px;">
-                <p><strong>{{ $signature->signer_name }}</strong> ({{ $signature->signer_role }})</p>
-                <p>{{ $signature->signed_at }} · {{ $signature->ip_address }} · {{ $signature->method }}</p>
-                <img src="{{ Storage::disk('consents')->path($signature->signature_image_path) }}" alt="firma">
+    <div class="page">
+        <div class="header">
+            <div>
+                <div class="header-title">Consentimiento {{ $consent->code }}</div>
+                <div class="text-sm">Plantilla: {{ $consent->template->name ?? 'Sin plantilla' }}</div>
             </div>
-        @endforeach
+            <div class="header-meta">
+                <div>Estado: {{ ucfirst($consent->status) }}</div>
+                <div>Firmado: {{ optional($consent->signed_at)->format('Y-m-d H:i') ?? 'Pendiente' }}</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">Datos del tutor</div>
+            <table class="info-grid">
+                <tr>
+                    <td class="info-label">Nombre completo</td>
+                    <td>{{ $consent->owner_snapshot['full_name'] ?? '' }}</td>
+                </tr>
+                <tr>
+                    <td class="info-label">Documento</td>
+                    <td>{{ $consent->owner_snapshot['document'] ?? '' }}</td>
+                </tr>
+                <tr>
+                    <td class="info-label">Teléfono</td>
+                    <td>{{ $consent->owner_snapshot['phone'] ?? '' }}</td>
+                </tr>
+                <tr>
+                    <td class="info-label">Correo</td>
+                    <td>{{ $consent->owner_snapshot['email'] ?? '' }}</td>
+                </tr>
+                <tr>
+                    <td class="info-label">Dirección</td>
+                    <td>{{ $consent->owner_snapshot['address'] ?? '' }}</td>
+                </tr>
+                <tr>
+                    <td class="info-label">Ciudad</td>
+                    <td>{{ $consent->owner_snapshot['city'] ?? '' }}</td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="section">
+            <div class="section-title">Datos del paciente</div>
+            <table class="info-grid">
+                <tr>
+                    <td class="info-label">Nombre</td>
+                    <td>{{ $consent->pet_snapshot['name'] ?? '' }}</td>
+                </tr>
+                <tr>
+                    <td class="info-label">Especie</td>
+                    <td>{{ $consent->pet_snapshot['species'] ?? '' }}</td>
+                </tr>
+                <tr>
+                    <td class="info-label">Raza</td>
+                    <td>{{ $consent->pet_snapshot['breed'] ?? '' }}</td>
+                </tr>
+                <tr>
+                    <td class="info-label">Sexo</td>
+                    <td>{{ $consent->pet_snapshot['sex'] ?? '' }}</td>
+                </tr>
+                <tr>
+                    <td class="info-label">Edad</td>
+                    <td>{{ $consent->pet_snapshot['age'] ?? '' }}</td>
+                </tr>
+                <tr>
+                    <td class="info-label">Peso</td>
+                    <td>{{ $consent->pet_snapshot['weight'] ?? '' }}</td>
+                </tr>
+                <tr>
+                    <td class="info-label">Color</td>
+                    <td>{{ $consent->pet_snapshot['color'] ?? '' }}</td>
+                </tr>
+                <tr>
+                    <td class="info-label">Microchip</td>
+                    <td>{{ $consent->pet_snapshot['microchip'] ?? '' }}</td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="section">
+            <div class="section-title">Detalle del consentimiento</div>
+            <div class="consent-body">{!! $consent->merged_body_html !!}</div>
+        </div>
+
+        <div class="signature">
+            <div class="section-title">Firmas</div>
+            @forelse($consent->signatures as $signature)
+                <div class="signature-card">
+                    <div><strong>{{ $signature->signer_name }}</strong> ({{ $signature->signer_role }})</div>
+                    <div class="text-sm">{{ $signature->signed_at }} · {{ $signature->ip_address }} · {{ $signature->method }}</div>
+                    <img src="{{ Storage::disk('consents')->path($signature->signature_image_path) }}" alt="firma">
+                </div>
+            @empty
+                <div class="text-sm text-gray-500">Sin firmas registradas.</div>
+            @endforelse
+        </div>
     </div>
 </body>
 </html>
