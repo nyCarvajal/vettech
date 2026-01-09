@@ -107,8 +107,8 @@
                                 <textarea name="notes" rows="2" class="mt-2 w-full rounded-lg border-slate-200 px-3 py-2 text-sm"></textarea>
                             </div>
                             <div class="flex justify-end gap-2">
-                                <button type="button" @click="open=false" class="rounded-lg border border-slate-200 bg-slate-50 px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-100">Cancelar</button>
-                                <button type="submit" class="rounded-lg bg-mint-600 px-4 py-2 text-sm font-semibold text-white">Guardar</button>
+                                <button type="button" @click="open=false" class="rounded-lg border border-violet-200 bg-violet-50 px-4 py-2 text-sm font-semibold text-violet-700 hover:bg-violet-100">Cancelar</button>
+                                <button type="submit" class="rounded-lg bg-mint-600 px-4 py-2 text-sm font-semibold text-white hover:bg-mint-700">Guardar</button>
                             </div>
                         </form>
                     </div>

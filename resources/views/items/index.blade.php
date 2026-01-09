@@ -64,10 +64,10 @@
                 </div>
             </div>
             <div class="lg:col-span-4 flex flex-wrap items-center gap-3">
-                <button type="submit" class="inline-flex items-center gap-2 rounded-lg bg-mint-600 px-4 py-2 text-sm font-semibold text-white shadow-sm">
+                <button type="submit" class="inline-flex items-center gap-2 rounded-lg bg-mint-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-mint-700">
                     Aplicar filtros
                 </button>
-                <a href="{{ route('items.index') }}" class="text-sm font-semibold text-slate-500 hover:text-slate-700">
+                <a href="{{ route('items.index') }}" class="rounded-lg border border-violet-200 bg-violet-50 px-4 py-2 text-sm font-semibold text-violet-700 hover:bg-violet-100">
                     Limpiar
                 </a>
             </div>
@@ -76,13 +76,13 @@
 
     <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
         <div class="flex items-center gap-3">
-            <a href="{{ route('items.create') }}" class="inline-flex items-center gap-2 rounded-lg bg-mint-600 px-4 py-2 text-sm font-semibold text-white shadow-sm">
+            <a href="{{ route('items.create') }}" class="inline-flex items-center gap-2 rounded-lg bg-mint-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-mint-700">
                 <span class="text-lg">+</span> Añadir producto
             </a>
-            <button type="button" class="hidden h-10 w-10 items-center justify-center rounded-lg border border-slate-200 text-slate-500 lg:flex">
+            <button type="button" class="hidden h-10 w-10 items-center justify-center rounded-lg border border-mint-200 bg-mint-50 text-mint-700 hover:bg-mint-100 lg:flex">
                 <i class="ri-layout-grid-line"></i>
             </button>
-            <button type="button" class="hidden h-10 w-10 items-center justify-center rounded-lg border border-slate-200 text-slate-500 lg:flex">
+            <button type="button" class="hidden h-10 w-10 items-center justify-center rounded-lg border border-violet-200 bg-violet-50 text-violet-700 hover:bg-violet-100 lg:flex">
                 <i class="ri-menu-line"></i>
             </button>
         </div>
@@ -199,8 +199,8 @@
                                             <textarea name="notes" rows="2" class="mt-2 w-full rounded-lg border-slate-200 px-3 py-2 text-sm" placeholder="Notas internas"></textarea>
                                         </div>
                                         <div class="flex justify-end gap-2">
-                                            <button type="button" @click="open=false" class="rounded-lg border border-slate-200 bg-slate-50 px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-100">Cancelar</button>
-                                            <button type="submit" class="rounded-lg bg-mint-600 px-4 py-2 text-sm font-semibold text-white">Guardar</button>
+                                            <button type="button" @click="open=false" class="rounded-lg border border-violet-200 bg-violet-50 px-4 py-2 text-sm font-semibold text-violet-700 hover:bg-violet-100">Cancelar</button>
+                                            <button type="submit" class="rounded-lg bg-mint-600 px-4 py-2 text-sm font-semibold text-white hover:bg-mint-700">Guardar</button>
                                         </div>
                                     </form>
                                 </div>
