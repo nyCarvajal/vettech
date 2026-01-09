@@ -144,10 +144,9 @@
                                                 @if(!empty($meta['example']))
                                                     <p class="text-xs text-gray-500">Ejemplo: {{ $meta['example'] }}</p>
                                                 @endif
-                                                <p class="text-[11px] text-indigo-700 font-semibold flex items-center gap-1">
-                                                    <span class="inline-flex items-center rounded-full bg-indigo-50 px-2 py-0.5 border border-indigo-100">Etiqueta</span>
-                                                    <span class="text-gray-600">{{ $meta['display'] ?? $key }}</span>
-                                                </p>
+                                            <span class="inline-flex items-center rounded-full bg-indigo-100 px-2.5 py-0.5 text-[11px] font-semibold text-indigo-700">
+                                                {{ $meta['display'] ?? $key }}
+                                            </span>
                                             </div>
                                             <button type="button" class="inline-flex items-center gap-2 rounded-full bg-indigo-50 px-3 py-1.5 text-xs font-semibold text-indigo-700 border border-indigo-100 hover:bg-indigo-100 shadow-sm" data-placeholder-key="{{ $key }}" data-placeholder-label="{{ $meta['label'] }}" data-placeholder-display="{{ $meta['display'] ?? $key }}">
                                                 <span>Insertar en el cuerpo</span>
