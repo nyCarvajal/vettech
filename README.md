@@ -108,3 +108,19 @@ Menta se usa solo como acento: borde superior de KPIs, resaltado de sidebar acti
    - `sale_price` y `cost_price` son fuente principal; se sincronizan con `valor` y `costo`.
    - `cantidad` es el stock mínimo (alerta) y `stock` el stock actual.
    - No se permite stock negativo si el ítem es inventariable o controla inventario.
+
+## Módulo de Reportes (rápidos y avanzados)
+
+1. Rutas principales:
+   - `/reports/quick`: dashboard de KPIs rápidos.
+   - `/reports`: menú de reportes administrativos (solo admin).
+   - `/reports/sales`, `/reports/payments`, `/reports/expenses`, `/reports/cash`, `/reports/operations`, `/reports/grooming`, `/reports/inventory`.
+2. Exportables:
+   - `/reports/export?report=sales&format=csv&from=YYYY-MM-DD&to=YYYY-MM-DD`
+3. Tablas asumidas:
+   - `invoices`, `invoice_lines`, `invoice_payments`, `inventory_movements`, `items`, `owners`.
+   - `expenses` y `cash_closures` se crean si no existen.
+4. Configuración:
+   - `config/reporting.php` permite mapear tipos/áreas de servicio y peluquería.
+5. Multitenancy:
+   - Si las tablas tienen `tenant_id`, las consultas filtran por el tenant del usuario autenticado.
