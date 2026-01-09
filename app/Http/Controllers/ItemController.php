@@ -2,30 +2,54 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreItemRequest;
+use App\Http\Requests\UpdateItemRequest;
 use App\Models\Item;
-use App\Models\InventarioHistorial;
 use App\Models\Area;
+use App\Services\Inventory\InventoryService;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
 
 class ItemController extends Controller
 {
+    public function __construct(private readonly InventoryService $inventoryService)
+    {
+    }
+
     /**
      * Mostrar listado de items.
      */
     public function index(Request $request)
     {
-        $query = Item::with('areaRelation');
+        $filters = $request->only(['search', 'tipo', 'area', 'status']);
 
-        if ($request->filled('search')) {
-            $query->where('nombre', 'like', '%' . $request->search . '%');
+        $items = Item::with('areaRelation')
+            ->filter($filters)
+            ->orderBy('nombre')
+            ->paginate(20)
+            ->withQueryString();
+
+        $selectedItem = null;
+        if ($request->filled('selected')) {
+            $selectedItem = Item::with([
+                'areaRelation',
+                'inventoryMovements' => fn ($query) => $query->latest('occurred_at')->limit(6),
+            ])->find($request->selected);
+        } elseif ($items->count() > 0) {
+            $selectedItem = Item::with([
+                'areaRelation',
+                'inventoryMovements' => fn ($query) => $query->latest('occurred_at')->limit(6),
+            ])->find($items->first()->id);
         }
 
-        $items = $query->orderBy('id', 'desc')
-                       ->paginate(10)
-                       ->appends($request->all());
+        $areas = Area::orderBy('descripcion')->get();
+        $categoryOptions = Item::query()
+            ->select('tipo')
+            ->whereNotNull('tipo')
+            ->distinct()
+            ->orderBy('tipo')
+            ->pluck('tipo');
 
-        return view('items.index', compact('items'));
+        return view('items.index', compact('items', 'areas', 'categoryOptions', 'selectedItem'));
     }
 
     /**
@@ -34,47 +58,23 @@ class ItemController extends Controller
     public function create()
     {
         $areas = Area::orderBy('descripcion')->get();
+        $categoryOptions = Item::query()
+            ->select('tipo')
+            ->whereNotNull('tipo')
+            ->distinct()
+            ->orderBy('tipo')
+            ->pluck('tipo');
 
-        return view('items.create', compact('areas'));
+        return view('items.create', compact('areas', 'categoryOptions'));
     }
 
     /**
      * Guardar un item nuevo en la base de datos.
      */
-    public function store(Request $request)
+    public function store(StoreItemRequest $request)
     {
-        $request->merge([
-            'valor' => $this->normalizeCurrency($request->input('valor')),
-            'costo' => $this->normalizeCurrency($request->input('costo')),
-        ]);
-
-        // Validar entrada
-        $request->validate([
-            'nombre'   => 'required|string|max:255',
-            'valor'    => 'required|numeric|min:0',
-            'tipo'     => 'required|in:0,1',
-            'costo'    => 'required_if:tipo,1|nullable|numeric|min:0',
-            'cantidad' => 'required_if:tipo,1|nullable|integer|min:0',
-            'area'     => ['nullable', Rule::exists('tenant.areas', 'id')],
-        ]);
-
-        // Crear el registro
-        $item = Item::create([
-            'nombre'   => $request->nombre,
-            'valor'    => $request->valor,
-            'tipo'     => $request->tipo,
-            'costo'    => $request->costo,
-            'cantidad' => $request->tipo == 1 ? $request->cantidad : null,
-            'area'     => $request->area ?: null,
-        ]);
-
-        if ($request->tipo == 1 && $request->cantidad) {
-            InventarioHistorial::create([
-                'item_id'    => $item->id,
-                'cambio'     => $request->cantidad,
-                'descripcion'=> 'Carga inicial',
-            ]);
-        }
+        $payload = $this->prepareItemPayload($request->validated());
+        $this->inventoryService->createItemWithInitialStock($payload);
 
         return redirect()
             ->route('items.index')
@@ -86,8 +86,21 @@ class ItemController extends Controller
      */
     public function show(Item $item)
     {
-        $item->load('movimientos', 'areaRelation');
-        return view('items.show', compact('item'));
+        $item->load('areaRelation');
+        $movements = $item->inventoryMovements()
+            ->latest('occurred_at')
+            ->paginate(15);
+
+        if (request()->wantsJson()) {
+            return response()->json([
+                'item' => $item,
+                'status_label' => $item->status_label,
+                'status_color' => $item->status_color,
+                'movements' => $movements,
+            ]);
+        }
+
+        return view('items.show', compact('item', 'movements'));
     }
 
     /**
@@ -96,42 +109,59 @@ class ItemController extends Controller
     public function edit(Item $item)
     {
         $areas = Area::orderBy('descripcion')->get();
+        $categoryOptions = Item::query()
+            ->select('tipo')
+            ->whereNotNull('tipo')
+            ->distinct()
+            ->orderBy('tipo')
+            ->pluck('tipo');
 
-        return view('items.edit', compact('item', 'areas'));
+        return view('items.edit', compact('item', 'areas', 'categoryOptions'));
     }
 
     /**
      * Actualizar un item existente.
      */
-    public function update(Request $request, Item $item)
+    public function update(UpdateItemRequest $request, Item $item)
     {
-        $request->merge([
-            'valor' => $this->normalizeCurrency($request->input('valor')),
-            'costo' => $this->normalizeCurrency($request->input('costo')),
-        ]);
+        $payload = $this->prepareItemPayload($request->validated());
+        $newStock = array_key_exists('stock', $payload) ? (float) ($payload['stock'] ?? 0) : null;
 
-        // Validar entrada
-        $request->validate([
-            'nombre'   => 'required|string|max:255',
-            'valor'    => 'required|numeric|min:0',
-            'tipo'     => 'required|in:0,1',
-            'costo'    => 'required_if:tipo,1|nullable|numeric|min:0',
-            'cantidad' => 'required_if:tipo,1|nullable|integer|min:0',
-            'area'     => ['nullable', Rule::exists('tenant.areas', 'id')],
-        ]);
+        unset($payload['stock']);
 
-        $item->update([
-            'nombre'   => $request->nombre,
-            'valor'    => $request->valor,
-            'tipo'     => $request->tipo,
-            'costo'    => $request->costo,
-            'cantidad' => $request->tipo == 1 ? $request->cantidad : null,
-            'area'     => $request->area ?: null,
-        ]);
+        $item->update($payload);
+
+        if ($newStock !== null) {
+            $currentStock = (float) $item->stock;
+            $delta = $newStock - $currentStock;
+            if (abs($delta) > 0.0001) {
+                $this->inventoryService->addAdjust($item, $delta, [
+                    'reference' => 'Ajuste por edición',
+                ]);
+            }
+        }
 
         return redirect()
             ->route('items.index')
             ->with('success', 'Item actualizado correctamente.');
+    }
+
+    private function prepareItemPayload(array $data): array
+    {
+        $data['sale_price'] = $this->normalizeCurrency($data['sale_price'] ?? null);
+        $data['cost_price'] = $this->normalizeCurrency($data['cost_price'] ?? null);
+        $data['valor'] = $data['sale_price'];
+        $data['costo'] = $data['cost_price'];
+
+        $data['inventariable'] = (bool) ($data['inventariable'] ?? false);
+        $data['track_inventory'] = (bool) ($data['track_inventory'] ?? false);
+
+        if (($data['type'] ?? 'product') === 'service') {
+            $data['inventariable'] = false;
+            $data['track_inventory'] = false;
+        }
+
+        return $data;
     }
 
     private function normalizeCurrency($value): ?float
@@ -149,30 +179,6 @@ class ItemController extends Controller
         $normalized = str_replace(',', '.', $normalized);
 
         return is_numeric($normalized) ? (float) $normalized : null;
-    }
-
-    public function addUnitsForm(Item $item)
-    {
-        return view('items.add-stock', compact('item'));
-    }
-
-    public function addUnits(Request $request, Item $item)
-    {
-        $data = $request->validate([
-            'cantidad' => 'required|integer|min:1',
-        ]);
-
-        $item->increment('cantidad', $data['cantidad']);
-
-        InventarioHistorial::create([
-            'item_id'    => $item->id,
-            'cambio'     => $data['cantidad'],
-            'descripcion'=> 'Ingreso manual',
-        ]);
-
-        return redirect()
-            ->route('items.show', $item)
-            ->with('success', 'Stock actualizado correctamente.');
     }
 
     /**
