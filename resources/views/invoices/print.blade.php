@@ -1,13 +1,13 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    @php
-        $paper = request('paper', 'ticket');
-        $isLetter = $paper === 'letter';
-    @endphp
-    <title>{{ $isLetter ? 'Factura' : 'Ticket' }} {{ $invoice->full_number }}</title>
+@extends('print.layout')
+
+@php
+    $paper = request('paper', 'ticket');
+    $isLetter = $paper === 'letter';
+@endphp
+
+@section('title', ($isLetter ? 'Factura' : 'Ticket') . ' ' . $invoice->full_number)
+
+@section('styles')
     <style>
         :root {
             --page-margin: {{ $isLetter ? '12mm' : '4mm' }};
@@ -18,7 +18,7 @@
             size: {{ $isLetter ? 'letter' : '80mm auto' }};
             margin: var(--page-margin);
         }
-        body { font-family: Arial, sans-serif; font-size: var(--font-size); margin: 0; padding: var(--page-margin); }
+        body { font-size: var(--font-size); padding: var(--page-margin); }
         .sheet { width: var(--content-width); }
         h1, h2 { margin: 0; }
         table { width: 100%; border-collapse: collapse; }
@@ -43,17 +43,18 @@
             body { padding: 0; }
         }
     </style>
-</head>
-<body>
+@endsection
+
+@section('content')
     <div class="sheet">
         <div class="print-actions">
             <a href="{{ route('invoices.print', [$invoice, 'paper' => 'letter']) }}">Carta (PDF)</a>
             <a href="{{ route('invoices.print', [$invoice, 'paper' => 'ticket']) }}">Ticket 80mm</a>
             <button type="button" onclick="window.print()">Imprimir / Guardar PDF</button>
         </div>
-        <p class="print-note">Se abre en una pestaña nueva. Usa "Guardar como PDF" para generar el archivo.</p>
+        <p class="print-note">Se abre en una pestaña nueva. Usa &quot;Guardar como PDF&quot; para generar el archivo.</p>
 
-        <h1>{{ config('app.name') }}</h1>
+        <h1>{{ $clinica->name ?? $clinica->nombre ?? config('app.name') }}</h1>
         <p>Factura: {{ $invoice->full_number }}</p>
         <p>Fecha: {{ $invoice->issued_at?->format('d/m/Y H:i') }}</p>
         <p>Cliente: {{ $invoice->owner->name ?? 'N/A' }}</p>
@@ -121,5 +122,4 @@
             setTimeout(() => window.print(), 300);
         });
     </script>
-</body>
-</html>
+@endsection

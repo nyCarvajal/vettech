@@ -170,7 +170,7 @@
                         ['label' => 'Facturación POS', 'route' => 'invoices.pos'],
                         ['label' => 'Ventas', 'route' => 'sales.index'],
                         ['label' => 'Caja', 'route' => 'cash.sessions.index'],
-                        ['label' => 'Reportes', 'route' => 'kardex.index'],
+                        ['label' => 'Reportes', 'route' => 'reports.quick'],
                     ];
                 @endphp
                 <nav class="p-4 space-y-1">
