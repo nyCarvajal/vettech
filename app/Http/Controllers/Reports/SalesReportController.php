@@ -24,7 +24,7 @@ class SalesReportController extends Controller
         return view('reports.sales.index', [
             'filters' => $filters,
             'data' => $data,
-            'users' => User::query()->select('id', 'nombre', 'apellidos')->orderBy('nombre')->get(),
+            'users' => User::query()->select('id', 'nombres', 'apellidos')->orderBy('nombres')->get(),
             'owners' => Owner::query()->select('id', 'name')->orderBy('name')->get(),
         ]);
     }
