@@ -42,6 +42,7 @@ use App\Http\Controllers\Consent\ConsentDocumentController;
 use App\Http\Controllers\Consent\ConsentSignatureController;
 use App\Http\Controllers\Consent\ConsentPublicLinkController;
 use App\Http\Controllers\Consent\PublicConsentController;
+use App\Http\Controllers\Settings\ClinicSettingsController;
 use App\Http\Controllers\HospitalController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\ClinicalAttachmentController;
@@ -123,6 +124,15 @@ Route::get('invoices/pos', [InvoiceController::class, 'create'])->name('invoices
 Route::post('invoices/{invoice}/void', [InvoiceController::class, 'void'])->name('invoices.void');
 Route::get('invoices/{invoice}/print', [InvoiceController::class, 'print'])->name('invoices.print');
 Route::resource('invoices', InvoiceController::class);
+Route::prefix('settings')
+    ->name('settings.')
+    ->middleware('ensureRole:admin')
+    ->group(function () {
+        Route::get('clinica', [ClinicSettingsController::class, 'edit'])->name('clinica.edit');
+        Route::put('clinica', [ClinicSettingsController::class, 'update'])->name('clinica.update');
+        Route::post('clinica/logo', [ClinicSettingsController::class, 'uploadLogo'])->name('clinica.logo.store');
+        Route::delete('clinica/logo', [ClinicSettingsController::class, 'removeLogo'])->name('clinica.logo.destroy');
+    });
 Route::resource('patients', PatientsController::class);
 Route::get('patients/{patient}/carnet', [\App\Http\Controllers\PatientVaccineCardController::class, 'show'])->name('patients.carnet');
 Route::get('pacientes/{patient}/carnet/pdf', [\App\Http\Controllers\PatientVaccineCardController::class, 'pdf'])->name('patients.carnet.pdf');
