@@ -10,7 +10,7 @@ use App\Models\ConsentTemplate;
 use App\Models\Owner;
 use App\Models\Patient;
 use App\Services\ConsentCodeGenerator;
-use App\Services\PlaceholderService;
+use App\Services\DocumentTemplateRenderer;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -61,7 +61,7 @@ class ConsentDocumentController extends Controller
         return view('consents.create', compact('templates', 'patient', 'ownerSnapshot', 'petSnapshot'));
     }
 
-    public function store(StoreConsentDocumentRequest $request, PlaceholderService $placeholderService, ConsentCodeGenerator $codeGenerator)
+    public function store(StoreConsentDocumentRequest $request, DocumentTemplateRenderer $renderer, ConsentCodeGenerator $codeGenerator)
     {
         $template = ConsentTemplate::findOrFail($request->integer('template_id'));
 
@@ -88,7 +88,7 @@ class ConsentDocumentController extends Controller
             'now' => ['date' => now()->toDateString(), 'datetime' => now()->toDateTimeString()],
         ];
 
-        $mergedHtml = $placeholderService->merge($template->body_html, $context);
+        $mergedHtml = $renderer->render($template->body_html, $context);
 
         $document = ConsentDocument::create([
             'tenant_id' => $request->user()->tenant_id ?? null,
@@ -107,7 +107,7 @@ class ConsentDocumentController extends Controller
         return redirect()->route('consents.show', $document)->with('status', 'Consentimiento listo para firmar');
     }
 
-    public function show(ConsentDocument $consent, PlaceholderService $placeholderService)
+    public function show(ConsentDocument $consent, DocumentTemplateRenderer $renderer)
     {
         $consent->load(
             'template',
@@ -133,8 +133,7 @@ class ConsentDocumentController extends Controller
         );
 
         // If the stored HTML is missing, still has placeholders, or we just enriched the snapshots, rebuild it
-        $stillHasPlaceholders = empty($consent->merged_body_html)
-            || preg_match('/\{\{\s*[a-zA-Z0-9_\.]+\s*\}\}/', $consent->merged_body_html);
+        $stillHasPlaceholders = $this->containsPlaceholders($consent->merged_body_html);
 
         $snapshotsImproved = $ownerSnapshot !== $originalOwnerSnapshot
             || $petSnapshot !== $originalPetSnapshot;
@@ -155,7 +154,7 @@ class ConsentDocumentController extends Controller
                 'now' => ['date' => now()->toDateString(), 'datetime' => now()->toDateTimeString()],
             ];
 
-            $mergedHtml = $placeholderService->merge($consent->template->body_html, $context);
+            $mergedHtml = $renderer->render($consent->template->body_html, $context);
             $consent->forceFill([
                 'owner_snapshot' => $ownerSnapshot,
                 'pet_snapshot' => $petSnapshot,
@@ -176,7 +175,7 @@ class ConsentDocumentController extends Controller
         return back()->with('status', 'Consentimiento cancelado');
     }
 
-    public function pdf(ConsentDocument $consent, PlaceholderService $placeholderService)
+    public function pdf(ConsentDocument $consent, DocumentTemplateRenderer $renderer)
     {
         $this->authorize('pdf', $consent);
         $consent->load('signatures', 'template', 'pet.owner', 'pet.species', 'pet.breed', 'owner');
@@ -194,8 +193,7 @@ class ConsentDocumentController extends Controller
             $consent->pet
         );
 
-        $stillHasPlaceholders = empty($consent->merged_body_html)
-            || preg_match('/\{\{\s*[a-zA-Z0-9_\.]+\s*\}\}/', $consent->merged_body_html);
+        $stillHasPlaceholders = $this->containsPlaceholders($consent->merged_body_html);
 
         $snapshotsImproved = $ownerSnapshot !== $originalOwnerSnapshot
             || $petSnapshot !== $originalPetSnapshot;
@@ -215,7 +213,7 @@ class ConsentDocumentController extends Controller
                 'now' => ['date' => now()->toDateString(), 'datetime' => now()->toDateTimeString()],
             ];
 
-            $mergedHtml = $placeholderService->merge($consent->template->body_html, $context);
+            $mergedHtml = $renderer->render($consent->template->body_html, $context);
             $consent->forceFill([
                 'owner_snapshot' => $ownerSnapshot,
                 'pet_snapshot' => $petSnapshot,
@@ -240,6 +238,7 @@ class ConsentDocumentController extends Controller
     {
         if ($owner) {
             $snapshot['full_name'] = $snapshot['full_name'] ?? $owner->name;
+            $snapshot['name'] = $snapshot['name'] ?? $owner->name;
             $snapshot['first_name'] = $snapshot['first_name'] ?? $owner->name;
             $snapshot['last_name'] = $snapshot['last_name'] ?? '';
             $snapshot['document'] = $snapshot['document'] ?? $owner->document;
@@ -257,6 +256,19 @@ class ConsentDocumentController extends Controller
         }
 
         return $snapshot;
+    }
+
+    private function containsPlaceholders(?string $html): bool
+    {
+        if (empty($html)) {
+            return true;
+        }
+
+        return (bool) preg_match(
+            '/\{\{\s*(?:owner|pet|clinic|vet|now|custom|tutorowner)\.[a-zA-Z0-9_]+\s*\}\}'
+            . '|(?<![A-Za-z0-9_\.])(?:owner|pet|clinic|vet|now|custom|tutorowner)\.[a-zA-Z0-9_]+(?![A-Za-z0-9_\.])/i',
+            $html
+        );
     }
 
     private function enrichPetSnapshot(array $snapshot, ?Patient $pet = null): array
