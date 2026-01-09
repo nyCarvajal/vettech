@@ -25,7 +25,7 @@
 
           <ul class="navbar-nav" id="navbar-nav">
 
-               <li class="menu-title">Menu...</li>
+               <li class="menu-title">Principal</li>
 
                <li class="nav-item">
                     <a class="nav-link" href="{{route('dashboard') }}">
@@ -38,14 +38,14 @@
                </li>
                             
 			    <li class="nav-item">
-                    <a class="nav-link menu-arrow" href="#sidebarAuthentication" data-bs-toggle="collapse" role="button"
-                         aria-expanded="false" aria-controls="sidebarAuthentication">
+                    <a class="nav-link menu-arrow" href="#sidebarPatients" data-bs-toggle="collapse" role="button"
+                         aria-expanded="false" aria-controls="sidebarPatients">
                          <span class="nav-icon">
                               <iconify-icon icon="mingcute:user-3-line"></iconify-icon>
                          </span>
                          <span class="nav-text"> Pacientes </span>
                     </a>
-                    <div class="collapse" id="sidebarAuthentication">
+                    <div class="collapse" id="sidebarPatients">
                          <ul class="nav sub-navbar-nav">
                               <li class="sub-nav-item">
                                    <a class="sub-nav-link" href="{{ route('pacientes.create') }}">Crear</a>
@@ -69,27 +69,39 @@
                     </a>
                </li>
 
+               <li class="menu-title">Reportes</li>
+
                <li class="nav-item">
-                    <a class="nav-link" href="{{ route('consent-templates.create') }}">
+                    <a class="nav-link menu-arrow" href="#sidebarReports" data-bs-toggle="collapse" role="button"
+                         aria-expanded="false" aria-controls="sidebarReports">
                          <span class="nav-icon">
-                              <i class="bx bx-edit-alt"></i>
+                              <i class="bx bx-line-chart"></i>
                          </span>
-                         <span class="nav-text"> Nueva plantilla de consentimiento </span>
+                         <span class="nav-text"> Reportes </span>
                     </a>
+                    <div class="collapse" id="sidebarReports">
+                         <ul class="nav sub-navbar-nav">
+                              <li class="sub-nav-item">
+                                   <a class="sub-nav-link" href="{{ route('reports.quick') }}">Reportes básicos</a>
+                              </li>
+                              <li class="sub-nav-item">
+                                   <a class="sub-nav-link" href="{{ route('reports.home') }}">Reportes avanzados</a>
+                              </li>
+                         </ul>
+                    </div>
                </li>
-			     
-			   
+
 			   <li class="menu-title">Configuración</li>
 
                <li class="nav-item">
-                    <a class="nav-link menu-arrow" href="#sidebarLayouts" data-bs-toggle="collapse" role="button"
-                         aria-expanded="false" aria-controls="sidebarLayouts">
+                    <a class="nav-link menu-arrow" href="#sidebarSettings" data-bs-toggle="collapse" role="button"
+                         aria-expanded="false" aria-controls="sidebarSettings">
                          <span class="nav-icon">
                              <i class='bx  bx-cog'  ></i> 
                          </span>
                          <span class="nav-text"> Configuración </span>
                     </a>
-                    <div class="collapse" id="sidebarLayouts">
+                    <div class="collapse" id="sidebarSettings">
                          <ul class="nav sub-navbar-nav">
                               <li class="sub-nav-item">
                                    <a class="sub-nav-link" href="{{ route('tipocitas.index') }}">
@@ -104,20 +116,20 @@
                                         Consentimientos informados</a>
                               </li>
                               <li class="sub-nav-item">
+                                   <a class="sub-nav-link" href="{{ route('consent-templates.create') }}">
+                                        Crear plantilla de consentimientos</a>
+                              </li>
+                              <li class="sub-nav-item">
                                    <a class="sub-nav-link" href="{{ route('areas.index') }}">
                                         Listar áreas</a>
+                              </li>
+                              <li class="sub-nav-item">
+                                   <a class="sub-nav-link" href="{{ route('clinicas.edit-own') }}">
+                                        Configuración de clínicas</a>
                               </li>
 
                          </ul>
                     </div>
-               </li>
-			   <li class="nav-item">
-                    <a class="nav-link" href="{{ route('clinicas.edit-own') }}">
-                         <span class="nav-icon">
-						 <i class="bx bx-pencil"></i>
-                               </span>
-                         <span class="nav-text"> Personalizar Clínica  </span>
-                    </a>
                </li>
 
                <li class="nav-item">
@@ -132,14 +144,14 @@
 			   
 
                <li class="nav-item">
-                    <a class="nav-link menu-arrow" href="#sidebarAuthentication" data-bs-toggle="collapse" role="button"
-                         aria-expanded="false" aria-controls="sidebarAuthentication">
+                    <a class="nav-link menu-arrow" href="#sidebarUsers" data-bs-toggle="collapse" role="button"
+                         aria-expanded="false" aria-controls="sidebarUsers">
                          <span class="nav-icon">
                               <iconify-icon icon="mingcute:user-3-line"></iconify-icon>
                          </span>
                          <span class="nav-text"> Usuarios & Roles</span>
                     </a>
-                    <div class="collapse" id="sidebarAuthentication">
+                    <div class="collapse" id="sidebarUsers">
                          <ul class="nav sub-navbar-nav">
 						 
 							<li class="sub-nav-item">
