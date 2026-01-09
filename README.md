@@ -40,6 +40,23 @@ Componentes Blade reutilizables en `resources/views/components`:
 - `dashboards/medico.blade.php`: agenda, hospitalización y alertas con cards/badges; acciones rápidas en botones menta/gris.
 - `dashboards/contador.blade.php`: filtros con inputs menta, KPIs financieros, cierre de caja en `<x-table>` y badges por estado.
 
+## Módulo de Arqueo de Caja
+
+1. Ejecuta migraciones del tenant si aún no existen:
+   ```bash
+   php artisan migrate --path=database/migrations/tenant
+   ```
+2. Rutas principales:
+   - `/cash/closures`: listado y filtros.
+   - `/cash/closures/create`: arqueo diario.
+   - `/cash/closures/{closure}`: detalle.
+   - `/cash/closures/{closure}/print`: imprimible.
+3. El resumen esperado se calcula desde `invoice_payments` por método (`cash`, `card`, `transfer`). Los egresos usan `cash_movements` cuando la tabla existe.
+4. Índices recomendados:
+   - `invoice_payments(paid_at, method)`
+   - `cash_movements(created_at, method)`
+   - `cash_closures(date, clinica_id)`
+
 ## Captura mental del diseño
 Menta se usa solo como acento: borde superior de KPIs, resaltado de sidebar activo, fondos muy claros en badges/botones primarios y contenedores de iconos. El fondo general permanece blanco/gris para mantener el espacio en blanco y la sensación clínica.
 
