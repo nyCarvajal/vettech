@@ -129,28 +129,34 @@ Route::middleware([
     ])
          ->group(function () {
 
-Route::resource('owners', OwnersController::class);
+Route::resource('owners', OwnersController::class)->middleware('feature:tutores');
 Route::get('api/items/search', ItemSearchController::class)->name('api.items.search');
 Route::get('api/owners/search', OwnerSearchController::class)->name('api.owners.search');
-Route::get('invoices/pos', [InvoiceController::class, 'create'])->name('invoices.pos');
+Route::get('invoices/pos', [InvoiceController::class, 'create'])
+    ->middleware('feature:facturacion_pos')
+    ->name('invoices.pos');
 Route::post('invoices/{invoice}/void', [InvoiceController::class, 'void'])->name('invoices.void');
 Route::get('invoices/{invoice}/print', [InvoiceController::class, 'print'])->name('invoices.print');
-Route::resource('invoices', InvoiceController::class);
+Route::resource('invoices', InvoiceController::class)->middleware('feature:facturacion_pos');
 Route::prefix('settings')
     ->name('settings.')
-    ->middleware('ensureRole:admin')
+    ->middleware(['ensureRole:admin', 'feature:config_clinica'])
     ->group(function () {
         Route::get('clinica', [ClinicSettingsController::class, 'edit'])->name('clinica.edit');
         Route::put('clinica', [ClinicSettingsController::class, 'update'])->name('clinica.update');
         Route::post('clinica/logo', [ClinicSettingsController::class, 'uploadLogo'])->name('clinica.logo.store');
         Route::delete('clinica/logo', [ClinicSettingsController::class, 'removeLogo'])->name('clinica.logo.destroy');
     });
-Route::resource('patients', PatientsController::class);
+Route::resource('patients', PatientsController::class)->middleware('feature:pacientes');
 
-Route::get('reports/quick', [QuickReportsController::class, 'index'])->name('reports.quick');
-Route::get('reports/quick/data', [QuickReportsController::class, 'data'])->name('reports.quick.data');
+Route::get('reports/quick', [QuickReportsController::class, 'index'])
+    ->middleware('feature:reportes_basicos')
+    ->name('reports.quick');
+Route::get('reports/quick/data', [QuickReportsController::class, 'data'])
+    ->middleware('feature:reportes_basicos')
+    ->name('reports.quick.data');
 
-Route::middleware('ensureRole:admin')
+Route::middleware(['ensureRole:admin', 'feature:reportes_avanzados'])
     ->prefix('reports')
     ->name('reports.')
     ->group(function () {
@@ -201,6 +207,7 @@ Route::get('/breeds', BreedsController::class)->name('breeds.index');
 
 Route::prefix('peluqueria')
     ->name('groomings.')
+    ->middleware('feature:belleza')
     ->group(function () {
         Route::get('/', [GroomingController::class, 'index'])->name('index');
         Route::get('/crear', [GroomingController::class, 'create'])->name('create');
@@ -223,6 +230,7 @@ Route::resource('tipo-identificaciones', TipoIdentificacionController::class)->e
 Route::resource('areas', AreaController::class)->except(['show', 'destroy']);
 
 Route::prefix('cash/closures')
+    ->middleware('feature:arqueo_caja')
     ->name('cash.closures.')
     ->group(function () {
         Route::get('/', [CashClosureController::class, 'index'])->name('index');
@@ -321,7 +329,12 @@ Route::get('clinica/perfil', [ClinicaController::class,'showOwn'])
   ]);
   Route::delete('adjuntos/{attachment}', [ClinicalAttachmentController::class, 'destroy'])
         ->name('historias-clinicas.adjuntos.destroy');
-Route::get('/calendar', [ReservaController::class, 'calendar'])->name('reservas.calendar');
+Route::get('/calendar', [ReservaController::class, 'calendar'])
+     ->middleware('feature:agenda')
+     ->name('reservas.calendar');
+Route::get('/agenda', [ReservaController::class, 'calendar'])
+     ->middleware('feature:agenda')
+     ->name('agenda.index');
 Route::get('/reservas.json', [ReservaController::class, 'events'])
      ->name('reservas.events');
 Route::post('reservas/{reserva}/cobrar', [ReservaController::class, 'cobrar'])
@@ -381,33 +394,37 @@ Route::middleware([Authenticate::class, ConnectTenantDB::class, SubstituteBindin
         Route::get('kardex', [\App\Http\Controllers\KardexController::class, 'index'])->name('kardex.index');
 
         Route::resource('prescriptions', \App\Http\Controllers\PrescriptionsController::class)->only(['index', 'create', 'store']);
-        Route::get('dispensations', [\App\Http\Controllers\DispensationsController::class, 'index'])->name('dispensations.index');
-        Route::post('dispensations/{prescription}', [\App\Http\Controllers\DispensationsController::class, 'store'])->name('dispensations.store');
-
-        Route::prefix('hospital')->name('hospital.')->group(function () {
-            Route::get('/', [HospitalController::class, 'index'])->name('index');
-            Route::get('/admit', [HospitalController::class, 'create'])->name('admit');
-            Route::post('/admit', [HospitalController::class, 'store'])->name('store');
-            Route::get('/board', \App\Http\Controllers\HospitalBoardController::class)->name('board');
-            Route::get('/{stay}', [HospitalController::class, 'show'])->name('show');
-            Route::post('/{stay}/discharge', [HospitalController::class, 'discharge'])->name('discharge');
-            Route::post('/{stay}/invoice', [HospitalController::class, 'generateInvoice'])->name('invoice');
-            Route::post('/{stay}/orders', [HospitalController::class, 'addOrder'])->name('orders.store');
-            Route::post('/orders/{order}/stop', [HospitalController::class, 'stopOrder'])->name('orders.stop');
-            Route::post('/orders/{order}/administrations', [HospitalController::class, 'addAdministration'])->name('orders.administrations');
-            Route::post('/{stay}/vitals', [HospitalController::class, 'addVitals'])->name('vitals.store');
-            Route::post('/{stay}/progress', [HospitalController::class, 'addProgress'])->name('progress.store');
-            Route::post('/{stay}/charges', [HospitalController::class, 'addCharge'])->name('charges.store');
+        Route::middleware('feature:dispensacion')->group(function () {
+            Route::get('dispensations', [\App\Http\Controllers\DispensationsController::class, 'index'])->name('dispensations.index');
+            Route::post('dispensations/{prescription}', [\App\Http\Controllers\DispensationsController::class, 'store'])->name('dispensations.store');
         });
 
-        Route::prefix('hospital/stays')->name('hospital.stays.')->group(function () {
-            Route::get('/', [\App\Http\Controllers\HospitalStaysController::class, 'index'])->name('index');
-            Route::get('/create', [\App\Http\Controllers\HospitalStaysController::class, 'create'])->name('create');
-            Route::post('/', [\App\Http\Controllers\HospitalStaysController::class, 'store'])->name('store');
+        Route::middleware('feature:hospitalizacion')->group(function () {
+            Route::prefix('hospital')->name('hospital.')->group(function () {
+                Route::get('/', [HospitalController::class, 'index'])->name('index');
+                Route::get('/admit', [HospitalController::class, 'create'])->name('admit');
+                Route::post('/admit', [HospitalController::class, 'store'])->name('store');
+                Route::get('/board', \App\Http\Controllers\HospitalBoardController::class)->name('board');
+                Route::get('/{stay}', [HospitalController::class, 'show'])->name('show');
+                Route::post('/{stay}/discharge', [HospitalController::class, 'discharge'])->name('discharge');
+                Route::post('/{stay}/invoice', [HospitalController::class, 'generateInvoice'])->name('invoice');
+                Route::post('/{stay}/orders', [HospitalController::class, 'addOrder'])->name('orders.store');
+                Route::post('/orders/{order}/stop', [HospitalController::class, 'stopOrder'])->name('orders.stop');
+                Route::post('/orders/{order}/administrations', [HospitalController::class, 'addAdministration'])->name('orders.administrations');
+                Route::post('/{stay}/vitals', [HospitalController::class, 'addVitals'])->name('vitals.store');
+                Route::post('/{stay}/progress', [HospitalController::class, 'addProgress'])->name('progress.store');
+                Route::post('/{stay}/charges', [HospitalController::class, 'addCharge'])->name('charges.store');
+            });
+
+            Route::prefix('hospital/stays')->name('hospital.stays.')->group(function () {
+                Route::get('/', [\App\Http\Controllers\HospitalStaysController::class, 'index'])->name('index');
+                Route::get('/create', [\App\Http\Controllers\HospitalStaysController::class, 'create'])->name('create');
+                Route::post('/', [\App\Http\Controllers\HospitalStaysController::class, 'store'])->name('store');
+            });
+            Route::post('hospital/stays/{stay}/discharge', [\App\Http\Controllers\HospitalStaysController::class, 'discharge'])->name('hospital.stays.discharge');
+            Route::resource('hospital/tasks', \App\Http\Controllers\HospitalTasksController::class)->only(['create', 'store']);
+            Route::post('hospital/handoff', [\App\Http\Controllers\HandoffController::class, 'store'])->name('hospital.handoff.store');
         });
-        Route::post('hospital/stays/{stay}/discharge', [\App\Http\Controllers\HospitalStaysController::class, 'discharge'])->name('hospital.stays.discharge');
-        Route::resource('hospital/tasks', \App\Http\Controllers\HospitalTasksController::class)->only(['create', 'store']);
-        Route::post('hospital/handoff', [\App\Http\Controllers\HandoffController::class, 'store'])->name('hospital.handoff.store');
 
         Route::resource('sales', \App\Http\Controllers\SalesController::class)->only(['index', 'store', 'show']);
         Route::get('cash/sessions', [\App\Http\Controllers\CashSessionsController::class, 'index'])->name('cash.sessions.index');
@@ -421,13 +438,17 @@ Route::middleware([Authenticate::class, ConnectTenantDB::class, SubstituteBindin
         Route::delete('procedures/{procedure}/attachments/{attachment}', [\App\Http\Controllers\ProcedureAttachmentController::class, 'destroy'])->name('procedures.attachments.destroy');
         Route::post('procedures/{procedure}/consent/link', [\App\Http\Controllers\ProcedureConsentController::class, 'linkSignedConsent'])->name('procedures.consent.link');
         Route::post('procedures/{procedure}/consent/create', [\App\Http\Controllers\ProcedureConsentController::class, 'createFromTemplate'])->name('procedures.consent.create');
-        Route::resource('consent-templates', ConsentTemplateController::class);
-        Route::resource('consents', ConsentDocumentController::class);
-        Route::post('consents/{consent}/sign', [ConsentSignatureController::class, 'store'])->name('consents.sign');
-        Route::post('consents/{consent}/public-link', [ConsentPublicLinkController::class, 'create'])->name('consents.public-link');
-        Route::post('consents/{consent}/public-link/{link}/revoke', [ConsentPublicLinkController::class, 'revoke'])->name('consents.public-link.revoke');
-        Route::post('consents/{consent}/cancel', [ConsentDocumentController::class, 'cancel'])->name('consents.cancel');
-        Route::get('consents/{consent}/pdf', [ConsentDocumentController::class, 'pdf'])->name('consents.pdf');
+
+        Route::resource('consent-templates', ConsentTemplateController::class)->middleware('feature:plantillas_consentimientos');
+
+        Route::middleware('feature:consentimientos')->group(function () {
+            Route::resource('consents', ConsentDocumentController::class);
+            Route::post('consents/{consent}/sign', [ConsentSignatureController::class, 'store'])->name('consents.sign');
+            Route::post('consents/{consent}/public-link', [ConsentPublicLinkController::class, 'create'])->name('consents.public-link');
+            Route::post('consents/{consent}/public-link/{link}/revoke', [ConsentPublicLinkController::class, 'revoke'])->name('consents.public-link.revoke');
+            Route::post('consents/{consent}/cancel', [ConsentDocumentController::class, 'cancel'])->name('consents.cancel');
+            Route::get('consents/{consent}/pdf', [ConsentDocumentController::class, 'pdf'])->name('consents.pdf');
+        });
     });
     Route::middleware([
         Authenticate::class,

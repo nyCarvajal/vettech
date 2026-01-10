@@ -48,6 +48,8 @@ class UpdateClinicaRequest extends FormRequest
             'dian_resolution_date' => ['nullable', 'date'],
             'timezone' => ['nullable', 'string', 'max:191'],
             'currency' => ['nullable', 'string', 'max:10'],
+            'features' => ['nullable', 'array'],
+            'features.*' => ['nullable', 'boolean'],
             'meta' => ['nullable', 'array'],
         ];
     }

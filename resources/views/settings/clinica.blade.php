@@ -23,9 +23,65 @@
             @php
                 $tabs = [
                     'general' => 'Datos generales',
+                    'modules' => 'Módulos del plan',
                     'branding' => 'Branding',
                     'billing' => 'Facturación y pagos',
                     'dian' => 'DIAN',
+                ];
+                $featureDefaults = \App\Models\Clinica::featureDefaults();
+                $featureOptions = [
+                    'agenda' => [
+                        'label' => 'Agenda',
+                        'description' => 'Citas, reservas y calendario.',
+                    ],
+                    'facturacion_pos' => [
+                        'label' => 'Facturación POS',
+                        'description' => 'Cobros rápidos y emisión de facturas.',
+                    ],
+                    'tutores' => [
+                        'label' => 'Tutores',
+                        'description' => 'Gestión de propietarios de mascotas.',
+                    ],
+                    'pacientes' => [
+                        'label' => 'Pacientes',
+                        'description' => 'Registro y seguimiento clínico.',
+                    ],
+                    'dispensacion' => [
+                        'label' => 'Dispensación',
+                        'description' => 'Entrega y control de medicamentos.',
+                    ],
+                    'hospitalizacion' => [
+                        'label' => 'Hospitalización 24/7',
+                        'description' => 'Manejo de estancias y monitoreo.',
+                    ],
+                    'belleza' => [
+                        'label' => 'Sala de belleza',
+                        'description' => 'Servicios de grooming y estética.',
+                    ],
+                    'consentimientos' => [
+                        'label' => 'Consentimientos',
+                        'description' => 'Documentos clínicos firmados.',
+                    ],
+                    'plantillas_consentimientos' => [
+                        'label' => 'Plantillas de consentimientos',
+                        'description' => 'Modelos reutilizables de formularios.',
+                    ],
+                    'arqueo_caja' => [
+                        'label' => 'Arqueo de caja',
+                        'description' => 'Cierres y consolidación de caja.',
+                    ],
+                    'reportes_basicos' => [
+                        'label' => 'Reportes básicos',
+                        'description' => 'Indicadores rápidos del negocio.',
+                    ],
+                    'reportes_avanzados' => [
+                        'label' => 'Reportes avanzados',
+                        'description' => 'Reportes detallados y analíticos.',
+                    ],
+                    'config_clinica' => [
+                        'label' => 'Configuración de clínica',
+                        'description' => 'Acceso al panel de ajustes.',
+                    ],
                 ];
             @endphp
             @foreach ($tabs as $key => $label)
@@ -110,6 +166,35 @@
                             <label class="text-sm font-medium text-slate-700">Moneda</label>
                             <input type="text" name="currency" value="{{ old('currency', $clinica->currency ?? 'COP') }}" class="mt-2 w-full rounded-xl border-slate-200 text-sm focus:border-indigo-500 focus:ring-indigo-500">
                         </div>
+                    </div>
+                </div>
+
+                <div x-show="tab === 'modules'" x-cloak class="space-y-6">
+                    <div class="rounded-xl border border-indigo-100 bg-indigo-50 p-4 text-sm text-indigo-700">
+                        Define qué módulos están disponibles para la clínica según su plan contratado.
+                    </div>
+                    <div class="grid gap-4 md:grid-cols-2">
+                        @foreach ($featureOptions as $key => $feature)
+                            <label class="flex h-full cursor-pointer items-start gap-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition hover:border-indigo-200">
+                                <span class="mt-1 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600">
+                                    <iconify-icon icon="solar:widget-4-line"></iconify-icon>
+                                </span>
+                                <span class="flex-1 space-y-1">
+                                    <span class="block text-sm font-semibold text-slate-800">{{ $feature['label'] }}</span>
+                                    <span class="block text-xs text-slate-500">{{ $feature['description'] }}</span>
+                                </span>
+                                <span class="flex items-center">
+                                    <input type="hidden" name="features[{{ $key }}]" value="0">
+                                    <input
+                                        type="checkbox"
+                                        name="features[{{ $key }}]"
+                                        value="1"
+                                        class="h-5 w-5 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
+                                        @checked(old("features.{$key}", $clinica->featureEnabled($key, $featureDefaults[$key])))
+                                    >
+                                </span>
+                            </label>
+                        @endforeach
                     </div>
                 </div>
 
