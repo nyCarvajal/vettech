@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Settings;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\UpdateClinicaRequest;
+use App\Models\Clinica;
 use App\Support\ClinicaActual;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -32,11 +33,23 @@ class ClinicSettingsController extends Controller
         $data['nombre'] = $data['name'];
         $data['direccion'] = $data['address'] ?? null;
         $data['terminos'] = $data['payment_terms'] ?? null;
+        $data['features'] = $this->normalizeFeatures($request, Clinica::featureDefaults());
 
         $clinica->fill($data);
         $clinica->save();
 
         return back()->with('status', 'Configuración actualizada correctamente.');
+    }
+
+    private function normalizeFeatures(Request $request, array $defaults): array
+    {
+        $features = [];
+
+        foreach ($defaults as $key => $default) {
+            $features[$key] = $request->boolean("features.{$key}");
+        }
+
+        return $features;
     }
 
     public function uploadLogo(Request $request): RedirectResponse
