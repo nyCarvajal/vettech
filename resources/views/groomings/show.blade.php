@@ -27,7 +27,7 @@
                     @if($grooming->status === 'agendado')
                         <form method="POST" action="{{ route('groomings.start', $grooming) }}">
                             @csrf
-                            <button class="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-mint-500 to-mint-600 px-4 py-2 text-sm font-semibold text-white shadow-md transition hover:scale-[1.02] hover:shadow-lg">
+                            <button class="inline-flex items-center gap-2 rounded-xl bg-mint-100 px-4 py-2 text-sm font-semibold text-mint-700 ring-1 ring-mint-200 shadow-sm transition hover:bg-mint-200">
                                 <span>Iniciar</span>
                             </button>
                         </form>
