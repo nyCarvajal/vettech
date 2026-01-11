@@ -1,377 +1,189 @@
 @php
-    $sidebarStylistLabels = \App\Support\RoleLabelResolver::forStylist();
-    $sidebarStylistLabelSingular = trim($sidebarStylistLabels['singular'] ?? '');
+    $featureDefaults = \App\Models\Clinica::featureDefaults();
+    $featureEnabled = function (string $key) use ($clinica, $featureDefaults): bool {
+        if ($clinica) {
+            return $clinica->featureEnabled($key, $featureDefaults[$key] ?? true);
+        }
 
-    if ($sidebarStylistLabelSingular === '') {
-        $sidebarStylistLabelSingular = \App\Models\Peluqueria::defaultRoleLabel(\App\Models\Peluqueria::ROLE_STYLIST);
-    }
+        return $featureDefaults[$key] ?? true;
+    };
+
+    $showServicios = $featureEnabled('dispensacion')
+        || $featureEnabled('hospitalizacion')
+        || $featureEnabled('belleza')
+        || $featureEnabled('consentimientos')
+        || $featureEnabled('plantillas_consentimientos');
+
+    $showCajaReportes = $featureEnabled('arqueo_caja')
+        || $featureEnabled('reportes_basicos')
+        || $featureEnabled('reportes_avanzados');
 @endphp
 
 <div class="app-sidebar">
-     <!-- Sidebar Logo -->
-{{--     <div class="logo-box">
-          <a href="{{route('dashboard') }}" class="logo-dark">
-               <img src="/images/logo-sm.png" class="logo-sm" alt="logo sm">
-               <img src="/images/logodarkal.png" class="logo-lg" alt="logo dark">
-          </a>
-
-          <a href="" class="logo-light">
-               <img src="/images/logo-sm.png" class="logo-sm" alt="logo sm">
-               <img src="/images/logo-light.png" class="logo-lg" alt="logo light">
-          </a>
-     </div> --}}
-
      <div class="scrollbar" data-simplebar>
-
           <ul class="navbar-nav" id="navbar-nav">
-
-               <li class="menu-title">Principal</li>
+               <li class="menu-title">OPERACIÓN</li>
 
                <li class="nav-item">
-                    <a class="nav-link" href="{{route('dashboard') }}">
+                    <a class="nav-link" href="{{ route('dashboard') }}">
                          <span class="nav-icon">
                               <iconify-icon icon="mingcute:home-3-line"></iconify-icon>
                          </span>
-                         <span class="nav-text"> Resumen De Hoy</span>
-                         
-                    </a>
-               </li>
-                            
-			    <li class="nav-item">
-                    <a class="nav-link menu-arrow" href="#sidebarPatients" data-bs-toggle="collapse" role="button"
-                         aria-expanded="false" aria-controls="sidebarPatients">
-                         <span class="nav-icon">
-                              <iconify-icon icon="mingcute:user-3-line"></iconify-icon>
-                         </span>
-                         <span class="nav-text"> Pacientes </span>
-                    </a>
-                    <div class="collapse" id="sidebarPatients">
-                         <ul class="nav sub-navbar-nav">
-                              <li class="sub-nav-item">
-                                   <a class="sub-nav-link" href="{{ route('pacientes.create') }}">Crear</a>
-                              </li>
-                              <li class="sub-nav-item">
-                                   <a class="sub-nav-link" href="{{ route('historias-clinicas.create') }}">Consulta</a>
-                              </li>
-                              <li class="sub-nav-item">
-                                   <a class="sub-nav-link" href="{{ route('pacientes.index') }}">Listar</a>
-                              </li>
-                            
-                         </ul>
-                    </div>
-               </li>
-			   
-               <li class="nav-item">
-                    <a class="nav-link" href="{{ route('reservas.calendar') }}">
-                         <span class="nav-icon">
-                              <i class="bx  bx-calendar-alt"  ></i> </span>
-                         <span class="nav-text"> Agenda </span>
+                         <span class="nav-text">Dashboard</span>
                     </a>
                </li>
 
-               <li class="menu-title">Reportes</li>
+               @if ($featureEnabled('agenda'))
+                   <li class="nav-item">
+                        <a class="nav-link" href="{{ route('agenda.index') }}">
+                             <span class="nav-icon">
+                                  <i class="bx bx-calendar-alt"></i>
+                             </span>
+                             <span class="nav-text">Agenda</span>
+                        </a>
+                   </li>
+               @endif
 
-               <li class="nav-item">
-                    <a class="nav-link menu-arrow" href="#sidebarReports" data-bs-toggle="collapse" role="button"
-                         aria-expanded="false" aria-controls="sidebarReports">
-                         <span class="nav-icon">
-                              <i class="bx bx-line-chart"></i>
-                         </span>
-                         <span class="nav-text"> Reportes </span>
-                    </a>
-                    <div class="collapse" id="sidebarReports">
-                         <ul class="nav sub-navbar-nav">
-                              <li class="sub-nav-item">
-                                   <a class="sub-nav-link" href="{{ route('reports.quick') }}">Reportes básicos</a>
-                              </li>
-                              <li class="sub-nav-item">
-                                   <a class="sub-nav-link" href="{{ route('reports.home') }}">Reportes avanzados</a>
-                              </li>
-                         </ul>
-                    </div>
-               </li>
+               @if ($featureEnabled('facturacion_pos'))
+                   <li class="nav-item">
+                        <a class="nav-link" href="{{ route('invoices.pos') }}">
+                             <span class="nav-icon">
+                                  <i class="bx bx-receipt"></i>
+                             </span>
+                             <span class="nav-text">Facturación POS</span>
+                        </a>
+                   </li>
+               @endif
 
-			   <li class="menu-title">Configuración</li>
+               @if ($featureEnabled('tutores'))
+                   <li class="nav-item">
+                        <a class="nav-link" href="{{ route('owners.index') }}">
+                             <span class="nav-icon">
+                                  <iconify-icon icon="mingcute:user-3-line"></iconify-icon>
+                             </span>
+                             <span class="nav-text">Tutores</span>
+                        </a>
+                   </li>
+               @endif
 
-               <li class="nav-item">
-                    <a class="nav-link menu-arrow" href="#sidebarSettings" data-bs-toggle="collapse" role="button"
-                         aria-expanded="false" aria-controls="sidebarSettings">
-                         <span class="nav-icon">
-                             <i class='bx  bx-cog'  ></i> 
-                         </span>
-                         <span class="nav-text"> Configuración </span>
-                    </a>
-                    <div class="collapse" id="sidebarSettings">
-                         <ul class="nav sub-navbar-nav">
-                              <li class="sub-nav-item">
-                                   <a class="sub-nav-link" href="{{ route('tipocitas.index') }}">
-                                        Tipos de Citas</a>
-                              </li>
-                              <li class="sub-nav-item">
-                                   <a class="sub-nav-link" href="{{ route('tipo-identificaciones.index') }}">
-                                        Tipos de identificaciones</a>
-                              </li>
-                              <li class="sub-nav-item">
-                                   <a class="sub-nav-link" href="{{ route('consent-templates.index') }}">
-                                        Consentimientos informados</a>
-                              </li>
-                              <li class="sub-nav-item">
-                                   <a class="sub-nav-link" href="{{ route('consent-templates.create') }}">
-                                        Crear plantilla de consentimientos</a>
-                              </li>
-                              <li class="sub-nav-item">
-                                   <a class="sub-nav-link" href="{{ route('areas.index') }}">
-                                        Listar áreas</a>
-                              </li>
-                              <li class="sub-nav-item">
-                                   <a class="sub-nav-link" href="{{ route('clinicas.edit-own') }}">
-                                        Configuración de clínicas</a>
-                              </li>
+               @if ($featureEnabled('pacientes'))
+                   <li class="nav-item">
+                        <a class="nav-link" href="{{ route('patients.index') }}">
+                             <span class="nav-icon">
+                                  <iconify-icon icon="solar:heart-pulse-2-line"></iconify-icon>
+                             </span>
+                             <span class="nav-text">Pacientes</span>
+                        </a>
+                   </li>
+               @endif
 
-                         </ul>
-                    </div>
-               </li>
+               @if ($showServicios)
+                   <li class="menu-title">SERVICIOS / CLÍNICA</li>
 
-               <li class="nav-item">
-                    <a class="nav-link" href="{{ route('items.index') }}">
-                         <span class="nav-icon">
-						 <i class="bx bx-dock-left"></i> 
-                               </span>
-                         <span class="nav-text"> Productos/Servicios </span>
-                    </a>
-               </li>
-			   
-			   
+                   @if ($featureEnabled('dispensacion'))
+                       <li class="nav-item">
+                            <a class="nav-link" href="{{ route('dispensations.index') }}">
+                                 <span class="nav-icon">
+                                      <iconify-icon icon="solar:pill-line"></iconify-icon>
+                                 </span>
+                                 <span class="nav-text">Dispensación</span>
+                            </a>
+                       </li>
+                   @endif
 
-               <li class="nav-item">
-                    <a class="nav-link menu-arrow" href="#sidebarUsers" data-bs-toggle="collapse" role="button"
-                         aria-expanded="false" aria-controls="sidebarUsers">
-                         <span class="nav-icon">
-                              <iconify-icon icon="mingcute:user-3-line"></iconify-icon>
-                         </span>
-                         <span class="nav-text"> Usuarios & Roles</span>
-                    </a>
-                    <div class="collapse" id="sidebarUsers">
-                         <ul class="nav sub-navbar-nav">
-						 
-							<li class="sub-nav-item">
-                                   <a class="sub-nav-link" href="{{ route('users.admins.create') }}">Crea Usuario</a>
-                              </li>
-                              <li class="sub-nav-item">
-                                   <a class="sub-nav-link" href="{{ route('users.trainers.create') }}">Crea {{ $sidebarStylistLabelSingular }}</a>
-                              </li>
-                              <li class="sub-nav-item">
-                                   <a class="sub-nav-link" href="{{ route ('users.index') }}">Listar Usuarios</a>
-                              </li>
-							 						  
-                             
-                         </ul>
-                    </div>
-               </li>
+                   @if ($featureEnabled('hospitalizacion'))
+                       <li class="nav-item">
+                            <a class="nav-link" href="{{ route('hospital.index') }}">
+                                 <span class="nav-icon">
+                                      <iconify-icon icon="solar:hospital-line"></iconify-icon>
+                                 </span>
+                                 <span class="nav-text">Hospitalización 24/7</span>
+                            </a>
+                       </li>
+                   @endif
 
-               
+                   @if ($featureEnabled('belleza'))
+                       <li class="nav-item">
+                            <a class="nav-link" href="{{ route('groomings.index') }}">
+                                 <span class="nav-icon">
+                                      <iconify-icon icon="solar:scissors-line"></iconify-icon>
+                                 </span>
+                                 <span class="nav-text">Sala de belleza</span>
+                            </a>
+                       </li>
+                   @endif
 
-                <li class="menu-title">Administración</li>
-<?php /**			   <li class="nav-item">
-                    <a class="nav-link menu-arrow" href="#sidebarError" data-bs-toggle="collapse" role="button"
-                         aria-expanded="false" aria-controls="sidebarError">
-                         <span class="nav-icon">
-                              <iconify-icon icon="mingcute:bug-line"></iconify-icon>
-                         </span>
-                         <span class="nav-text"> Error Pages</span>
-                    </a>
-                    <div class="collapse" id="sidebarError">
-                         <ul class="nav sub-navbar-nav">
-                              <li class="sub-nav-item">
-                                   <a class="sub-nav-link" href="{{ route ('second' , ['pages','404']) }}">Pages 404</a>
-                              </li>
-                              <li class="sub-nav-item">
-                                   <a class="sub-nav-link" href="{{ route ('second' , ['pages','404-alt']) }}">Pages 404 Alt</a>
-                              </li>
-							   <li class="sub-nav-item">
-                                   <a class="sub-nav-link" href="{{ route ('second' , ['forms','validation']) }}">Validation</a>
-                              </li>
-                              <li class="sub-nav-item">
-                                   <a class="sub-nav-link" href="{{ route ('second' , ['forms','fileuploads']) }}">File Upload</a>
-                              </li>
-                              <li class="sub-nav-item">
-                                   <a class="sub-nav-link" href="{{ route ('second' , ['forms','editors']) }}">Editors</a>
-                              </li>
-							  <li class="sub-nav-item">
-                                   <a class="sub-nav-link" href="{{ route ('second' , ['ui','avatar']) }}">Avatar</a>
-                              </li>
-                              <li class="sub-nav-item">
-                                   <a class="sub-nav-link" href="{{ route ('second' , ['ui','badge']) }}">Badge</a>
-                              </li>
-                              <li class="sub-nav-item">
-                                   <a class="sub-nav-link" href="{{ route ('second' , ['ui','breadcrumb']) }}">Breadcrumb</a>
-                              </li>
-                              <li class="sub-nav-item">
-                                   <a class="sub-nav-link" href="{{ route ('second' , ['ui','buttons']) }}">Buttons</a>
-                              </li>
-                              <li class="sub-nav-item">
-                                   <a class="sub-nav-link" href="{{ route ('second' , ['ui','card']) }}">Card</a>
-                              </li>
-                              <li class="sub-nav-item">
-                                   <a class="sub-nav-link" href="{{ route ('second' , ['ui','carousel']) }}">Carousel</a>
-                              </li>
-                              <li class="sub-nav-item">
-                                   <a class="sub-nav-link" href="{{ route ('second' , ['ui','collapse']) }}">Collapse</a>
-                              </li>
-                              <li class="sub-nav-item">
-                                   <a class="sub-nav-link" href="{{ route ('second' , ['ui','dropdown']) }}">Dropdown</a>
-                              </li>
-                              <li class="sub-nav-item">
-                                   <a class="sub-nav-link" href="{{ route ('second' , ['ui','list-group']) }}">List Group</a>
-                              </li>
-                              <li class="sub-nav-item">
-                                   <a class="sub-nav-link" href="{{ route ('second' , ['ui','modal']) }}">Modal</a>
-                              </li>
-                              <li class="sub-nav-item">
-                                   <a class="sub-nav-link" href="{{ route ('second' , ['ui','tabs']) }}">Tabs</a>
-                              </li>
-                              <li class="sub-nav-item">
-                                   <a class="sub-nav-link" href="{{ route ('second' , ['ui','offcanvas']) }}">Offcanvas</a>
-                              </li>
-                              <li class="sub-nav-item">
-                                   <a class="sub-nav-link" href="{{ route ('second' , ['ui','pagination']) }}">Pagination</a>
-                              </li>
-                              <li class="sub-nav-item">
-                                   <a class="sub-nav-link" href="{{ route ('second' , ['ui','placeholders']) }}">Placeholders</a>
-                              </li>
-							   <li class="sub-nav-item">
-                                   <a class="sub-nav-link" href="{{ route ('second' , ['auth','signup']) }}">Sign Up</a>
-                              </li>
-                              <li class="sub-nav-item">
-                                   <a class="sub-nav-link" href="{{ route ('second' , ['auth','password']) }}">Reset Password</a>
-                              </li>
-                              <li class="sub-nav-item">
-                                   <a class="sub-nav-link" href="{{ route ('second' , ['auth','lock-screen']) }}">Lock Screen</a>
-                              </li>
-                              <li class="sub-nav-item">
-                                   <a class="sub-nav-link" href="{{ route ('second' , ['ui','popovers']) }}">Popovers</a>
-                              </li>
-                              <li class="sub-nav-item">
-                                   <a class="sub-nav-link" href="{{ route ('second' , ['ui','progress']) }}">Progress</a>
-                              </li>
-                              <li class="sub-nav-item">
-                                   <a class="sub-nav-link" href="{{ route ('second' , ['ui','scrollspy']) }}">Scrollspy</a>
-                              </li>
-                              <li class="sub-nav-item">
-                                   <a class="sub-nav-link" href="{{ route ('second' , ['ui','spinners']) }}">Spinners</a>
-                              </li>
-                              <li class="sub-nav-item">
-                                   <a class="sub-nav-link" href="{{ route ('second' , ['ui','toasts']) }}">Toasts</a>
-                              </li>
-                              <li class="sub-nav-item">
-                                   <a class="sub-nav-link" href="{{ route ('second' , ['ui','tooltips']) }}">Tooltips</a>
-                              </li>
-                         </ul>
-                    </div>
-               </li>
+                   @if ($featureEnabled('consentimientos'))
+                       <li class="nav-item">
+                            <a class="nav-link" href="{{ route('consents.index') }}">
+                                 <span class="nav-icon">
+                                      <iconify-icon icon="solar:document-add-line"></iconify-icon>
+                                 </span>
+                                 <span class="nav-text">Consentimientos</span>
+                            </a>
+                       </li>
+                   @endif
 
-               <li class="nav-item">
-                    <a class="nav-link menu-arrow" href="#sidebarTables" data-bs-toggle="collapse" role="button"
-                         aria-expanded="false" aria-controls="sidebarTables">
-                         <span class="nav-icon">
-                              <iconify-icon icon="mingcute:table-line"></iconify-icon>
-                         </span>
-                         <span class="nav-text"> Tables </span>
-                    </a>
-                    <div class="collapse" id="sidebarTables">
-                         <ul class="nav sub-navbar-nav">
-                              <li class="sub-nav-item">
-                                   <a class="sub-nav-link" href="{{ route ('second' , ['tables','basic']) }}">Basic Tables</a>
-                              </li>
-                              <li class="sub-nav-item">
-                                   <a class="sub-nav-link" href="{{ route ('second' , ['tables','gridjs']) }}">Grid Js</a>
-                              </li>
-                         </ul>
-                    </div>
-               </li>
+                   @if ($featureEnabled('plantillas_consentimientos'))
+                       <li class="nav-item">
+                            <a class="nav-link" href="{{ route('consent-templates.index') }}">
+                                 <span class="nav-icon">
+                                      <iconify-icon icon="solar:documents-line"></iconify-icon>
+                                 </span>
+                                 <span class="nav-text">Plantillas de consentimientos</span>
+                            </a>
+                       </li>
+                   @endif
+               @endif
 
-               <li class="nav-item">
-                    <a class="nav-link menu-arrow" href="#sidebarIcons" data-bs-toggle="collapse" role="button"
-                         aria-expanded="false" aria-controls="sidebarIcons">
-                         <span class="nav-icon">
-                              <iconify-icon icon="mingcute:dribbble-line"></iconify-icon>
-                         </span>
-                         <span class="nav-text"> Icons </span>
-                    </a>
-                    <div class="collapse" id="sidebarIcons">
-                         <ul class="nav sub-navbar-nav">
-                              <li class="sub-nav-item">
-                                   <a class="sub-nav-link" href="{{ route ('second' , ['icons','boxicons']) }}">Boxicons</a>
-                              </li>
-                              <li class="sub-nav-item">
-                                   <a class="sub-nav-link" href="{{ route ('second' , ['icons','solar']) }}">Solar Icons</a>
-                              </li>
-                         </ul>
-                    </div>
-               </li>
+               @if ($showCajaReportes)
+                   <li class="menu-title">CAJA Y REPORTES</li>
 
-               <li class="nav-item">
-                    <a class="nav-link menu-arrow" href="#sidebarMaps" data-bs-toggle="collapse" role="button"
-                         aria-expanded="false" aria-controls="sidebarMaps">
-                         <span class="nav-icon">
-                              <iconify-icon icon="mingcute:map-line"></iconify-icon>
-                         </span>
-                         <span class="nav-text"> Maps </span>
-                    </a>
-                    <div class="collapse" id="sidebarMaps">
-                         <ul class="nav sub-navbar-nav">
-                              <li class="sub-nav-item">
-                                   <a class="sub-nav-link" href="{{ route ('second' , ['maps','google']) }}">Google Maps</a>
-                              </li>
-                              <li class="sub-nav-item">
-                                   <a class="sub-nav-link" href="{{ route ('second' , ['maps','vector']) }}">Vector Maps</a>
-                              </li>
-                         </ul>
-                    </div>
-               </li>
+                   @if ($featureEnabled('arqueo_caja'))
+                       <li class="nav-item">
+                            <a class="nav-link" href="{{ route('cash.closures.create') }}">
+                                 <span class="nav-icon">
+                                      <iconify-icon icon="solar:wallet-money-line"></iconify-icon>
+                                 </span>
+                                 <span class="nav-text">Arqueo de caja</span>
+                            </a>
+                       </li>
+                   @endif
 
-               
+                   @if ($featureEnabled('reportes_basicos'))
+                       <li class="nav-item">
+                            <a class="nav-link" href="{{ route('reports.quick') }}">
+                                 <span class="nav-icon">
+                                      <i class="bx bx-line-chart"></i>
+                                 </span>
+                                 <span class="nav-text">Reportes básicos</span>
+                            </a>
+                       </li>
+                   @endif
 
-               <li class="nav-item">
-                    <a class="nav-link menu-arrow" href="#sidebarMultiLevelDemo" data-bs-toggle="collapse" role="button"
-                         aria-expanded="false" aria-controls="sidebarMultiLevelDemo">
-                         <span class="nav-icon">
-                              <iconify-icon icon="mingcute:menu-line"></iconify-icon>
-                         </span>
-                         <span class="nav-text"> Menu Item </span>
-                    </a>
-                    <div class="collapse" id="sidebarMultiLevelDemo">
-                         <ul class="nav sub-navbar-nav">
-                              <li class="sub-nav-item">
-                                   <a class="sub-nav-link" href="javascript:void(0);">Menu Item 1</a>
-                              </li>
-                              <li class="sub-nav-item">
-                                   <a class="sub-nav-link  menu-arrow" href="#sidebarItemDemoSubItem"
-                                        data-bs-toggle="collapse" role="button" aria-expanded="false"
-                                        aria-controls="sidebarItemDemoSubItem">
-                                        <span> Menu Item 2 </span>
-                                   </a>
-                                   <div class="collapse" id="sidebarItemDemoSubItem">
-                                        <ul class="nav sub-navbar-nav">
-                                             <li class="sub-nav-item">
-                                                  <a class="sub-nav-link" href="javascript:void(0);">Menu Sub item</a>
-                                             </li>
-                                        </ul>
-                                   </div>
-                              </li>
-                         </ul>
-                    </div>
-               </li>
+                   @if ($featureEnabled('reportes_avanzados'))
+                       <li class="nav-item">
+                            <a class="nav-link" href="{{ route('reports.home') }}">
+                                 <span class="nav-icon">
+                                      <iconify-icon icon="solar:chart-2-line"></iconify-icon>
+                                 </span>
+                                 <span class="nav-text">Reportes avanzados</span>
+                            </a>
+                       </li>
+                   @endif
+               @endif
 
-               <li class="nav-item">
-                    <a class="nav-link disabled" href="javascript:void(0);">
-                         <span class="nav-icon">
-                              <iconify-icon icon="mingcute:close-circle-line"></iconify-icon>
-                         </span>
-                         <span class="nav-text"> Disable Item </span>
-                    </a>
-               </li>
-			   */ ?>
+               @if ($featureEnabled('config_clinica'))
+                   <li class="menu-title">CONFIGURACIÓN</li>
+                   <li class="nav-item">
+                        <a class="nav-link" href="{{ route('settings.clinica.edit') }}">
+                             <span class="nav-icon">
+                                  <i class='bx bx-cog'></i>
+                             </span>
+                             <span class="nav-text">Configuración de clínicas</span>
+                        </a>
+                   </li>
+               @endif
           </ul>
      </div>
 </div>

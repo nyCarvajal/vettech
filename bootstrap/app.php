@@ -1,5 +1,6 @@
 <?php
 use App\Http\Middleware\ConnectTenantDB;
+use App\Http\Middleware\EnsureClinicFeatureEnabled;
 use App\Http\Middleware\EnsureRole;
 use Illuminate\Auth\Middleware\Authenticate;
 use Illuminate\Foundation\Application;
@@ -29,6 +30,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->alias([
             'ensureRole' => EnsureRole::class,
+            'feature' => EnsureClinicFeatureEnabled::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

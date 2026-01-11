@@ -159,38 +159,61 @@
         <div class="flex flex-1">
             <aside class="hidden lg:block w-64 bg-white border-r border-gray-200">
                 @php
+                    $featureDefaults = \App\Models\Clinica::featureDefaults();
+                    $featureEnabled = function (string $key) use ($clinica, $featureDefaults): bool {
+                        if ($clinica) {
+                            return $clinica->featureEnabled($key, $featureDefaults[$key] ?? true);
+                        }
+
+                        return $featureDefaults[$key] ?? true;
+                    };
+
                     $navSections = [
                         [
-                            'title' => 'Principal',
-                            'items' => [
+                            'title' => 'OPERACIÓN',
+                            'items' => array_filter([
                                 ['label' => 'Dashboard', 'route' => 'dashboard'],
-                                ['label' => 'Tutores', 'route' => 'owners.index'],
-                                ['label' => 'Pacientes', 'route' => 'patients.index'],
-                                ['label' => 'Sala de belleza', 'route' => 'groomings.index'],
-                                ['label' => 'Agenda', 'route' => 'reservas.index'],
-                                ['label' => 'Hospitalización 24/7', 'route' => 'hospital.board'],
-                                ['label' => 'Dispensación', 'route' => 'dispensations.index'],
-                                ['label' => 'Facturación POS', 'route' => 'invoices.pos'],
-                                ['label' => 'Ventas', 'route' => 'sales.index'],
-                                ['label' => 'Caja', 'route' => 'cash.sessions.index'],
-                            ],
+                                $featureEnabled('agenda') ? ['label' => 'Agenda', 'route' => 'agenda.index'] : null,
+                                $featureEnabled('facturacion_pos') ? ['label' => 'Facturación POS', 'route' => 'invoices.pos'] : null,
+                                $featureEnabled('tutores') ? ['label' => 'Tutores', 'route' => 'owners.index'] : null,
+                                $featureEnabled('pacientes') ? ['label' => 'Pacientes', 'route' => 'patients.index'] : null,
+                            ]),
                         ],
                         [
-                            'title' => 'Reportes',
-                            'items' => [
-                                ['label' => 'Reportes básicos', 'route' => 'reports.quick', 'active' => 'reports.quick*'],
-                                ['label' => 'Reportes avanzados', 'route' => 'reports.home', 'active' => 'reports.*'],
-                            ],
+                            'title' => 'SERVICIOS / CLÍNICA',
+                            'items' => array_filter([
+                                $featureEnabled('dispensacion') ? ['label' => 'Dispensación', 'route' => 'dispensations.index'] : null,
+                                $featureEnabled('hospitalizacion') ? ['label' => 'Hospitalización 24/7', 'route' => 'hospital.index'] : null,
+                                $featureEnabled('belleza') ? ['label' => 'Sala de belleza', 'route' => 'groomings.index'] : null,
+                                $featureEnabled('consentimientos') ? ['label' => 'Consentimientos', 'route' => 'consents.index'] : null,
+                                $featureEnabled('plantillas_consentimientos') ? ['label' => 'Plantillas de consentimientos', 'route' => 'consent-templates.index'] : null,
+                            ]),
                         ],
                         [
-                            'title' => 'Configuración',
-                            'items' => [
-                                ['label' => 'Configuración de clínicas', 'route' => 'clinicas.edit-own'],
-                                ['label' => 'Consentimientos informados', 'route' => 'consent-templates.index'],
-                                ['label' => 'Crear plantilla de consentimientos', 'route' => 'consent-templates.create'],
-                            ],
+                            'title' => 'CAJA Y REPORTES',
+                            'items' => array_filter([
+                                $featureEnabled('arqueo_caja') ? ['label' => 'Arqueo de caja', 'route' => 'cash.closures.create'] : null,
+                                $featureEnabled('reportes_basicos') ? [
+                                    'label' => 'Reportes básicos',
+                                    'route' => 'reports.quick',
+                                    'active' => 'reports.quick*',
+                                ] : null,
+                                $featureEnabled('reportes_avanzados') ? [
+                                    'label' => 'Reportes avanzados',
+                                    'route' => 'reports.home',
+                                    'active' => 'reports.*',
+                                ] : null,
+                            ]),
+                        ],
+                        [
+                            'title' => 'CONFIGURACIÓN',
+                            'items' => array_filter([
+                                $featureEnabled('config_clinica') ? ['label' => 'Configuración de clínicas', 'route' => 'settings.clinica.edit'] : null,
+                            ]),
                         ],
                     ];
+
+                    $navSections = array_filter($navSections, fn ($section) => count($section['items']) > 0);
                 @endphp
                 <nav class="p-4 space-y-4">
                     @foreach($navSections as $section)

@@ -21,8 +21,31 @@ class Clinica extends Model
         'responsable_iva' => 'boolean',
         'dian_enabled' => 'boolean',
         'default_tax_rate' => 'decimal:3',
+        'features' => 'array',
         'meta' => 'array',
     ];
+
+    // Valores por defecto para módulos disponibles por plan.
+    public const FEATURE_DEFAULTS = [
+        'agenda' => true,
+        'facturacion_pos' => true,
+        'tutores' => true,
+        'pacientes' => true,
+        'dispensacion' => false,
+        'hospitalizacion' => false,
+        'belleza' => true,
+        'consentimientos' => true,
+        'plantillas_consentimientos' => true,
+        'arqueo_caja' => true,
+        'reportes_basicos' => true,
+        'reportes_avanzados' => false,
+        'config_clinica' => true,
+    ];
+
+    public static function featureDefaults(): array
+    {
+        return self::FEATURE_DEFAULTS;
+    }
 
     public function getRouteKeyName(): string
     {
@@ -80,5 +103,16 @@ class Clinica extends Model
         }
 
         return asset('images/logo.png');
+    }
+
+    public function featureEnabled(string $key, bool $default = true): bool
+    {
+        $features = $this->features ?? [];
+
+        if (array_key_exists($key, $features)) {
+            return (bool) $features[$key];
+        }
+
+        return $default;
     }
 }
