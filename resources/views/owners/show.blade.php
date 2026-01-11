@@ -56,7 +56,7 @@
         </div>
         <div class="col-lg-8">
             <div class="d-flex justify-content-between align-items-center mb-3">
-                <h5 class="mb-0">Pacientes</h5>
+                <h5 class="mb-0">Mascotas</h5>
             </div>
             <div class="row g-3">
                 @forelse($owner->patients as $patient)

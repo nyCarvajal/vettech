@@ -5,7 +5,7 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
             <h1 class="h3 mb-1">Tutores</h1>
-            <p class="text-muted mb-0">Gestiona la agenda de tutores y sus pacientes.</p>
+            <p class="text-muted mb-0">Administra los datos de los tutores y sus mascotas.</p>
         </div>
         <a href="{{ route('owners.create') }}" class="btn btn-primary">Nuevo tutor</a>
     </div>
@@ -30,7 +30,7 @@
                     <tr>
                         <th>Nombre</th>
                         <th>Contacto</th>
-                        <th>Pacientes</th>
+                        <th>Mascotas</th>
                         <th></th>
                     </tr>
                 </thead>
