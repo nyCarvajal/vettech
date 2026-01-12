@@ -8,6 +8,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
 use App\Models\Clinica;
+use Stancl\Tenancy\Tenancy;
 
 class User extends Authenticatable
 {
@@ -76,6 +77,24 @@ class User extends Authenticatable
         $name = trim($firstName . ' ' . ($this->apellidos ?? ''));
 
         return $name !== '' ? $name : null;
+    }
+
+    public function getConnectionName()
+    {
+        /** @var Tenancy|null $tenancy */
+        $tenancy = app()->bound('tenancy') ? app('tenancy') : null;
+
+        if ($tenancy && $tenancy->initialized && $tenancy->tenant) {
+            return 'tenant';
+        }
+
+        $tenantDatabase = config('database.connections.tenant.database');
+
+        if ($tenantDatabase) {
+            return 'tenant';
+        }
+
+        return $this->connection ?? parent::getConnectionName();
     }
 	// Aquí definimos la relación "item" (o como prefieras nombrarla):
     public function peluqueria()
