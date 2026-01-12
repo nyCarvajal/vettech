@@ -126,12 +126,14 @@
         <header class="bg-white border-b border-gray-200">
             <div class="h-16 px-6 flex items-center justify-between gap-6">
                 <div class="flex items-center">
-    <img
-        src="{{ asset('images/logo-dark.png') }}"
-        alt="{{ config('app.name', 'VetTech') }}"
-        class="h-48 w-auto"
-    />
-</div>
+                    <a href="{{ route('dashboard') }}" class="inline-flex items-center" aria-label="Ir al dashboard">
+                        <img
+                            src="{{ asset('images/logo-dark.png') }}"
+                            alt="{{ config('app.name', 'VetTech') }}"
+                            class="h-48 w-auto"
+                        />
+                    </a>
+                </div>
                 <div class="hidden md:flex items-center gap-2 text-sm text-gray-500">
                     @yield('breadcrumbs')
                 </div>

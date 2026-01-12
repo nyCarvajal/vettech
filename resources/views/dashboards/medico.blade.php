@@ -29,7 +29,7 @@
                 @endforelse
             </div>
             <div class="mt-4 flex gap-2">
-                <x-button variant="secondary" size="sm" href="{{ route('pacientes.index') }}">Abrir paciente</x-button>
+                <x-button variant="secondary" size="sm" href="{{ route('patients.index') }}">Abrir paciente</x-button>
                 <x-button size="sm" href="{{ route('historias-clinicas.index') }}">Iniciar consulta</x-button>
             </div>
         </x-card>
