@@ -6,6 +6,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Spatie\Permission\Traits\HasRoles;
 use App\Models\Clinica;
 use Stancl\Tenancy\Tenancy;
@@ -13,7 +15,9 @@ use Stancl\Tenancy\Tenancy;
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasRoles;
+    use HasRoles {
+        hasRole as spatieHasRole;
+    }
     use HasFactory, Notifiable;
 
     protected $connection = 'mysql';
@@ -79,6 +83,13 @@ class User extends Authenticatable
         return $name !== '' ? $name : null;
     }
 
+    public function hasRole($roles, $guard = null): bool
+    {
+        if (! $this->canUseSpatieRoles()) {
+            return false;
+        }
+
+        return $this->spatieHasRole($roles, $guard);
     public function getConnectionName()
     {
         /** @var Tenancy|null $tenancy */
@@ -106,5 +117,24 @@ class User extends Authenticatable
     public function clinica()
     {
         return $this->belongsTo(Clinica::class, 'clinica_id', 'id');
+    }
+
+    private function canUseSpatieRoles(): bool
+    {
+        $connection = $this->permissionConnection();
+
+        return Schema::connection($connection)->hasTable('roles')
+            && Schema::connection($connection)->hasTable('model_has_roles');
+    }
+
+    private function permissionConnection(): string
+    {
+        $tenantDatabase = config('database.connections.tenant.database');
+
+        if ($tenantDatabase) {
+            return 'tenant';
+        }
+
+        return DB::getDefaultConnection();
     }
 }
