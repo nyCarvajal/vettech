@@ -70,7 +70,7 @@
         </x-card>
 
         <div class="flex justify-end">
-            <button type="submit" class="inline-flex items-center bg-mint-600 text-white px-5 py-2 rounded-lg shadow-sm hover:bg-mint-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-mint-500">Guardar informe</button>
+            <button type="submit" class="inline-flex items-center rounded-lg bg-purple-100 px-5 py-2 text-sm font-semibold text-purple-700 shadow-sm ring-1 ring-purple-200 hover:bg-purple-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-300">Guardar informe</button>
         </div>
     </form>
 @endsection

@@ -63,7 +63,10 @@ class ClinicaController extends Controller
 
         abort_unless($clinica, 404);
 
-        return view('clinicas.edit', compact('clinica'));
+        return view('clinicas.edit', [
+            'clinica' => $clinica,
+            'isOwnClinic' => true,
+        ]);
     }
 
     public function updateOwn(Request $request)
@@ -75,7 +78,7 @@ class ClinicaController extends Controller
         $clinica->update($this->validated($request, $clinica->id));
 
         return redirect()
-            ->route('clinicas.edit')
+            ->route('clinicas.edit-own')
             ->with('success', 'Clínica actualizada correctamente.');
     }
 
