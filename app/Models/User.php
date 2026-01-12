@@ -90,6 +90,9 @@ class User extends Authenticatable
         }
 
         return $this->spatieHasRole($roles, $guard);
+
+    }
+
     public function getConnectionName()
     {
         /** @var Tenancy|null $tenancy */
