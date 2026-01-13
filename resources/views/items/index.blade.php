@@ -64,7 +64,7 @@
                 </div>
             </div>
             <div class="lg:col-span-4 flex flex-wrap items-center gap-3">
-                <button type="submit" class="inline-flex items-center gap-2 rounded-lg bg-mint-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-mint-700">
+                <button type="submit" class="inline-flex items-center gap-2 rounded-lg bg-mint-200 px-4 py-2 text-sm font-semibold text-mint-900 shadow-sm hover:bg-mint-500 hover:text-white">
                     Aplicar filtros
                 </button>
                 <a href="{{ route('items.index') }}" class="rounded-lg border border-violet-200 bg-violet-50 px-4 py-2 text-sm font-semibold text-violet-700 hover:bg-violet-100">
@@ -76,7 +76,7 @@
 
     <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
         <div class="flex items-center gap-3">
-            <a href="{{ route('items.create') }}" class="inline-flex items-center gap-2 rounded-lg bg-mint-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-mint-700">
+            <a href="{{ route('items.create') }}" class="inline-flex items-center gap-2 rounded-lg bg-violet-200 px-4 py-2 text-sm font-semibold text-violet-900 shadow-sm hover:bg-violet-300">
                 <span class="text-lg">+</span> Añadir producto
             </a>
             <button type="button" class="hidden h-10 w-10 items-center justify-center rounded-lg border border-mint-200 bg-mint-50 text-mint-700 hover:bg-mint-100 lg:flex">

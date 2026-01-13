@@ -213,6 +213,7 @@
                         [
                             'title' => 'CONFIGURACIÓN',
                             'items' => array_filter([
+                                ['label' => 'Catálogos', 'route' => 'configuracion.index'],
                                 $featureEnabled('config_clinica') ? ['label' => 'Configuración de clínicas', 'route' => 'settings.clinica.edit'] : null,
                                 $featureEnabled('plantillas_consentimientos') ? ['label' => 'Plantillas de consentimientos', 'route' => 'consent-templates.index'] : null,
          ]),
