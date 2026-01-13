@@ -142,6 +142,25 @@
                                     </div>
                                 </div>
                                 <div class="col-md-6">
+                                    <label class="form-label">Microchip</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text input-icon-mint">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M2 3h12v10H2z"/><path d="M5 1v2M11 1v2M5 13v2M11 13v2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                                        </span>
+                                        <input type="text" name="microchip" value="{{ old('microchip', $patient->microchip) }}" class="form-control" placeholder="Código de microchip">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Estado</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text input-icon-purple">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M8 2a6 6 0 1 0 6 6" /><path d="M8 4v4l3 2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                                        </span>
+                                        <input type="text" name="estado" value="{{ old('estado', $patient->estado) }}" class="form-control" placeholder="Ej: estable, en tratamiento">
+                                    </div>
+                                    <div class="form-text text-muted">Indica el estado clínico general del paciente.</div>
+                                </div>
+                                <div class="col-md-6">
                                     <label class="form-label">Carácter</label>
                                     <div class="input-group">
                                         <span class="input-group-text input-icon-mint">
