@@ -88,6 +88,18 @@
         box-shadow: 0 10px 24px rgba(124, 111, 242, 0.16);
     }
 
+    .pill-action--contrast {
+        background: #ffffff;
+        color: var(--lavender-600);
+        border-color: rgba(255, 255, 255, 0.95);
+        box-shadow: 0 12px 28px rgba(15, 23, 42, 0.2);
+    }
+
+    .pill-action--contrast:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 16px 32px rgba(15, 23, 42, 0.28);
+    }
+
     .pill-action--wide {
         flex-basis: 260px;
         max-width: 280px;
@@ -495,8 +507,7 @@
                         <a href="#" class="pill-action" style="border-color: rgba(255,255,255,0.5); color: #fff; background: rgba(255,255,255,0.12);">Ver historia</a>
                         <a
                             href="{{ route('historias-clinicas.create', ['paciente_id' => $patient->id]) }}"
-                            class="pill-action"
-                            style="border-color: rgba(255,255,255,0.5); color: #fff; background: rgba(255,255,255,0.12);"
+                            class="pill-action pill-action--contrast"
                         >
                             Nueva consulta
                         </a>
@@ -557,30 +568,37 @@
                     <a href="{{ route('followups.create', ['patient_id' => $patient->id]) }}" class="pill-action">
                         Crear control
                     </a>
-                    @php
-                        $tabs = [
-                            'timeline' => 'Todo',
-                            'historia' => 'Historias clínicas',
-                            'consulta' => 'Consultas',
-                            'control' => 'Controles',
-                            'banio' => 'Peluquería',
-                            'procedimiento' => 'Cirugías y procedimientos',
-                            'vacunacion' => 'Vacunaciones',
-                            'desparasitacion' => 'Desparasitaciones',
-                            'certificado' => 'Certificados de viaje',
-                            'hospital' => 'Hospital',
-                            'dispensacion' => 'Dispensación',
-                            'venta' => 'Ventas',
-                        ];
-                    @endphp
-                    @foreach($tabs as $key => $label)
-                        <a href="{{ request()->fullUrlWithQuery(['tipo' => $key === 'timeline' ? null : $key, 'page' => null]) }}" class="badge-soft {{ request('tipo') === $key ? 'active' : '' }}">{{ $label }}</a>
-                    @endforeach
                 </div>
             </div>
 
             <form method="get" class="row g-2 mt-3">
-                <input type="hidden" name="tipo" value="{{ request('tipo') }}">
+                @php
+                    $tabs = [
+                        'timeline' => 'Todo',
+                        'historia' => 'Historias clínicas',
+                        'consulta' => 'Consultas',
+                        'control' => 'Controles',
+                        'banio' => 'Peluquería',
+                        'procedimiento' => 'Cirugías y procedimientos',
+                        'vacunacion' => 'Vacunaciones',
+                        'desparasitacion' => 'Desparasitaciones',
+                        'certificado' => 'Certificados de viaje',
+                        'hospital' => 'Hospital',
+                        'dispensacion' => 'Dispensación',
+                        'venta' => 'Ventas',
+                    ];
+                    $currentTipo = request('tipo') ?? 'timeline';
+                @endphp
+                <div class="col-md-4">
+                    <label class="form-label text-muted">Tipo</label>
+                    <select name="tipo" class="form-select">
+                        @foreach($tabs as $key => $label)
+                            <option value="{{ $key === 'timeline' ? '' : $key }}" @selected($currentTipo === $key)>
+                                {{ $label }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
                 <div class="col-md-3">
                     <label class="form-label text-muted">Desde</label>
                     <input type="date" name="desde" value="{{ request('desde') }}" class="form-control">
