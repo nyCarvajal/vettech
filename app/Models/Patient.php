@@ -21,6 +21,7 @@ class Patient extends BaseModel
         'fecha_nacimiento',
         'color',
         'microchip',
+        'estado',
         'peso_actual',
         'weight_unit',
         'temperamento',
