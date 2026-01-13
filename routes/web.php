@@ -20,10 +20,14 @@ use App\Http\Controllers\TipoUsuarioController;
 use App\Http\Controllers\TipocitaController;
 use App\Http\Controllers\TipoIdentificacionController;
 use App\Http\Controllers\AreaController;
+use App\Http\Controllers\BancoController;
+use App\Http\Controllers\BreedController;
+use App\Http\Controllers\ConfiguracionController;
 use App\Http\Controllers\ProveedorController;
 use App\Http\Controllers\HistoriaClinicaController;
 use App\Http\Controllers\OwnersController;
 use App\Http\Controllers\PatientsController;
+use App\Http\Controllers\SpeciesController;
 use App\Http\Controllers\TravelCertificateController;
 use App\Http\Controllers\GeoController;
 use App\Http\Controllers\BreedsController;
@@ -227,7 +231,12 @@ Route::post('/ordenes/{orden}/email', [OrdendecompraController::class, 'sendEmai
 
 Route::resource('proveedores', ProveedorController::class);
 Route::resource('tipo-identificaciones', TipoIdentificacionController::class)->except(['show']);
-Route::resource('areas', AreaController::class)->except(['show', 'destroy']);
+Route::resource('areas', AreaController::class)->except(['show']);
+Route::resource('bancos', BancoController::class);
+Route::resource('tipocitas', TipocitaController::class)->except(['show']);
+Route::resource('especies', SpeciesController::class)->except(['show']);
+Route::resource('razas', BreedController::class)->except(['show']);
+Route::get('configuracion', [ConfiguracionController::class, 'index'])->name('configuracion.index');
 
 Route::prefix('cash/closures')
     ->middleware('feature:arqueo_caja')
@@ -284,7 +293,6 @@ Route::post('reservas/{reserva}/confirmar-publico', [ReservaController::class, '
 Route::resource('proveedores', ProveedorController::class);
 Route::get('/clientesb', [ClientesController::class, 'search'])->name('clientes.search');
 Route::resource('tipo-usuarios', TipoUsuarioController::class);
-Route::resource('tipocitas', TipocitaController::class)->except(['show']);
 Route::resource('clinicas', ClinicaController::class);
 Route::get('clinica/editar',     [ClinicaController::class, 'editOwn'])
          ->name('clinicas.edit-own');

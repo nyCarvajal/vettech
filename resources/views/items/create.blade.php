@@ -44,6 +44,7 @@
                             <option value="{{ $option }}" @selected((string) old('tipo') === (string) $option)>{{ $option }}</option>
                         @endforeach
                     </select>
+                    <p class="mt-1 text-xs text-slate-500">Las categorías se toman del campo "tipo" de los ítems existentes.</p>
                 </div>
                 <div>
                     <label class="text-sm font-semibold text-slate-700">Área</label>
@@ -124,7 +125,7 @@
 
         <div class="flex justify-end gap-3">
             <a href="{{ route('items.index') }}" class="rounded-lg border border-violet-200 bg-violet-50 px-4 py-2 text-sm font-semibold text-violet-700 hover:bg-violet-100">Cancelar</a>
-            <button type="submit" class="rounded-lg bg-mint-600 px-4 py-2 text-sm font-semibold text-white hover:bg-mint-700">Guardar ítem</button>
+            <button type="submit" class="rounded-lg bg-mint-200 px-4 py-2 text-sm font-semibold text-mint-900 hover:bg-mint-500 hover:text-white">Guardar ítem</button>
         </div>
     </form>
 </div>
