@@ -286,7 +286,7 @@
                     </div>
 
                     <div class="space-y-2">
-                        <button class="w-full rounded-lg bg-mint-600 px-4 py-2 text-sm font-semibold text-white">Guardar cierre</button>
+                        <button class="w-full rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700">Guardar cierre</button>
                         @if ($closure)
                             <a href="{{ route('cash.closures.print', $closure) }}" target="_blank" class="block w-full rounded-lg border border-gray-200 px-4 py-2 text-center text-sm font-semibold text-gray-600">Imprimir</a>
                         @endif
