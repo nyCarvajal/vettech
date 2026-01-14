@@ -69,7 +69,7 @@ class InventoryService
     {
         $connection = $item->getConnectionName() ?? 'tenant';
 
-        return DB::connection($connection)->transaction(function () use ($item, $type, $delta, $data) {
+        return DB::connection($connection)->transaction(function () use ($item, $type, $delta, $data, $connection) {
             $lockedItem = Item::query()
                 ->whereKey($item->getKey())
                 ->lockForUpdate()
