@@ -52,7 +52,7 @@
                     <label class="text-sm text-gray-600">Notas</label>
                     <textarea name="notes" class="w-full border border-gray-300 rounded px-3 py-2" rows="3"></textarea>
                 </div>
-                <button type="submit" class="bg-mint-600 text-white px-4 py-2 rounded">Guardar arqueo</button>
+                <button type="submit" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded">Guardar arqueo</button>
             </form>
         </div>
         <div class="bg-white border border-gray-200 rounded-xl p-4 shadow-soft">
