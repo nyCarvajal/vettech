@@ -56,9 +56,21 @@ class ClinicalAttachmentController extends Controller
                 $fileType = $request->fileTypeFromMime($mimeType);
                 $uniqueTitle = $this->uniqueTitle($historiaClinica, $sanitizedTitle, $index);
                 $publicId = $uniqueTitle . '-' . Str::random(6);
+                $filenameOverride = null;
+
+                if ($fileType === 'pdf') {
+                    $publicId = null;
+                    $filenameOverride = $uniqueTitle;
+                }
 
                 try {
-                    $uploadResult = $cloudinaryAttachmentService->upload($file, $folder, $fileType, $publicId);
+                    $uploadResult = $cloudinaryAttachmentService->upload(
+                        $file,
+                        $folder,
+                        $fileType,
+                        $publicId,
+                        $filenameOverride
+                    );
                 } catch (Throwable $exception) {
                     Log::error('Fallo la subida a Cloudinary', [
                         'historia_id' => $historiaClinica->id,
