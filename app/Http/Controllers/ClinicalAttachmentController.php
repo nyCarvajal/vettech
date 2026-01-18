@@ -63,6 +63,10 @@ class ClinicalAttachmentController extends Controller
                     $filenameOverride = $uniqueTitle;
                 }
 
+                if ($fileType === 'pdf') {
+                    $publicId .= '.pdf';
+                }
+
                 try {
                     $uploadResult = $cloudinaryAttachmentService->upload(
                         $file,
