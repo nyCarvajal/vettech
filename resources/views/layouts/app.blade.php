@@ -126,12 +126,14 @@
         <header class="bg-white border-b border-gray-200">
             <div class="h-16 px-6 flex items-center justify-between gap-6">
                 <div class="flex items-center">
-    <img
-        src="{{ asset('images/logo-dark.png') }}"
-        alt="{{ config('app.name', 'VetTech') }}"
-        class="h-48 w-auto"
-    />
-</div>
+                    <a href="{{ route('dashboard') }}" class="inline-flex items-center" aria-label="Ir al dashboard">
+                        <img
+                            src="{{ asset('images/logo-dark.png') }}"
+                            alt="{{ config('app.name', 'VetTech') }}"
+                            class="h-48 w-auto"
+                        />
+                    </a>
+                </div>
                 <div class="hidden md:flex items-center gap-2 text-sm text-gray-500">
                     @yield('breadcrumbs')
                 </div>
@@ -182,11 +184,9 @@
                         [
                             'title' => 'SERVICIOS / CLÍNICA',
                             'items' => array_filter([
-                                $featureEnabled('dispensacion') ? ['label' => 'Dispensación', 'route' => 'dispensations.index'] : null,
+                                
                                 $featureEnabled('hospitalizacion') ? ['label' => 'Hospitalización 24/7', 'route' => 'hospital.index'] : null,
                                 $featureEnabled('belleza') ? ['label' => 'Sala de belleza', 'route' => 'groomings.index'] : null,
-                                $featureEnabled('consentimientos') ? ['label' => 'Consentimientos', 'route' => 'consents.index'] : null,
-                                $featureEnabled('plantillas_consentimientos') ? ['label' => 'Plantillas de consentimientos', 'route' => 'consent-templates.index'] : null,
                             ]),
                         ],
                         [
@@ -203,13 +203,20 @@
                                     'route' => 'reports.home',
                                     'active' => 'reports.*',
                                 ] : null,
+
+                                $featureEnabled('dispensacion') ? ['label' => 'Dispensación', 'route' => 'dispensations.index'] : null,
+                                $featureEnabled('Inventario') ? ['label' => 'Inventario', 'route' => 'items.index'] : null,
+                                
                             ]),
+
                         ],
                         [
                             'title' => 'CONFIGURACIÓN',
                             'items' => array_filter([
+                                ['label' => 'Catálogos', 'route' => 'configuracion.index'],
                                 $featureEnabled('config_clinica') ? ['label' => 'Configuración de clínicas', 'route' => 'settings.clinica.edit'] : null,
-                            ]),
+                                $featureEnabled('plantillas_consentimientos') ? ['label' => 'Plantillas de consentimientos', 'route' => 'consent-templates.index'] : null,
+         ]),
                         ],
                     ];
 

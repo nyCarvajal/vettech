@@ -52,8 +52,12 @@ class PatientsController extends Controller
             $query->where('species_id', $request->integer('species_id'));
         })->orderBy('name')->get();
 
+        $patient = new Patient([
+            'owner_id' => $request->integer('owner_id') ?: null,
+        ]);
+
         return view('patients.form', [
-            'patient' => new Patient(),
+            'patient' => $patient,
             'species' => $species,
             'owners' => $owners,
             'breeds' => $breeds,

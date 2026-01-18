@@ -23,6 +23,7 @@ class PatientRequest extends FormRequest
             'fecha_nacimiento' => ['nullable', 'date', 'before:tomorrow'],
             'color' => ['nullable', 'string', 'max:100'],
             'microchip' => ['nullable', 'string', 'max:100'],
+            'estado' => ['nullable', 'string', 'max:100'],
             'peso_actual' => ['nullable', 'numeric', 'between:0,200000'],
             'weight_unit' => ['nullable', 'in:kg,g', 'required_with:peso_actual'],
             'temperamento' => ['nullable', 'in:tranquilo,nervioso,agresivo,miedoso,otro'],

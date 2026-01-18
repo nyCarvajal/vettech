@@ -67,9 +67,10 @@ class InventoryService
 
     protected function recordMovement(Item $item, string $type, float $delta, array $data = []): InventoryMovement
     {
-        $connection = $item->getConnectionName() ?? 'tenant';
+        $connectionName = $item->getConnectionName() ?? 'tenant';
 
-        return DB::connection($connection)->transaction(function () use ($item, $type, $delta, $data) {
+        return DB::connection($connectionName)->transaction(function () use ($item, $type, $delta, $data, $connectionName) {
+            $resolvedConnection = $item->getConnectionName() ?? $connectionName;
             $lockedItem = Item::query()
                 ->whereKey($item->getKey())
                 ->lockForUpdate()
@@ -89,7 +90,7 @@ class InventoryService
 
             $movementQuantity = $type === 'adjust' ? $delta : abs($delta);
 
-            $resolvedType = $this->resolveMovementType($connection, $type);
+            $resolvedType = $this->resolveMovementType($resolvedConnection, $type);
             $meta = $data['meta'] ?? null;
             if ($resolvedType !== $type) {
                 $meta = array_merge($meta ?? [], [
