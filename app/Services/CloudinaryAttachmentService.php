@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
+use Cloudinary\Cloudinary as CloudinarySdk;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Str;
 use Throwable;
@@ -19,6 +19,7 @@ class CloudinaryAttachmentService
     public function upload(UploadedFile $file, string $folder, string $fileType, ?string $publicId = null): array
     {
         $this->ensureCloudinaryConfigured();
+        $cloudinary = $this->cloudinary();
 
         $resourceType = $this->resourceTypeFromFileType($fileType);
 
@@ -41,16 +42,17 @@ class CloudinaryAttachmentService
             'overwrite' => false,
         ]);
 
-        $upload = Cloudinary::uploadApi()->upload($file->getRealPath(), $options);
+        $upload = $cloudinary->uploadApi()->upload($file->getRealPath(), $options);
 
-        return $upload;
+        return $this->normalizeUploadResponse($upload);
     }
 
     public function delete(string $publicId, string $resourceType = 'image'): void
     {
         try {
             $this->ensureCloudinaryConfigured();
-            Cloudinary::uploadApi()->destroy($publicId, ['resource_type' => $resourceType]);
+            $cloudinary = $this->cloudinary();
+            $cloudinary->uploadApi()->destroy($publicId, ['resource_type' => $resourceType]);
         } catch (Throwable $exception) {
             report($exception);
         }
@@ -76,5 +78,29 @@ class CloudinaryAttachmentService
             'pdf' => 'raw',
             default => 'image',
         };
+    }
+
+    private function cloudinary(): CloudinarySdk
+    {
+        return new CloudinarySdk(config('cloudinary'));
+    }
+
+    private function normalizeUploadResponse($upload): array
+    {
+        if (is_array($upload)) {
+            return $upload;
+        }
+
+        if (is_object($upload)) {
+            if (method_exists($upload, 'toArray')) {
+                return $upload->toArray();
+            }
+
+            if (method_exists($upload, 'jsonSerialize')) {
+                return (array) $upload->jsonSerialize();
+            }
+        }
+
+        return (array) $upload;
     }
 }

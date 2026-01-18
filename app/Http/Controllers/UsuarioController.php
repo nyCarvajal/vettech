@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\TipoIdentificacion;
 use App\Models\User;
 use App\Support\RoleLabelResolver;
-use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
+use Cloudinary\Cloudinary as CloudinarySdk;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -245,8 +245,9 @@ class UsuarioController extends Controller
         }
 
         $this->ensureCloudinaryConfigured();
+        $cloudinary = $this->cloudinary();
 
-        $upload = Cloudinary::uploadApi()->upload($file->getRealPath(), [
+        $upload = $cloudinary->uploadApi()->upload($file->getRealPath(), [
             'folder' => sprintf('clinicas/%s/firmas', Auth::user()->clinica_id ?? 'general'),
             'resource_type' => 'image',
             'transformation' => [['quality' => 'auto', 'fetch_format' => 'auto', 'width' => 1600, 'crop' => 'limit']],
@@ -254,7 +255,8 @@ class UsuarioController extends Controller
 
         if ($user && $user->firma_medica_public_id) {
             $this->ensureCloudinaryConfigured();
-            Cloudinary::uploadApi()->destroy($user->firma_medica_public_id, ['resource_type' => 'image']);
+            $cloudinary = $this->cloudinary();
+            $cloudinary->uploadApi()->destroy($user->firma_medica_public_id, ['resource_type' => 'image']);
         }
 
         return [
@@ -275,5 +277,10 @@ class UsuarioController extends Controller
         if (empty($cloudConfig['cloud_name']) || empty($cloudConfig['api_key']) || empty($cloudConfig['api_secret'])) {
             throw new \RuntimeException('Cloudinary credentials missing. Set CLOUDINARY_URL or CLOUDINARY_API_KEY/SECRET.');
         }
+    }
+
+    private function cloudinary(): CloudinarySdk
+    {
+        return new CloudinarySdk(config('cloudinary'));
     }
 }
