@@ -38,7 +38,7 @@ class CloudinaryAttachmentService
             'resource_type' => $resourceType,
             'public_id' => $publicId,
             'transformation' => $transformation,
-            'format' => $fileType === 'image' ? 'webp' : null,
+            'format' => $fileType === 'image' ? 'webp' : ($fileType === 'pdf' ? 'pdf' : null),
             'overwrite' => false,
         ]);
 
