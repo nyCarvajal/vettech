@@ -57,6 +57,10 @@ class ClinicalAttachmentController extends Controller
                 $uniqueTitle = $this->uniqueTitle($historiaClinica, $sanitizedTitle, $index);
                 $publicId = $uniqueTitle . '-' . Str::random(6);
 
+                if ($fileType === 'pdf') {
+                    $publicId .= '.pdf';
+                }
+
                 try {
                     $uploadResult = $cloudinaryAttachmentService->upload($file, $folder, $fileType, $publicId);
                 } catch (Throwable $exception) {
