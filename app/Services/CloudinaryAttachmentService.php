@@ -44,7 +44,7 @@ class CloudinaryAttachmentService
 
         $upload = $cloudinary->uploadApi()->upload($file->getRealPath(), $options);
 
-        return $upload;
+        return $this->normalizeUploadResponse($upload);
     }
 
     public function delete(string $publicId, string $resourceType = 'image'): void
@@ -83,5 +83,24 @@ class CloudinaryAttachmentService
     private function cloudinary(): CloudinarySdk
     {
         return new CloudinarySdk(config('cloudinary'));
+    }
+
+    private function normalizeUploadResponse($upload): array
+    {
+        if (is_array($upload)) {
+            return $upload;
+        }
+
+        if (is_object($upload)) {
+            if (method_exists($upload, 'toArray')) {
+                return $upload->toArray();
+            }
+
+            if (method_exists($upload, 'jsonSerialize')) {
+                return (array) $upload->jsonSerialize();
+            }
+        }
+
+        return (array) $upload;
     }
 }
