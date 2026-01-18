@@ -16,7 +16,13 @@ class CloudinaryAttachmentService
         return "tenants/{$tenantSlug}/pacientes/{$pacienteId}/historias/{$historiaId}/adjuntos";
     }
 
-    public function upload(UploadedFile $file, string $folder, string $fileType, ?string $publicId = null): array
+    public function upload(
+        UploadedFile $file,
+        string $folder,
+        string $fileType,
+        ?string $publicId = null,
+        ?string $filenameOverride = null
+    ): array
     {
         $this->ensureCloudinaryConfigured();
         $cloudinary = $this->cloudinary();
@@ -39,6 +45,9 @@ class CloudinaryAttachmentService
             'public_id' => $publicId,
             'transformation' => $transformation,
             'format' => $fileType === 'image' ? 'webp' : null,
+            'use_filename' => $filenameOverride ? true : null,
+            'unique_filename' => $filenameOverride ? true : null,
+            'filename_override' => $filenameOverride,
             'overwrite' => false,
         ]);
 

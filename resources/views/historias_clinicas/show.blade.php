@@ -112,11 +112,15 @@
                         $viewUrl = $attachment->cloudinary_secure_url;
 
                         if ($attachment->file_type === 'pdf') {
-                            $pdfUrl = preg_replace(
-                                '/\\.[^.\\/]+$/',
-                                '.' . $attachmentExtension,
-                                $attachment->cloudinary_secure_url
-                            );
+                            $pdfUrl = $attachment->cloudinary_secure_url;
+
+                            if (\Illuminate\Support\Str::endsWith($attachment->cloudinary_secure_url, '.tmp')) {
+                                $pdfUrl = \Illuminate\Support\Str::replaceLast(
+                                    '.tmp',
+                                    '.pdf',
+                                    $attachment->cloudinary_secure_url
+                                );
+                            }
                             $downloadUrl = \Illuminate\Support\Str::replaceFirst(
                                 '/raw/upload/',
                                 '/raw/upload/fl_attachment:' . rawurlencode($attachment->titulo_limpio) . '/',
