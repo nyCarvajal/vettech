@@ -55,6 +55,7 @@ class ClinicalAttachmentController extends Controller
                 $mimeType = $file->getMimeType();
                 $fileType = $request->fileTypeFromMime($mimeType);
                 $uniqueTitle = $this->uniqueTitle($historiaClinica, $sanitizedTitle, $index);
+                $filenameOverride = null;
                 if ($fileType === 'pdf') {
                     $publicId = $uniqueTitle;
                 } else {
