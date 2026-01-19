@@ -62,7 +62,13 @@ class ClinicalAttachmentController extends Controller
                 }
 
                 try {
-                    $uploadResult = $cloudinaryAttachmentService->upload($file, $folder, $fileType, $publicId);
+                    $uploadResult = $cloudinaryAttachmentService->upload(
+                        $file,
+                        $folder,
+                        $fileType,
+                        $publicId,
+                        $filenameOverride
+                    );
                 } catch (Throwable $exception) {
                     Log::error('Fallo la subida a Cloudinary', [
                         'historia_id' => $historiaClinica->id,

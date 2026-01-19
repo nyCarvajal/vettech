@@ -108,7 +108,13 @@
                             </div>
                             <div class="flex justify-end gap-2">
                                 <button type="button" @click="open=false" class="rounded-lg border border-violet-200 bg-violet-50 px-4 py-2 text-sm font-semibold text-violet-700 hover:bg-violet-100">Cancelar</button>
-                                <button type="submit" class="rounded-lg bg-mint-600 px-4 py-2 text-sm font-semibold text-white hover:bg-mint-700">Guardar</button>
+                                <button
+                                    type="submit"
+                                    class="rounded-lg px-4 py-2 text-sm font-semibold text-white"
+                                    :class="type === 'adjust' ? 'bg-violet-600 hover:bg-violet-700' : 'bg-mint-600 hover:bg-mint-700'"
+                                >
+                                    Guardar
+                                </button>
                             </div>
                         </form>
                     </div>

@@ -16,7 +16,13 @@ class CloudinaryAttachmentService
         return "tenants/{$tenantSlug}/pacientes/{$pacienteId}/historias/{$historiaId}/adjuntos";
     }
 
-    public function upload(UploadedFile $file, string $folder, string $fileType, ?string $publicId = null): array
+    public function upload(
+        UploadedFile $file,
+        string $folder,
+        string $fileType,
+        ?string $publicId = null,
+        ?string $filenameOverride = null
+    ): array
     {
         $this->ensureCloudinaryConfigured();
         $cloudinary = $this->cloudinary();
