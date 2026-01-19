@@ -45,9 +45,6 @@ class CloudinaryAttachmentService
             'public_id' => $publicId,
             'transformation' => $transformation,
             'format' => $fileType === 'image' ? 'webp' : ($fileType === 'pdf' ? 'pdf' : null),
-            'use_filename' => $filenameOverride ? true : null,
-            'unique_filename' => $filenameOverride ? true : null,
-            'filename_override' => $filenameOverride,
             'overwrite' => false,
         ]);
 
