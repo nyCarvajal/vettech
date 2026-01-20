@@ -14,9 +14,14 @@ class Permission extends SpatiePermission
 
     protected $fillable = ['name', 'label'];
 
-    public function roles()
+    public function roles(): BelongsToMany
     {
-        return $this->belongsToMany(Role::class);
+        return $this->belongsToMany(
+            Role::class,
+            config('permission.table_names.role_has_permissions'),
+            config('permission.column_names.permission_pivot_key') ?? 'permission_id',
+            config('permission.column_names.role_pivot_key') ?? 'role_id'
+        );
     }
 
     public function getConnectionName()
