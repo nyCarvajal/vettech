@@ -108,17 +108,22 @@
                         $attachmentExtension = $attachment->cloudinary_format
                             ?? ($attachment->file_type === 'pdf' ? 'pdf' : $attachment->file_type);
                         $downloadFilename = $attachment->titulo_limpio . ($attachmentExtension ? '.' . $attachmentExtension : '');
-                        $downloadUrl = $attachment->cloudinary_secure_url;
-                        $viewUrl = $attachment->cloudinary_secure_url;
+                        $baseUrl = preg_replace(
+                            '#/upload/[^/]+/v#',
+                            '/upload/v',
+                            $attachment->cloudinary_secure_url
+                        );
+                        $downloadUrl = $baseUrl;
+                        $viewUrl = $baseUrl;
 
                         if ($attachment->file_type === 'pdf') {
-                            $pdfUrl = $attachment->cloudinary_secure_url;
+                            $pdfUrl = $baseUrl;
 
-                            if (\Illuminate\Support\Str::endsWith($attachment->cloudinary_secure_url, '.tmp')) {
+                            if (\Illuminate\Support\Str::endsWith($baseUrl, '.tmp')) {
                                 $pdfUrl = \Illuminate\Support\Str::replaceLast(
                                     '.tmp',
                                     '.pdf',
-                                    $attachment->cloudinary_secure_url
+                                    $baseUrl
                                 );
                             }
                             $downloadUrl = \Illuminate\Support\Str::replaceFirst(
