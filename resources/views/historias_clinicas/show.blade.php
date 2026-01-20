@@ -112,16 +112,24 @@
                         $resourceType = $attachment->cloudinary_resource_type ?? ($attachment->file_type === 'pdf' ? 'raw' : 'image');
                         $publicId = $attachment->cloudinary_public_id;
                         $baseUrl = $attachment->cloudinary_secure_url;
+                        $versionSegment = null;
+
+                        if (preg_match('#/v\\d+/#', $attachment->cloudinary_secure_url, $versionMatch)) {
+                            $versionSegment = $versionMatch[0];
+                        }
 
                         if ($cloudName && $publicId) {
                             $publicExtension = $attachment->cloudinary_format
                                 ?? ($attachment->file_type === 'pdf' ? 'pdf' : null);
+                            $hasExtension = \Illuminate\Support\Str::contains($publicId, '.');
+                            $extensionSuffix = (! $hasExtension && $publicExtension) ? '.' . $publicExtension : '';
                             $baseUrl = sprintf(
-                                'https://res.cloudinary.com/%s/%s/upload/%s%s',
+                                'https://res.cloudinary.com/%s/%s/upload%s%s%s',
                                 $cloudName,
                                 $resourceType,
+                                $versionSegment ?? '/',
                                 $publicId,
-                                $publicExtension ? '.' . $publicExtension : ''
+                                $extensionSuffix
                             );
                         }
                         $downloadUrl = $baseUrl;
