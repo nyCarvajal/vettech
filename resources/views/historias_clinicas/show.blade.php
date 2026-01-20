@@ -108,11 +108,22 @@
                         $attachmentExtension = $attachment->cloudinary_format
                             ?? ($attachment->file_type === 'pdf' ? 'pdf' : $attachment->file_type);
                         $downloadFilename = $attachment->titulo_limpio . ($attachmentExtension ? '.' . $attachmentExtension : '');
-                        $baseUrl = preg_replace(
-                            '#/upload/[^/]+/v#',
-                            '/upload/v',
-                            $attachment->cloudinary_secure_url
-                        );
+                        $cloudName = config('cloudinary.cloud.cloud_name');
+                        $resourceType = $attachment->cloudinary_resource_type ?? ($attachment->file_type === 'pdf' ? 'raw' : 'image');
+                        $publicId = $attachment->cloudinary_public_id;
+                        $baseUrl = $attachment->cloudinary_secure_url;
+
+                        if ($cloudName && $publicId) {
+                            $publicExtension = $attachment->cloudinary_format
+                                ?? ($attachment->file_type === 'pdf' ? 'pdf' : null);
+                            $baseUrl = sprintf(
+                                'https://res.cloudinary.com/%s/%s/upload/%s%s',
+                                $cloudName,
+                                $resourceType,
+                                $publicId,
+                                $publicExtension ? '.' . $publicExtension : ''
+                            );
+                        }
                         $downloadUrl = $baseUrl;
                         $viewUrl = $baseUrl;
 
