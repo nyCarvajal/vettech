@@ -104,21 +104,66 @@
                         @endif
                     </div>
 
-                    <div class="flex items-start justify-between">
+                    @php
+                        $attachmentExtension = $attachment->cloudinary_format
+                            ?? ($attachment->file_type === 'pdf' ? 'pdf' : $attachment->file_type);
+                        $downloadFilename = $attachment->titulo_limpio . ($attachmentExtension ? '.' . $attachmentExtension : '');
+                        $cloudName = config('cloudinary.cloud.cloud_name');
+                        $resourceType = $attachment->cloudinary_resource_type ?? ($attachment->file_type === 'pdf' ? 'raw' : 'image');
+                        $publicId = $attachment->cloudinary_public_id;
+                        $baseUrl = $attachment->cloudinary_secure_url;
+
+                        if ($cloudName && $publicId) {
+                            $publicExtension = $attachment->cloudinary_format
+                                ?? ($attachment->file_type === 'pdf' ? 'pdf' : null);
+                            $baseUrl = sprintf(
+                                'https://res.cloudinary.com/%s/%s/upload/%s%s',
+                                $cloudName,
+                                $resourceType,
+                                $publicId,
+                                $publicExtension ? '.' . $publicExtension : ''
+                            );
+                        }
+                        $downloadUrl = $baseUrl;
+                        $viewUrl = $baseUrl;
+
+                        if ($attachment->file_type === 'pdf') {
+                            $pdfUrl = $baseUrl;
+
+                            if (\Illuminate\Support\Str::endsWith($baseUrl, '.tmp')) {
+                                $pdfUrl = \Illuminate\Support\Str::replaceLast(
+                                    '.tmp',
+                                    '.pdf',
+                                    $baseUrl
+                                );
+                            }
+                            $downloadUrl = \Illuminate\Support\Str::replaceFirst(
+                                '/raw/upload/',
+                                '/raw/upload/fl_attachment:' . rawurlencode($attachment->titulo_limpio) . '/',
+                                $pdfUrl
+                            );
+                            $viewUrl = \Illuminate\Support\Str::replaceFirst(
+                                '/raw/upload/',
+                                '/raw/upload/fl_inline/',
+                                $pdfUrl
+                            );
+                        }
+                    @endphp
+                    <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                         <div>
                             <p class="font-semibold text-gray-900">{{ $attachment->titulo_limpio }}</p>
                             <p class="text-xs text-gray-500">{{ strtoupper($attachment->file_type) }} • {{ number_format($attachment->size_bytes / 1024 / 1024, 2) }} MB</p>
                             <p class="text-xs text-gray-400">{{ $attachment->created_at?->format('d/m/Y H:i') }}</p>
                         </div>
-                        <div class="flex gap-2 text-xs font-semibold">
+                        <div class="flex flex-wrap gap-2 text-xs font-semibold">
                             @if($attachment->file_type === 'image')
                                 <button type="button" class="rounded-full border border-emerald-200 px-3 py-1 text-emerald-700 hover:bg-emerald-50 transition" onclick="window.open('{{ $attachment->cloudinary_secure_url }}','_blank')">Ver</button>
                             @elseif($attachment->file_type === 'pdf')
-                                <a class="rounded-full border border-blue-200 px-3 py-1 text-blue-700 hover:bg-blue-50 transition" href="{{ $attachment->cloudinary_secure_url }}" target="_blank" rel="noopener">Ver</a>
+                                <a class="rounded-full border border-blue-200 px-3 py-1 text-blue-700 hover:bg-blue-50 transition" href="{{ $viewUrl }}" target="_blank" rel="noopener">Ver</a>
                             @else
                                 <a class="rounded-full border border-indigo-200 px-3 py-1 text-indigo-700 hover:bg-indigo-50 transition" href="{{ $attachment->cloudinary_secure_url }}" target="_blank" rel="noopener">Reproducir</a>
                             @endif
-                            <a class="rounded-full border border-gray-200 px-3 py-1 text-gray-700 hover:bg-gray-50 transition" href="{{ $attachment->cloudinary_secure_url }}" download>Descargar</a>
+                            <a class="rounded-full border border-gray-200 px-3 py-1 text-gray-700 hover:bg-gray-50 transition" href="{{ $downloadUrl }}" download="{{ $downloadFilename }}">Descargar</a>
                             <form method="POST" action="{{ route('historias-clinicas.adjuntos.destroy', $attachment) }}">
                                 @csrf
                                 @method('DELETE')
