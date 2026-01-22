@@ -108,49 +108,18 @@
                         $attachmentExtension = $attachment->cloudinary_format
                             ?? ($attachment->file_type === 'pdf' ? 'pdf' : $attachment->file_type);
                         $downloadFilename = $attachment->titulo_limpio . ($attachmentExtension ? '.' . $attachmentExtension : '');
-                        $cloudName = config('cloudinary.cloud.cloud_name');
-                        $resourceType = $attachment->cloudinary_resource_type ?? ($attachment->file_type === 'pdf' ? 'raw' : 'image');
-                        $publicId = $attachment->cloudinary_public_id;
-                        $baseUrl = $attachment->cloudinary_secure_url;
-                        $versionSegment = null;
-
-                        if (preg_match('#/v\\d+/#', $attachment->cloudinary_secure_url, $versionMatch)) {
-                            $versionSegment = $versionMatch[0];
-                        }
-
-                        if ($cloudName && $publicId) {
-                            $publicExtension = $attachment->cloudinary_format
-                                ?? ($attachment->file_type === 'pdf' ? 'pdf' : null);
-                            $hasExtension = \Illuminate\Support\Str::contains($publicId, '.');
-                            $extensionSuffix = (! $hasExtension && $publicExtension) ? '.' . $publicExtension : '';
-                            $baseUrl = sprintf(
-                                'https://res.cloudinary.com/%s/%s/upload%s%s%s',
-                                $cloudName,
-                                $resourceType,
-                                $versionSegment ?? '/',
-                                $publicId,
-                                $extensionSuffix
-                            );
-                        }
-                        $downloadUrl = $baseUrl;
-                        $viewUrl = $baseUrl;
+                        $downloadUrl = $attachment->cloudinary_secure_url;
+                        $viewUrl = $attachment->cloudinary_secure_url;
 
                         if ($attachment->file_type === 'pdf') {
-                            $pdfUrl = $baseUrl;
-
-                            if (\Illuminate\Support\Str::endsWith($baseUrl, '.tmp')) {
-                                $pdfUrl = \Illuminate\Support\Str::replaceLast(
+                            if (\Illuminate\Support\Str::endsWith($downloadUrl, '.tmp')) {
+                                $downloadUrl = \Illuminate\Support\Str::replaceLast(
                                     '.tmp',
                                     '.pdf',
-                                    $baseUrl
+                                    $downloadUrl
                                 );
                             }
-                            $downloadUrl = \Illuminate\Support\Str::replaceFirst(
-                                '/raw/upload/',
-                                '/raw/upload/fl_attachment:' . rawurlencode($attachment->titulo_limpio) . '/',
-                                $pdfUrl
-                            );
-                            $viewUrl = $pdfUrl;
+                            $viewUrl = $downloadUrl;
                         }
                     @endphp
                     <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
