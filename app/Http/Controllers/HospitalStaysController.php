@@ -41,7 +41,7 @@ class HospitalStaysController extends Controller
     public function store(HospitalStayRequest $request): RedirectResponse
     {
         $this->hospitalService->admit($request->validated(), $request->user());
-        return redirect()->route('hospital.stays.index')->with('status', 'Paciente hospitalizado');
+        return redirect()->route('hospital.index')->with('status', 'Paciente hospitalizado');
     }
 
     public function discharge(HospitalStay $stay): RedirectResponse
