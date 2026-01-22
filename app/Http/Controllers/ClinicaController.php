@@ -110,6 +110,8 @@ class ClinicaController extends Controller
             'direccion' => ['nullable', 'string', 'max:300'],
             'municipio' => ['nullable', 'integer'],
             'db' => ['nullable', 'string', 'max:191'],
+            'features' => ['nullable', 'array'],
+            'features.*' => ['nullable', 'boolean'],
         ]);
     }
 }

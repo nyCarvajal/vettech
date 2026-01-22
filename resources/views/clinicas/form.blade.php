@@ -1,4 +1,61 @@
 <div class="row g-3">
+    @php
+        $featureDefaults = \App\Models\Clinica::featureDefaults();
+        $featureOptions = [
+            'agenda' => [
+                'label' => 'Agenda',
+                'description' => 'Citas, reservas y calendario.',
+            ],
+            'facturacion_pos' => [
+                'label' => 'Facturación POS',
+                'description' => 'Cobros rápidos y emisión de facturas.',
+            ],
+            'tutores' => [
+                'label' => 'Tutores',
+                'description' => 'Gestión de propietarios de mascotas.',
+            ],
+            'pacientes' => [
+                'label' => 'Pacientes',
+                'description' => 'Registro y seguimiento clínico.',
+            ],
+            'dispensacion' => [
+                'label' => 'Dispensación',
+                'description' => 'Entrega y control de medicamentos.',
+            ],
+            'hospitalizacion' => [
+                'label' => 'Hospitalización 24/7',
+                'description' => 'Manejo de estancias y monitoreo.',
+            ],
+            'belleza' => [
+                'label' => 'Sala de belleza',
+                'description' => 'Servicios de grooming y estética.',
+            ],
+            'consentimientos' => [
+                'label' => 'Consentimientos',
+                'description' => 'Documentos clínicos firmados.',
+            ],
+            'plantillas_consentimientos' => [
+                'label' => 'Plantillas de consentimientos',
+                'description' => 'Modelos reutilizables de formularios.',
+            ],
+            'arqueo_caja' => [
+                'label' => 'Arqueo de caja',
+                'description' => 'Cierres y consolidación de caja.',
+            ],
+            'reportes_basicos' => [
+                'label' => 'Reportes básicos',
+                'description' => 'Indicadores rápidos del negocio.',
+            ],
+            'reportes_avanzados' => [
+                'label' => 'Reportes avanzados',
+                'description' => 'Reportes detallados y analíticos.',
+            ],
+            'config_clinica' => [
+                'label' => 'Configuración de clínica',
+                'description' => 'Acceso al panel de ajustes.',
+            ],
+        ];
+    @endphp
     <div class="col-md-6">
         <label class="form-label">Nombre</label>
         <input type="text" name="nombre" class="form-control" value="{{ old('nombre', $clinica->nombre) }}" required>
@@ -58,5 +115,33 @@
     <div class="col-md-12">
         <label class="form-label">Mensaje de cierre</label>
         <textarea name="msj_finalizado" class="form-control" rows="2">{{ old('msj_finalizado', $clinica->msj_finalizado) }}</textarea>
+    </div>
+    <div class="col-12">
+        <div class="border rounded-3 p-3 bg-light">
+            <h5 class="mb-2">Módulos del plan</h5>
+            <p class="text-muted mb-3">Activa los módulos disponibles para esta clínica.</p>
+            <div class="row g-3">
+                @foreach ($featureOptions as $key => $feature)
+                    <div class="col-md-6">
+                        <label class="border rounded-3 p-3 w-100 h-100 d-flex gap-3 align-items-start">
+                            <div class="flex-grow-1">
+                                <div class="fw-semibold">{{ $feature['label'] }}</div>
+                                <div class="text-muted small">{{ $feature['description'] }}</div>
+                            </div>
+                            <div class="form-check form-switch m-0">
+                                <input type="hidden" name="features[{{ $key }}]" value="0">
+                                <input
+                                    class="form-check-input"
+                                    type="checkbox"
+                                    name="features[{{ $key }}]"
+                                    value="1"
+                                    @checked(old("features.{$key}", $clinica->featureEnabled($key, $featureDefaults[$key])))
+                                >
+                            </div>
+                        </label>
+                    </div>
+                @endforeach
+            </div>
+        </div>
     </div>
 </div>
