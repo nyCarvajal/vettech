@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Cloudinary\Cloudinary as CloudinarySdk;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -49,5 +50,38 @@ class ClinicalAttachment extends BaseModel
     public function author(): BelongsTo
     {
         return $this->belongsTo(User::class, 'created_by');
+    }
+
+    public function signedViewUrl(): string
+    {
+        return $this->buildSignedUrl();
+    }
+
+    public function signedDownloadUrl(string $filename): string
+    {
+        return $this->buildSignedUrl($filename);
+    }
+
+    private function buildSignedUrl(?string $downloadFilename = null): string
+    {
+        if (! $this->cloudinary_public_id) {
+            return (string) $this->cloudinary_secure_url;
+        }
+
+        $cloudinary = new CloudinarySdk(config('cloudinary'));
+        $asset = $cloudinary->image($this->cloudinary_public_id);
+
+        $format = $this->cloudinary_format ?? ($this->file_type === 'pdf' ? 'pdf' : null);
+        if ($format) {
+            $asset = $asset->format($format);
+        }
+
+        if ($downloadFilename) {
+            $asset = $asset->addFlag('attachment:' . $downloadFilename);
+        }
+
+        $asset = $asset->signUrl(true);
+
+        return (string) $asset->toUrl();
     }
 }
