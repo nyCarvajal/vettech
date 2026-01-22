@@ -150,11 +150,7 @@
                                 '/raw/upload/fl_attachment:' . rawurlencode($attachment->titulo_limpio) . '/',
                                 $pdfUrl
                             );
-                            $viewUrl = \Illuminate\Support\Str::replaceFirst(
-                                '/raw/upload/',
-                                '/raw/upload/fl_inline/',
-                                $pdfUrl
-                            );
+                            $viewUrl = $pdfUrl;
                         }
                     @endphp
                     <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
