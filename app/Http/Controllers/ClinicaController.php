@@ -22,7 +22,9 @@ class ClinicaController extends Controller
 
     public function store(Request $request)
     {
-        $clinica = Clinica::create($this->validated($request));
+        $data = $this->validated($request);
+        $data['features'] = $this->normalizeFeatures($request);
+        $clinica = Clinica::create($data);
 
         return redirect()
             ->route('clinicas.index')
@@ -41,7 +43,9 @@ class ClinicaController extends Controller
 
     public function update(Request $request, Clinica $clinica)
     {
-        $clinica->update($this->validated($request, $clinica->id));
+        $data = $this->validated($request, $clinica->id);
+        $data['features'] = $this->normalizeFeatures($request);
+        $clinica->update($data);
 
         return redirect()
             ->route('clinicas.edit', $clinica)
@@ -75,7 +79,9 @@ class ClinicaController extends Controller
 
         abort_unless($clinica, 404);
 
-        $clinica->update($this->validated($request, $clinica->id));
+        $data = $this->validated($request, $clinica->id);
+        $data['features'] = $this->normalizeFeatures($request);
+        $clinica->update($data);
 
         return redirect()
             ->route('clinicas.edit-own')
@@ -110,6 +116,19 @@ class ClinicaController extends Controller
             'direccion' => ['nullable', 'string', 'max:300'],
             'municipio' => ['nullable', 'integer'],
             'db' => ['nullable', 'string', 'max:191'],
+            'features' => ['nullable', 'array'],
+            'features.*' => ['nullable', 'boolean'],
         ]);
+    }
+
+    private function normalizeFeatures(Request $request): array
+    {
+        $features = [];
+
+        foreach (Clinica::featureDefaults() as $key => $default) {
+            $features[$key] = $request->boolean("features.{$key}");
+        }
+
+        return $features;
     }
 }
