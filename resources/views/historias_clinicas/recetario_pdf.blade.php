@@ -40,6 +40,12 @@
             display: grid;
             place-items: center;
             margin-right: 14px;
+            overflow: hidden;
+        }
+        .brand-mark img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
         }
         .brand-mark span {
             font-size: 26px;
@@ -145,7 +151,18 @@
 <body>
     <div class="card">
         <div class="header">
-            <div class="brand-mark"><span>❤</span></div>
+            @php
+                $clinicLogoPath = $clinica->logo_path
+                    ? public_path('storage/' . $clinica->logo_path)
+                    : public_path('images/logo-dark.png');
+            @endphp
+            <div class="brand-mark">
+                @if ($clinicLogoPath && file_exists($clinicLogoPath))
+                    <img src="{{ $clinicLogoPath }}" alt="Logo {{ $clinica->name ?? $clinica->nombre ?? config('app.name') }}">
+                @else
+                    <span>❤</span>
+                @endif
+            </div>
             <div>
                 <h1>Receta Mádica</h1>
                 <p>Rx #{{ $prescription->id }} · {{ $prescription->created_at?->format('d/m/Y') }}</p>
