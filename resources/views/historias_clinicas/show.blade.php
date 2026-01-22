@@ -112,7 +112,7 @@
                         $viewUrl = $attachment->cloudinary_secure_url;
 
                         if ($attachment->file_type === 'pdf') {
-                            $downloadUrl = $attachment->signedDownloadUrl($attachment->titulo_limpio);
+                            $downloadUrl = $attachment->signedDownloadUrl($downloadFilename);
                             $viewUrl = $attachment->signedViewUrl();
                         }
                     @endphp
