@@ -70,6 +70,7 @@ class ClinicalAttachment extends BaseModel
 
         $cloudinary = new CloudinarySdk(config('cloudinary'));
         $asset = $cloudinary->image($this->cloudinary_public_id);
+        $asset = $asset->deliveryType('authenticated');
         $version = $this->extractCloudinaryVersion();
 
         $format = $this->cloudinary_format ?? ($this->file_type === 'pdf' ? 'pdf' : null);
