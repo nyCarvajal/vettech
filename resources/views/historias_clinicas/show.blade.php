@@ -112,8 +112,14 @@
                         $viewUrl = $attachment->cloudinary_secure_url;
 
                         if ($attachment->file_type === 'pdf') {
-                            $downloadUrl = $attachment->signedDownloadUrl($downloadFilename);
-                            $viewUrl = $attachment->signedViewUrl();
+                            if (\Illuminate\Support\Str::endsWith($downloadUrl, '.tmp')) {
+                                $downloadUrl = \Illuminate\Support\Str::replaceLast(
+                                    '.tmp',
+                                    '.pdf',
+                                    $downloadUrl
+                                );
+                            }
+                            $viewUrl = $downloadUrl;
                         }
                     @endphp
                     <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
