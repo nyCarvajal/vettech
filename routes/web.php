@@ -413,15 +413,15 @@ Route::middleware([Authenticate::class, ConnectTenantDB::class, SubstituteBindin
                 Route::get('/admit', [HospitalController::class, 'create'])->name('admit');
                 Route::post('/admit', [HospitalController::class, 'store'])->name('store');
                 Route::get('/board', \App\Http\Controllers\HospitalBoardController::class)->name('board');
-                Route::get('/{stay}', [HospitalController::class, 'show'])->name('show');
-                Route::post('/{stay}/discharge', [HospitalController::class, 'discharge'])->name('discharge');
-                Route::post('/{stay}/invoice', [HospitalController::class, 'generateInvoice'])->name('invoice');
-                Route::post('/{stay}/orders', [HospitalController::class, 'addOrder'])->name('orders.store');
+                Route::get('/{stay}', [HospitalController::class, 'show'])->name('show')->whereNumber('stay');
+                Route::post('/{stay}/discharge', [HospitalController::class, 'discharge'])->name('discharge')->whereNumber('stay');
+                Route::post('/{stay}/invoice', [HospitalController::class, 'generateInvoice'])->name('invoice')->whereNumber('stay');
+                Route::post('/{stay}/orders', [HospitalController::class, 'addOrder'])->name('orders.store')->whereNumber('stay');
                 Route::post('/orders/{order}/stop', [HospitalController::class, 'stopOrder'])->name('orders.stop');
                 Route::post('/orders/{order}/administrations', [HospitalController::class, 'addAdministration'])->name('orders.administrations');
-                Route::post('/{stay}/vitals', [HospitalController::class, 'addVitals'])->name('vitals.store');
-                Route::post('/{stay}/progress', [HospitalController::class, 'addProgress'])->name('progress.store');
-                Route::post('/{stay}/charges', [HospitalController::class, 'addCharge'])->name('charges.store');
+                Route::post('/{stay}/vitals', [HospitalController::class, 'addVitals'])->name('vitals.store')->whereNumber('stay');
+                Route::post('/{stay}/progress', [HospitalController::class, 'addProgress'])->name('progress.store')->whereNumber('stay');
+                Route::post('/{stay}/charges', [HospitalController::class, 'addCharge'])->name('charges.store')->whereNumber('stay');
             });
 
             Route::prefix('hospital/stays')->name('hospital.stays.')->group(function () {
