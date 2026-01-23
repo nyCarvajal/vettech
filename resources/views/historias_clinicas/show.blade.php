@@ -251,6 +251,10 @@
                                 </div>
                                 <div class="flex items-center gap-2 text-xs font-semibold">
                                     <a class="rounded-full border border-blue-200 px-3 py-1 text-blue-700 hover:bg-blue-50 transition" href="{{ route('historias-clinicas.recetarios.print', $prescription) }}">PDF</a>
+                                    <form method="post" action="{{ route('historias-clinicas.recetarios.whatsapp', $prescription) }}">
+                                        @csrf
+                                        <button class="rounded-full border border-emerald-200 px-3 py-1 text-emerald-700 hover:bg-emerald-50 transition" type="submit">WhatsApp</button>
+                                    </form>
                                     <form method="post" action="{{ route('historias-clinicas.recetarios.facturar', $prescription) }}">
                                         @csrf
                                         <button class="rounded-full border border-emerald-200 px-3 py-1 text-emerald-700 hover:bg-emerald-50 transition" type="submit">Facturar</button>
@@ -286,7 +290,13 @@
                                 <p class="font-semibold text-gray-900">Remisión #{{ $referral->id }}</p>
                                 <p class="text-sm text-gray-600">{{ $referral->created_at?->format('d/m/Y') }}</p>
                             </div>
-                            <a class="rounded-full border border-blue-200 px-3 py-1 text-blue-700 hover:bg-blue-50 transition" href="{{ route('historias-clinicas.remisiones.print', $referral) }}">PDF</a>
+                            <div class="flex items-center gap-2 text-xs font-semibold">
+                                <a class="rounded-full border border-blue-200 px-3 py-1 text-blue-700 hover:bg-blue-50 transition" href="{{ route('historias-clinicas.remisiones.print', $referral) }}">PDF</a>
+                                <form method="post" action="{{ route('historias-clinicas.remisiones.whatsapp', $referral) }}">
+                                    @csrf
+                                    <button class="rounded-full border border-emerald-200 px-3 py-1 text-emerald-700 hover:bg-emerald-50 transition" type="submit">WhatsApp</button>
+                                </form>
+                            </div>
                         </div>
                     @empty
                         <p class="py-2 text-sm text-gray-500">Sin remisiones registradas.</p>
