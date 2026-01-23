@@ -175,36 +175,36 @@
                             'title' => 'OPERACIÓN',
                             'items' => array_filter([
                                 ['label' => 'Dashboard', 'route' => 'dashboard'],
-                                $featureEnabled('agenda') ? ['label' => 'Agenda', 'route' => 'agenda.index'] : null,
-                                $featureEnabled('facturacion_pos') ? ['label' => 'Facturación POS', 'route' => 'invoices.pos'] : null,
-                                $featureEnabled('tutores') ? ['label' => 'Tutores', 'route' => 'owners.index'] : null,
-                                $featureEnabled('pacientes') ? ['label' => 'Pacientes', 'route' => 'patients.index'] : null,
+                                ['label' => 'Agenda', 'route' => 'agenda.index'],
+                                ['label' => 'Facturación POS', 'route' => 'invoices.pos'],
+                                ['label' => 'Tutores', 'route' => 'owners.index'],
+                                ['label' => 'Pacientes', 'route' => 'patients.index'],
                             ]),
                         ],
                         [
                             'title' => 'SERVICIOS / CLÍNICA',
                             'items' => array_filter([
-                                $featureEnabled('dispensacion') ? ['label' => 'Dispensación', 'route' => 'dispensations.index'] : null,
-                                $featureEnabled('hospitalizacion') ? ['label' => 'Hospitalización 24/7', 'route' => 'hospital.index'] : null,
-                                $featureEnabled('belleza') ? ['label' => 'Sala de belleza', 'route' => 'groomings.index'] : null,
-                                $featureEnabled('consentimientos') ? ['label' => 'Consentimientos', 'route' => 'consents.index'] : null,
-                                $featureEnabled('plantillas_consentimientos') ? ['label' => 'Plantillas de consentimientos', 'route' => 'consent-templates.index'] : null,
+                                ['label' => 'Dispensación', 'route' => 'dispensations.index'],
+                                ['label' => 'Hospitalización 24/7', 'route' => 'hospital.index'],
+                                ['label' => 'Sala de belleza', 'route' => 'groomings.index'],
+                                ['label' => 'Consentimientos', 'route' => 'consents.index'],
+                                ['label' => 'Plantillas de consentimientos', 'route' => 'consent-templates.index'],
                             ]),
                         ],
                         [
                             'title' => 'CAJA Y REPORTES',
                             'items' => array_filter([
-                                $featureEnabled('arqueo_caja') ? ['label' => 'Arqueo de caja', 'route' => 'cash.closures.create'] : null,
-                                $featureEnabled('reportes_basicos') ? [
+                                ['label' => 'Arqueo de caja', 'route' => 'cash.closures.create'],
+                                [
                                     'label' => 'Reportes básicos',
                                     'route' => 'reports.quick',
                                     'active' => 'reports.quick*',
-                                ] : null,
-                                $featureEnabled('reportes_avanzados') ? [
+                                ],
+                                [
                                     'label' => 'Reportes avanzados',
                                     'route' => 'reports.home',
                                     'active' => 'reports.*',
-                                ] : null,
+                                ],
                             ]),
 
                         ],
