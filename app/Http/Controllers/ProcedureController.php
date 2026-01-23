@@ -14,7 +14,9 @@ use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\View\View;
 
 class ProcedureController extends Controller
@@ -234,10 +236,26 @@ class ProcedureController extends Controller
 
     private function clinicUsers(?User $user)
     {
-        return User::query()
+        $connection = 'mysql';
+        $columns = ['id', 'nombres'];
+
+        if (Schema::connection($connection)->hasColumn('users', 'numero_identificacion')) {
+            $columns[] = 'numero_identificacion';
+        } else {
+            $columns[] = DB::raw('null as numero_identificacion');
+        }
+
+        if (Schema::connection($connection)->hasColumn('users', 'firma_medica_texto')) {
+            $columns[] = 'firma_medica_texto';
+        } else {
+            $columns[] = DB::raw('null as firma_medica_texto');
+        }
+
+        return User::on($connection)
             ->when($user?->clinica_id, fn ($query, $clinicId) => $query->where('clinica_id', $clinicId))
             ->orderBy('nombres')
-            ->get(['id', 'nombres',  'numero_identificacion', 'firma_medica_texto']);
+            ->select($columns)
+            ->get();
     }
 
     private function responsibleDisplayName(?User $user): ?string
