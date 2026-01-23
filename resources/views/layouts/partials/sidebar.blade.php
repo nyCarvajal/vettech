@@ -86,7 +86,7 @@
                                  <span class="nav-icon">
                                       <iconify-icon icon="solar:pill-line"></iconify-icon>
                                  </span>
-                                 <span class="nav-text">Dispensación</span>
+                                 <span class="nav-text">Dispensario</span>
                             </a>
                        </li>
                    @endif
@@ -108,7 +108,7 @@
                                  <span class="nav-icon">
                                       <iconify-icon icon="solar:scissors-line"></iconify-icon>
                                  </span>
-                                 <span class="nav-text">Sala de belleza</span>
+                                 <span class="nav-text">Peluquería</span>
                             </a>
                        </li>
                    @endif
