@@ -73,11 +73,11 @@ if($template=="reserva"){
 		if($template=="finalizado"){
 	
 	return [
-        'namespace' => "36f05a4b_f53a_4676_a95e_239e854de795",
+        'namespace' => $namespace,
         'template'  => $template,
         'language'  => [
             'policy' => 'deterministic',
-            'code'   => 'es',
+            'code'   => $langCode,
         ],
         'params'    => [
            
@@ -93,11 +93,11 @@ if($template=="reserva"){
 }else{
 
     return [
-        'namespace' => "36f05a4b_f53a_4676_a95e_239e854de795",
+        'namespace' => $namespace,
         'template'  => $template,
         'language'  => [
             'policy' => 'deterministic',
-            'code'   => 'es',
+            'code'   => $langCode,
         ],
         'params'    => [
             // Header params array
