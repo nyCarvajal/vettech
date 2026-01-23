@@ -23,7 +23,7 @@ class User extends Authenticatable
     protected $connection = 'mysql';
 
     // Modelo de autenticación apuntando a la tabla de usuarios
-    protected $table = 'users';
+    protected $table = 'usuarios';
 
     protected $casts = [
         'db' => 'string',
