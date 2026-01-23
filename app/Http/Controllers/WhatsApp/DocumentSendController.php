@@ -12,7 +12,7 @@ class DocumentSendController extends Controller
 {
     public function sendPrescription(Prescription $prescription, OneMsgClient $client): RedirectResponse
     {
-        $prescription->load(['historiaClinica.paciente.owner', 'professional']);
+        $prescription->load(['historiaClinica.paciente.owner']);
 
         $phone = $this->resolvePhone($prescription->historiaClinica?->paciente);
 
@@ -31,7 +31,7 @@ class DocumentSendController extends Controller
 
     public function sendExamReferral(ExamReferral $examReferral, OneMsgClient $client): RedirectResponse
     {
-        $examReferral->load(['historiaClinica.paciente.owner', 'author']);
+        $examReferral->load(['historiaClinica.paciente.owner']);
 
         $phone = $this->resolvePhone($examReferral->historiaClinica?->paciente);
 
@@ -66,14 +66,7 @@ class DocumentSendController extends Controller
     {
         $paciente = $prescription->historiaClinica?->paciente;
         $pacienteNombre = trim(($paciente?->nombres ?? '') . ' ' . ($paciente?->apellidos ?? '')) ?: 'tu mascota';
-        $profesional = $prescription->professional?->name;
-
         $mensaje = "Recetario de {$pacienteNombre}.";
-
-        if ($profesional) {
-            $mensaje .= "\nProfesional: {$profesional}.";
-        }
-
         $mensaje .= "\nGracias por confiar en nosotros.";
 
         return $mensaje;
@@ -83,14 +76,10 @@ class DocumentSendController extends Controller
     {
         $paciente = $examReferral->historiaClinica?->paciente;
         $pacienteNombre = trim(($paciente?->nombres ?? '') . ' ' . ($paciente?->apellidos ?? '')) ?: 'tu mascota';
-        $doctor = $examReferral->author?->name ?? $examReferral->doctor_name;
-
         $mensaje = "Remisión de exámenes para {$pacienteNombre}.";
-
-        if ($doctor) {
-            $mensaje .= "\nDr(a). {$doctor}.";
+        if ($examReferral->doctor_name) {
+            $mensaje .= "\nDr(a). {$examReferral->doctor_name}.";
         }
-
         $mensaje .= "\nSi tienes dudas, estamos atentos.";
 
         return $mensaje;
