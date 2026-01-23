@@ -251,7 +251,8 @@ class ProcedureController extends Controller
             $columns[] = DB::raw('null as firma_medica_texto');
         }
 
-        return User::on($connection)
+        return DB::connection($connection)
+            ->table('users')
             ->when($user?->clinica_id, fn ($query, $clinicId) => $query->where('clinica_id', $clinicId))
             ->orderBy('nombres')
             ->select($columns)
