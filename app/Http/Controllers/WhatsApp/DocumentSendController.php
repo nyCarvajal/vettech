@@ -24,7 +24,20 @@ class DocumentSendController extends Controller
         $filename = 'recetario-' . $prescription->id . '.pdf';
         $caption = $this->prescriptionCaption($prescription);
 
-        $client->sendFile($phone, $url, $filename, $caption);
+        $template = config('services.onemsg.templates.recetario');
+        if ($template) {
+            $client->sendTemplate(
+                $phone,
+                $this->documentTemplatePayload(
+                    $template,
+                    $url,
+                    $filename,
+                    $this->prescriptionBodyParams($prescription)
+                )
+            );
+        } else {
+            $client->sendFile($phone, $url, $filename, $caption);
+        }
 
         return back()->with('success', 'Recetario enviado por WhatsApp.');
     }
@@ -43,7 +56,20 @@ class DocumentSendController extends Controller
         $filename = 'remision-' . $examReferral->id . '.pdf';
         $caption = $this->examReferralCaption($examReferral);
 
-        $client->sendFile($phone, $url, $filename, $caption);
+        $template = config('services.onemsg.templates.remision');
+        if ($template) {
+            $client->sendTemplate(
+                $phone,
+                $this->documentTemplatePayload(
+                    $template,
+                    $url,
+                    $filename,
+                    $this->examReferralBodyParams($examReferral)
+                )
+            );
+        } else {
+            $client->sendFile($phone, $url, $filename, $caption);
+        }
 
         return back()->with('success', 'Remisión enviada por WhatsApp.');
     }
@@ -83,5 +109,67 @@ class DocumentSendController extends Controller
         $mensaje .= "\nSi tienes dudas, estamos atentos.";
 
         return $mensaje;
+    }
+
+    private function prescriptionBodyParams(Prescription $prescription): array
+    {
+        $paciente = $prescription->historiaClinica?->paciente;
+        $pacienteNombre = trim(($paciente?->nombres ?? '') . ' ' . ($paciente?->apellidos ?? '')) ?: 'tu mascota';
+
+        return [$pacienteNombre];
+    }
+
+    private function examReferralBodyParams(ExamReferral $examReferral): array
+    {
+        $paciente = $examReferral->historiaClinica?->paciente;
+        $pacienteNombre = trim(($paciente?->nombres ?? '') . ' ' . ($paciente?->apellidos ?? '')) ?: 'tu mascota';
+        $doctorLine = $examReferral->doctor_name ? "Dr(a). {$examReferral->doctor_name}.\n" : '';
+
+        return [$pacienteNombre, $doctorLine];
+    }
+
+    private function documentTemplatePayload(
+        string $template,
+        string $fileUrl,
+        string $filename,
+        array $bodyParams
+    ): array {
+        $namespace = config('services.onemsg.namespace');
+        $langCode = config('services.onemsg.lang.default', 'es');
+
+        $bodyParameters = collect($bodyParams)
+            ->map(fn ($value) => [
+                'type' => 'text',
+                'text' => (string) $value,
+            ])
+            ->values()
+            ->toArray();
+
+        return [
+            'namespace' => $namespace,
+            'template' => $template,
+            'language' => [
+                'policy' => 'deterministic',
+                'code' => $langCode,
+            ],
+            'params' => [
+                [
+                    'type' => 'header',
+                    'parameters' => [
+                        [
+                            'type' => 'document',
+                            'document' => [
+                                'link' => $fileUrl,
+                                'filename' => $filename,
+                            ],
+                        ],
+                    ],
+                ],
+                [
+                    'type' => 'body',
+                    'parameters' => $bodyParameters,
+                ],
+            ],
+        ];
     }
 }
