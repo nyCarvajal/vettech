@@ -41,6 +41,8 @@ return [
     'channel_id' => env('ONEMSG_CHANNEL_ID'),
     'token'      => env('ONEMSG_TOKEN'),
 	'namespace' => env('ONEMSG_TPL_NAMESPACE'),
+    'country_code' => env('ONEMSG_COUNTRY_CODE', '57'),
+    'reminder_window_minutes' => (int) env('ONEMSG_REMINDER_WINDOW', 10),
     'lang'      => env('ONEMSG_TPL_LANG', 'es'),
     'templates'  => [
         'bienvenida'     => env('ONEMSG_TPL_BIENVENIDA'),

@@ -10,6 +10,7 @@ class Kernel extends ConsoleKernel
 {
     protected function schedule(Schedule $schedule): void
     {
+        $schedule->command('agenda:send-reminders')->everyFiveMinutes();
     }
 
     protected function commands(): void
