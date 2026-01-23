@@ -152,19 +152,22 @@
     <div class="card">
         <div class="header">
             @php
-                $clinicLogoPath = $clinica->logo_path
-                    ? public_path('storage/' . $clinica->logo_path)
-                    : public_path('images/logo-dark.png');
+                $clinicLogoPath = null;
+                if ($clinica->logo_path) {
+                    $storageLogoPath = storage_path('app/public/' . ltrim($clinica->logo_path, '/'));
+                    if (is_readable($storageLogoPath)) {
+                        $clinicLogoPath = $storageLogoPath;
+                    }
+                }
+                if (! $clinicLogoPath) {
+                    $fallbackLogoPath = public_path('images/logo-dark.png');
+                    if (is_readable($fallbackLogoPath)) {
+                        $clinicLogoPath = $fallbackLogoPath;
+                    }
+                }
                 $clinicLogoDataUri = null;
-                if ($clinicLogoPath && is_readable($clinicLogoPath)) {
-                    $extension = strtolower(pathinfo($clinicLogoPath, PATHINFO_EXTENSION));
-                    $mimeType = match ($extension) {
-                        'jpg', 'jpeg' => 'image/jpeg',
-                        'svg' => 'image/svg+xml',
-                        'gif' => 'image/gif',
-                        'webp' => 'image/webp',
-                        default => 'image/png',
-                    };
+                if ($clinicLogoPath) {
+                    $mimeType = \Illuminate\Support\Facades\File::mimeType($clinicLogoPath) ?? 'image/png';
                     $clinicLogoDataUri = sprintf(
                         'data:%s;base64,%s',
                         $mimeType,
