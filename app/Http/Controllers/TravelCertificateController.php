@@ -284,7 +284,8 @@ class TravelCertificateController extends Controller
             $columns[] = DB::raw('null as firma_medica_texto');
         }
 
-        return User::on($connection)
+        return DB::connection($connection)
+            ->table('users')
             ->when($clinic, fn ($query) => $query->where('clinica_id', $clinic->id))
             ->orderBy('nombres')
             ->select($columns)
