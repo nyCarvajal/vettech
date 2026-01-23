@@ -86,10 +86,10 @@ class UsuarioController extends Controller
 
     public function index()
     {
-        $clinicaId = Auth::user()->clinica_id;
+        $clinicaId = Auth::user()->clinica_id ?? Auth::user()->peluqueria_id;
 
         $users = User::with('peluqueria')
-            ->where('clinica_id', $clinicaId)
+            ->when($clinicaId, fn ($query) => $query->where('clinica_id', $clinicaId))
             ->orderBy('nombres')
             ->paginate(15);
 
