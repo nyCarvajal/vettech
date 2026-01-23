@@ -19,15 +19,19 @@
                 'description' => 'Registro y seguimiento clínico.',
             ],
             'dispensacion' => [
-                'label' => 'Dispensación',
+                'label' => 'Dispensario',
                 'description' => 'Entrega y control de medicamentos.',
             ],
             'hospitalizacion' => [
                 'label' => 'Hospitalización 24/7',
                 'description' => 'Manejo de estancias y monitoreo.',
             ],
+            'cirugia' => [
+                'label' => 'Cirugía y procedimientos',
+                'description' => 'Registro y seguimiento de cirugías.',
+            ],
             'belleza' => [
-                'label' => 'Sala de belleza',
+                'label' => 'Peluquería',
                 'description' => 'Servicios de grooming y estética.',
             ],
             'consentimientos' => [
