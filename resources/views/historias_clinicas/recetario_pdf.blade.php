@@ -155,10 +155,26 @@
                 $clinicLogoPath = $clinica->logo_path
                     ? public_path('storage/' . $clinica->logo_path)
                     : public_path('images/logo-dark.png');
+                $clinicLogoDataUri = null;
+                if ($clinicLogoPath && is_readable($clinicLogoPath)) {
+                    $extension = strtolower(pathinfo($clinicLogoPath, PATHINFO_EXTENSION));
+                    $mimeType = match ($extension) {
+                        'jpg', 'jpeg' => 'image/jpeg',
+                        'svg' => 'image/svg+xml',
+                        'gif' => 'image/gif',
+                        'webp' => 'image/webp',
+                        default => 'image/png',
+                    };
+                    $clinicLogoDataUri = sprintf(
+                        'data:%s;base64,%s',
+                        $mimeType,
+                        base64_encode(file_get_contents($clinicLogoPath))
+                    );
+                }
             @endphp
             <div class="brand-mark">
-                @if ($clinicLogoPath && file_exists($clinicLogoPath))
-                    <img src="{{ $clinicLogoPath }}" alt="Logo {{ $clinica->name ?? $clinica->nombre ?? config('app.name') }}">
+                @if ($clinicLogoDataUri)
+                    <img src="{{ $clinicLogoDataUri }}" alt="Logo {{ $clinica->name ?? $clinica->nombre ?? config('app.name') }}">
                 @else
                     <span>❤</span>
                 @endif
