@@ -40,6 +40,12 @@
             display: grid;
             place-items: center;
             margin-right: 14px;
+            overflow: hidden;
+        }
+        .brand-mark img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
         }
         .brand-mark span {
             font-size: 26px;
@@ -145,7 +151,37 @@
 <body>
     <div class="card">
         <div class="header">
-            <div class="brand-mark"><span>❤</span></div>
+            @php
+                $clinicLogoPath = null;
+                if ($clinica->logo_path) {
+                    $storageLogoPath = storage_path('app/public/' . ltrim($clinica->logo_path, '/'));
+                    if (is_readable($storageLogoPath)) {
+                        $clinicLogoPath = $storageLogoPath;
+                    }
+                }
+                if (! $clinicLogoPath) {
+                    $fallbackLogoPath = public_path('images/logo-dark.png');
+                    if (is_readable($fallbackLogoPath)) {
+                        $clinicLogoPath = $fallbackLogoPath;
+                    }
+                }
+                $clinicLogoDataUri = null;
+                if ($clinicLogoPath) {
+                    $mimeType = \Illuminate\Support\Facades\File::mimeType($clinicLogoPath) ?? 'image/png';
+                    $clinicLogoDataUri = sprintf(
+                        'data:%s;base64,%s',
+                        $mimeType,
+                        base64_encode(file_get_contents($clinicLogoPath))
+                    );
+                }
+            @endphp
+            <div class="brand-mark">
+                @if ($clinicLogoDataUri)
+                    <img src="{{ $clinicLogoDataUri }}" alt="Logo {{ $clinica->name ?? $clinica->nombre ?? config('app.name') }}">
+                @else
+                    <span>❤</span>
+                @endif
+            </div>
             <div>
                 <h1>Receta Mádica</h1>
                 <p>Rx #{{ $prescription->id }} · {{ $prescription->created_at?->format('d/m/Y') }}</p>
