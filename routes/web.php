@@ -18,6 +18,7 @@ use App\Http\Controllers\UsuarioController;
 use App\Http\Controllers\ItemController;
 use App\Http\Controllers\TipoUsuarioController;
 use App\Http\Controllers\TipocitaController;
+use App\Http\Controllers\WhatsApp\DocumentSendController;
 use App\Http\Controllers\TipoIdentificacionController;
 use App\Http\Controllers\AreaController;
 use App\Http\Controllers\BancoController;
@@ -322,6 +323,8 @@ Route::get('clinica/perfil', [ClinicaController::class,'showOwn'])
         ->name('historias-clinicas.recetarios.create');
   Route::post('historias-clinicas/{historiaClinica}/recetario', [HistoriaClinicaController::class, 'storeRecetario'])
         ->name('historias-clinicas.recetarios.store');
+  Route::post('historias-clinicas/recetario/{prescription}/whatsapp', [DocumentSendController::class, 'sendPrescription'])
+        ->name('historias-clinicas.recetarios.whatsapp');
   Route::post('recetarios/{prescription}/facturar', [HistoriaClinicaController::class, 'facturarRecetario'])
         ->name('historias-clinicas.recetarios.facturar');
   Route::get('recetarios/{prescription}/imprimir', [HistoriaClinicaController::class, 'imprimirRecetario'])
@@ -330,6 +333,8 @@ Route::get('clinica/perfil', [ClinicaController::class,'showOwn'])
         ->name('historias-clinicas.remisiones.create');
   Route::post('historias-clinicas/{historiaClinica}/remision', [HistoriaClinicaController::class, 'storeRemision'])
         ->name('historias-clinicas.remisiones.store');
+  Route::post('historias-clinicas/remision/{examReferral}/whatsapp', [DocumentSendController::class, 'sendExamReferral'])
+        ->name('historias-clinicas.remisiones.whatsapp');
   Route::get('remisiones/{examReferral}/imprimir', [HistoriaClinicaController::class, 'imprimirRemision'])
         ->name('historias-clinicas.remisiones.print');
   Route::resource('historias-clinicas', HistoriaClinicaController::class, [
