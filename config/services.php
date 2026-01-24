@@ -51,6 +51,9 @@ return [
         'cancelacion'    => env('ONEMSG_TPL_CANCELACION'),
         'paquete'        => env('ONEMSG_TPL_PAQUETE'),
 		'finalizado'     => env('ONEMSG_TPL_FINALIZADO'),
+        'recetario'      => env('ONEMSG_TPL_RECETARIO'),
+        'remision'       => env('ONEMSG_TPL_REMISION'),
+        'recordatorio_cita' => env('ONEMSG_TPL_RECORDATORIO_CITA'),
     ],
     'lang' => [
         'default'        => env('ONEMSG_TPL_LANG', 'es'),

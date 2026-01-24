@@ -27,6 +27,7 @@ class SendAgendaReminders extends Command
             $client,
             $this->queryReservas($dayStart, $dayEnd, 'reminder_day_before_sent_at'),
             fn (Reserva $reserva) => $this->buildDayBeforeMessage($reserva),
+            fn (Reserva $reserva) => $this->buildDayBeforeTemplateParams($reserva),
             'reminder_day_before_sent_at'
         );
 
@@ -34,6 +35,7 @@ class SendAgendaReminders extends Command
             $client,
             $this->queryReservas($hourStart, $hourEnd, 'reminder_hour_before_sent_at'),
             fn (Reserva $reserva) => $this->buildHourBeforeMessage($reserva),
+            fn (Reserva $reserva) => $this->buildHourBeforeTemplateParams($reserva),
             'reminder_hour_before_sent_at'
         );
 
@@ -49,8 +51,16 @@ class SendAgendaReminders extends Command
             ->get();
     }
 
-    private function sendReminders(OneMsgClient $client, $reservas, callable $messageBuilder, string $sentColumn): void
+    private function sendReminders(
+        OneMsgClient $client,
+        $reservas,
+        callable $messageBuilder,
+        callable $templateParamsBuilder,
+        string $sentColumn
+    ): void
     {
+        $template = config('services.onemsg.templates.recordatorio_cita');
+
         foreach ($reservas as $reserva) {
             $phone = $this->resolvePhone($reserva);
 
@@ -58,7 +68,14 @@ class SendAgendaReminders extends Command
                 continue;
             }
 
-            $client->sendMessage($phone, $messageBuilder($reserva));
+            if ($template) {
+                $client->sendTemplate(
+                    $phone,
+                    $this->buildReminderTemplatePayload($template, $templateParamsBuilder($reserva))
+                );
+            } else {
+                $client->sendMessage($phone, $messageBuilder($reserva));
+            }
 
             $reserva->forceFill([$sentColumn => now()])->save();
         }
@@ -95,5 +112,59 @@ class SendAgendaReminders extends Command
         $appName = config('app.name', 'VetTech');
 
         return "Tu cita de {$paciente} ({$tipo}) es hoy {$fecha} a las {$hora} (en 1 hora).\n{$appName}";
+    }
+
+    private function buildDayBeforeTemplateParams(Reserva $reserva): array
+    {
+        return $this->buildReminderTemplateParams($reserva, 'mañana');
+    }
+
+    private function buildHourBeforeTemplateParams(Reserva $reserva): array
+    {
+        return $this->buildReminderTemplateParams($reserva, 'hoy');
+    }
+
+    private function buildReminderTemplateParams(Reserva $reserva, string $dayLabel): array
+    {
+        $fecha = optional($reserva->fecha)->format('d/m/Y');
+        $hora = optional($reserva->fecha)->format('H:i');
+        $paciente = trim(($reserva->paciente?->nombres ?? '') . ' ' . ($reserva->paciente?->apellidos ?? '')) ?: 'tu mascota';
+        $tipo = $reserva->tipocita?->nombre ?? $reserva->tipo ?? 'cita';
+
+        return [
+            $paciente,
+            $tipo,
+            "{$dayLabel} {$fecha}",
+            $hora,
+        ];
+    }
+
+    private function buildReminderTemplatePayload(string $template, array $params): array
+    {
+        $namespace = config('services.onemsg.namespace');
+        $langCode = config('services.onemsg.lang.default', 'es');
+
+        $bodyParameters = collect($params)
+            ->map(fn ($value) => [
+                'type' => 'text',
+                'text' => (string) $value,
+            ])
+            ->values()
+            ->toArray();
+
+        return [
+            'namespace' => $namespace,
+            'template' => $template,
+            'language' => [
+                'policy' => 'deterministic',
+                'code' => $langCode,
+            ],
+            'params' => [
+                [
+                    'type' => 'body',
+                    'parameters' => $bodyParameters,
+                ],
+            ],
+        ];
     }
 }
