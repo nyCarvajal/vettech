@@ -23,7 +23,9 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
@@ -80,10 +82,7 @@ class TravelCertificateController extends Controller
             $defaultClinic['vet_name'] = trim(($user->nombres ?? '')) ?: $defaultClinic['vet_name'];
             $defaultClinic['vet_license'] = $user->firma_medica_texto ?? $user->numero_identificacion ?? $defaultClinic['vet_license'];
         }
-        $vets = User::query()
-            ->when($clinic, fn ($query) => $query->where('clinica_id', $clinic->id))
-            ->orderBy('nombres')
-            ->get(['id', 'nombres', 'numero_identificacion', 'firma_medica_texto']);
+        $vets = $this->clinicVets($clinic);
         $declaration = config('travel_certificates.default_declaration');
         $patient = $request->filled('patient_id')
             ? Patient::with(['owner.departamento', 'owner.municipio', 'species', 'breed'])->find($request->integer('patient_id'))
@@ -142,10 +141,7 @@ class TravelCertificateController extends Controller
             $defaultClinic['vet_name'] = trim(($user->nombres ?? '')) ?: $defaultClinic['vet_name'];
             $defaultClinic['vet_license'] = $user->firma_medica_texto ?? $user->numero_identificacion ?? $defaultClinic['vet_license'];
         }
-        $vets = User::query()
-            ->when($clinic, fn ($query) => $query->where('clinica_id', $clinic->id))
-            ->orderBy('nombres')
-            ->get(['id', 'nombres', 'numero_identificacion', 'firma_medica_texto']);
+        $vets = $this->clinicVets($clinic);
 
         return view('travel_certificates.edit', [
             'certificate' => $travel_certificate->load(['vaccinations', 'dewormings', 'attachments']),
@@ -269,6 +265,31 @@ class TravelCertificateController extends Controller
                 ]);
             }
         }
+    }
+
+    private function clinicVets(?Clinica $clinic)
+    {
+        $connection = 'mysql';
+        $columns = ['id', 'nombres'];
+
+        if (Schema::connection($connection)->hasColumn('users', 'numero_identificacion')) {
+            $columns[] = 'numero_identificacion';
+        } else {
+            $columns[] = DB::raw('null as numero_identificacion');
+        }
+
+        if (Schema::connection($connection)->hasColumn('users', 'firma_medica_texto')) {
+            $columns[] = 'firma_medica_texto';
+        } else {
+            $columns[] = DB::raw('null as firma_medica_texto');
+        }
+
+        return DB::connection($connection)
+            ->table('users')
+            ->when($clinic, fn ($query) => $query->where('clinica_id', $clinic->id))
+            ->orderBy('nombres')
+            ->select($columns)
+            ->get();
     }
 
     protected function prefillFromPatient(Patient $patient): array

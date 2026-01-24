@@ -244,12 +244,12 @@
                 <div class="divide-y divide-gray-100">
                     @forelse($prescriptions as $prescription)
                         <div class="py-3 space-y-2">
-                            <div class="flex items-start justify-between gap-3">
+                            <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                                 <div>
                                     <p class="font-semibold text-gray-900">Recetario #{{ $prescription->id }}</p>
                                     <p class="text-sm text-gray-600">{{ optional($prescription->professional)->name }}</p>
                                 </div>
-                                <div class="flex items-center gap-2 text-xs font-semibold">
+                                <div class="flex flex-wrap items-center gap-2 text-xs font-semibold sm:justify-end">
                                     <a class="rounded-full border border-blue-200 px-3 py-1 text-blue-700 hover:bg-blue-50 transition" href="{{ route('historias-clinicas.recetarios.print', $prescription) }}">PDF</a>
                                     <form method="post" action="{{ route('historias-clinicas.recetarios.whatsapp', $prescription) }}">
                                         @csrf

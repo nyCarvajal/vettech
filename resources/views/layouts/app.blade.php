@@ -184,9 +184,9 @@
                         [
                             'title' => 'SERVICIOS / CLÍNICA',
                             'items' => array_filter([
-                                $featureEnabled('dispensacion') ? ['label' => 'Dispensación', 'route' => 'dispensations.index'] : null,
+                                $featureEnabled('dispensacion') ? ['label' => 'Dispensario', 'route' => 'dispensations.index'] : null,
                                 $featureEnabled('hospitalizacion') ? ['label' => 'Hospitalización 24/7', 'route' => 'hospital.index'] : null,
-                                $featureEnabled('belleza') ? ['label' => 'Sala de belleza', 'route' => 'groomings.index'] : null,
+                                $featureEnabled('belleza') ? ['label' => 'Peluquería', 'route' => 'groomings.index'] : null,
                                 $featureEnabled('consentimientos') ? ['label' => 'Consentimientos', 'route' => 'consents.index'] : null,
                                 $featureEnabled('plantillas_consentimientos') ? ['label' => 'Plantillas de consentimientos', 'route' => 'consent-templates.index'] : null,
                             ]),
