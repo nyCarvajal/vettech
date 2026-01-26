@@ -9,12 +9,13 @@
 
     <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
         @foreach($stays as $stay)
+            @php($owner = $stay->owner ?? $stay->patient?->owner)
             <x-card class="bg-white border border-emerald-100">
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm text-gray-500">{{ $stay->admitted_at->format('d M Y') }}</p>
-                        <h3 class="text-lg font-semibold text-emerald-700">{{ $stay->patient->name ?? 'Paciente' }}</h3>
-                        <p class="text-sm text-gray-600">{{ $stay->owner->name ?? '' }}</p>
+                        <h3 class="text-lg font-semibold text-emerald-700">{{ $stay->patient->display_name ?? 'Paciente' }}</h3>
+                        <p class="text-sm text-gray-600">{{ $owner->name ?? '' }}</p>
                         <p class="text-sm text-gray-500">Día {{ $stay->daysSinceAdmission() }} • Severidad: <x-badge>{{ ucfirst($stay->severity) }}</x-badge></p>
                     </div>
                     <div class="text-right space-y-2">

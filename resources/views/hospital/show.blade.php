@@ -4,11 +4,12 @@
 <div class="max-w-7xl mx-auto space-y-4">
     <x-card class="bg-white border border-emerald-100">
         <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            @php($owner = $stay->owner ?? $stay->patient?->owner)
             <div class="flex items-center gap-3">
                 <img src="{{ $stay->patient->photo_url ?? 'https://placekitten.com/120/120' }}" class="w-16 h-16 rounded-full object-cover" />
                 <div>
                     <p class="text-sm text-gray-500">Hospitalizado desde {{ $stay->admitted_at->format('d M Y H:i') }}</p>
-                    <h2 class="text-xl font-semibold text-emerald-700">{{ $stay->patient->name ?? 'Paciente' }}</h2>
+                    <h2 class="text-xl font-semibold text-emerald-700">{{ $stay->patient->display_name ?? 'Paciente' }}</h2>
                     <div class="flex gap-2 items-center text-sm text-gray-600">
                         <x-badge color="success">{{ ucfirst($stay->severity) }}</x-badge>
                         <x-badge>Hospitalizado</x-badge>
@@ -18,16 +19,16 @@
             <div class="flex-1 grid md:grid-cols-3 gap-4">
                 <div>
                     <p class="text-xs text-gray-500">Peso</p>
-                    <p class="font-semibold text-emerald-700">{{ $stay->patient->weight ?? '--' }}</p>
+                    <p class="font-semibold text-emerald-700">{{ $stay->patient->peso_formateado ?? '--' }}</p>
                 </div>
                 <div>
                     <p class="text-xs text-gray-500">Alergias</p>
-                    <p class="font-semibold text-emerald-700">{{ $stay->patient->allergies ?? 'N/D' }}</p>
+                    <p class="font-semibold text-emerald-700">{{ $stay->patient->alergias ?? 'N/D' }}</p>
                 </div>
                 <div>
                     <p class="text-xs text-gray-500">Tutor</p>
-                    <p class="font-semibold text-emerald-700">{{ $stay->owner->name ?? '' }}</p>
-                    <p class="text-sm text-gray-500">{{ $stay->owner->phone ?? '' }}</p>
+                    <p class="font-semibold text-emerald-700">{{ $owner->name ?? '' }}</p>
+                    <p class="text-sm text-gray-500">{{ $owner->phone ?? '' }}</p>
                 </div>
             </div>
             <div class="flex gap-2">
