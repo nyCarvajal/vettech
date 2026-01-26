@@ -43,7 +43,7 @@ class HospitalController extends Controller
     {
         $this->ensureTenantConnection();
 
-        $stays = HospitalStay::with(['patient', 'owner', 'cage'])
+        $stays = HospitalStay::with(['patient.owner', 'owner', 'cage'])
             ->orderByDesc('admitted_at')
             ->get();
 
@@ -74,7 +74,7 @@ class HospitalController extends Controller
 
         $this->stayService->ensureDays($stay);
         $stay->load([
-            'patient',
+            'patient.owner',
             'owner',
             'cage',
             'charges',
