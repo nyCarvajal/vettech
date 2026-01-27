@@ -313,6 +313,10 @@ Route::get('clinica/perfil', [ClinicaController::class,'showOwn'])
   });
   Route::post('historias-clinicas/autoguardado', [HistoriaClinicaController::class, 'autoSave'])
        ->name('historias-clinicas.autosave');
+  Route::get('historias-clinicas/recetario', [HistoriaClinicaController::class, 'createRecetarioQuick'])
+        ->name('historias-clinicas.recetarios.quick');
+  Route::post('historias-clinicas/recetario', [HistoriaClinicaController::class, 'storeRecetarioQuick'])
+        ->name('historias-clinicas.recetarios.quick.store');
   Route::get('historias-clinicas/{historiaClinica}/pdf', [HistoriaClinicaController::class, 'pdf'])
         ->name('historias-clinicas.pdf');
   Route::get('historias-clinicas/{historiaClinica}/adjuntos', [ClinicalAttachmentController::class, 'index'])
