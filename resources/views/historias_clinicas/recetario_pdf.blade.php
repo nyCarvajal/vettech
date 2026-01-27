@@ -2,10 +2,33 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    @php
+        $primaryColor = $clinica->primary_color ?? $clinica->color ?? '#5e4cfa';
+        $primaryHex = ltrim($primaryColor, '#');
+        if (strlen($primaryHex) === 3) {
+            $primaryHex = sprintf('%s%s%s%s%s%s', $primaryHex[0], $primaryHex[0], $primaryHex[1], $primaryHex[1], $primaryHex[2], $primaryHex[2]);
+        }
+        $primaryRgb = '94, 76, 250';
+        if (strlen($primaryHex) === 6) {
+            $primaryRgb = implode(', ', [
+                hexdec(substr($primaryHex, 0, 2)),
+                hexdec(substr($primaryHex, 2, 2)),
+                hexdec(substr($primaryHex, 4, 2)),
+            ]);
+        }
+        $clinicName = $clinica->nombre ?? $clinica->name ?? config('app.name');
+        $clinicNit = $clinica->nit ?? null;
+        $clinicAddress = $clinica->direccion ?? $clinica->address ?? null;
+        $clinicPhone = $clinica->telefono ?? $clinica->phone ?? null;
+        $professional = $prescription->professional;
+        $signatureUrl = $professional?->firma_medica_url;
+        $signatureText = $professional?->firma_medica_texto;
+    @endphp
     <style>
         @page { margin: 20px 24px; }
         :root {
-            --purple: #5e4cfa;
+            --primary: {{ $primaryColor }};
+            --primary-rgb: {{ $primaryRgb }};
             --mint: #44d4b7;
             --mint-soft: #e8fbf5;
             --ink: #1a1a1a;
@@ -28,9 +51,18 @@
         .header {
             display: flex;
             align-items: center;
+            justify-content: space-between;
+            gap: 16px;
             padding: 16px 18px;
-            background: rgba(94, 76, 250, 0.96);
+            background: var(--primary);
             color: #fff;
+        }
+        .header-main {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            min-width: 0;
+            flex: 1 1 auto;
         }
         .brand-mark {
             width: 52px;
@@ -49,7 +81,25 @@
         }
         .brand-mark span {
             font-size: 26px;
-            color: var(--purple);
+            color: var(--primary);
+        }
+        .clinic-details {
+            text-align: right;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            min-width: 180px;
+            flex: 0 1 40%;
+        }
+        .clinic-details strong {
+            font-size: 13px;
+            line-height: 1.2;
+        }
+        .clinic-details span {
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.85);
+            line-height: 1.3;
+            word-break: break-word;
         }
         .header h1 { margin: 0; font-size: 18px; letter-spacing: 0.2px; }
         .header p { margin: 2px 0 0; color: rgba(255,255,255,0.82); font-size: 11px; }
@@ -105,7 +155,7 @@
             padding: 10px 12px;
             background: #fff;
         }
-        .info-card h3 { margin: 0 0 6px; font-size: 13px; color: var(--purple); }
+        .info-card h3 { margin: 0 0 6px; font-size: 13px; color: var(--primary); }
         .info-table {
             width: 100%;
             border-collapse: collapse;
@@ -120,7 +170,7 @@
             overflow: hidden;
         }
         .rx-head {
-            background: linear-gradient(90deg, rgba(94, 76, 250, 0.1), rgba(68, 212, 183, 0.16));
+            background: linear-gradient(90deg, rgba(var(--primary-rgb), 0.12), rgba(68, 212, 183, 0.16));
             padding: 10px 12px;
             display: flex;
             align-items: center;
@@ -128,7 +178,7 @@
             font-weight: 700;
             color: var(--ink);
         }
-        .rx-head span { color: var(--purple); font-size: 15px; }
+        .rx-head span { color: var(--primary); font-size: 15px; }
         .rx-table { width: 100%; border-collapse: collapse; }
         .rx-table th { text-align: left; font-size: 11px; letter-spacing: 0.4px; text-transform: uppercase; color: var(--muted); padding: 8px 10px; background: #f9fafc; }
         .rx-table td { padding: 8px 10px; border-top: 1px solid var(--line); font-size: 12px; vertical-align: top; }
@@ -140,10 +190,11 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            background: linear-gradient(110deg, rgba(94, 76, 250, 0.08), rgba(68, 212, 183, 0.08));
+            background: linear-gradient(110deg, rgba(var(--primary-rgb), 0.08), rgba(68, 212, 183, 0.08));
             border-top: 1px solid var(--line);
         }
         .signature { margin-top: 28px; text-align: center; }
+        .signature img { max-height: 70px; object-fit: contain; display: block; margin: 0 auto 10px; }
         .signature-line { height: 1px; background: var(--line); margin: 18px 0 8px; }
         .tiny { font-size: 10px; color: var(--muted); }
     </style>
@@ -175,18 +226,31 @@
                     );
                 }
             @endphp
-            <div class="brand-mark">
-                @if ($clinicLogoDataUri)
-                    <img src="{{ $clinicLogoDataUri }}" alt="Logo {{ $clinica->name ?? $clinica->nombre ?? config('app.name') }}">
-                @else
-                    <span>❤</span>
+            <div class="header-main">
+                <div class="brand-mark">
+                    @if ($clinicLogoDataUri)
+                        <img src="{{ $clinicLogoDataUri }}" alt="Logo {{ $clinicName }}">
+                    @else
+                        <span>❤</span>
+                    @endif
+                </div>
+                <div>
+                    <h1>Receta Médica</h1>
+                    <p>Rx #{{ $prescription->id }} · {{ $prescription->created_at?->format('d/m/Y') }}</p>
+                </div>
+            </div>
+            <div class="clinic-details">
+                <strong>{{ $clinicName }}</strong>
+                @if ($clinicNit)
+                    <span>NIT: {{ $clinicNit }}</span>
+                @endif
+                @if ($clinicAddress)
+                    <span>{{ $clinicAddress }}</span>
+                @endif
+                @if ($clinicPhone)
+                    <span>Tel: {{ $clinicPhone }}</span>
                 @endif
             </div>
-            <div>
-                <h1>Receta Mádica</h1>
-                <p>Rx #{{ $prescription->id }} · {{ $prescription->created_at?->format('d/m/Y') }}</p>
-            </div>
-           
         </div>
 
         <div class="section">
@@ -281,15 +345,22 @@
             </div>
 
             <div class="signature">
+                @if ($signatureUrl)
+                    <img src="{{ $signatureUrl }}" alt="Firma médica">
+                @endif
                 <div class="signature-line"></div>
                 <div style="font-weight:700;">{{ optional($prescription->professional)->name ?? 'Profesional N/D' }}</div>
-                <div class="tiny">Firma y sello</div>
+                @if ($signatureText)
+                    <div class="tiny">{{ $signatureText }}</div>
+                @else
+                    <div class="tiny">Firma y sello</div>
+                @endif
             </div>
         </div>
 
         <div class="footer">
             <div>
-                <div style="font-weight:700; color: var(--purple);">Gracias por confiar en nosotros</div>
+                <div style="font-weight:700; color: var(--primary);">Gracias por confiar en nosotros</div>
                 <div class="tiny">Para dudas o seguimiento contáctanos por WhatsApp.</div>
             </div>
             <div style="text-align:right;">
