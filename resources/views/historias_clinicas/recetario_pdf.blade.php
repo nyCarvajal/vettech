@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     @php
-        $primaryColor = $clinica->color ?? '#5e4cfa';
+        $primaryColor = $clinica->primary_color ?? $clinica->color ?? '#5e4cfa';
         $primaryHex = ltrim($primaryColor, '#');
         if (strlen($primaryHex) === 3) {
             $primaryHex = sprintf('%s%s%s%s%s%s', $primaryHex[0], $primaryHex[0], $primaryHex[1], $primaryHex[1], $primaryHex[2], $primaryHex[2]);
