@@ -88,7 +88,7 @@ class ClinicalAttachmentController extends Controller
                     'mime_type' => $mimeType,
                     'size_bytes' => $file->getSize() ?: 0,
                     'cloudinary_public_id' => $uploadResult['public_id'] ?? $publicId,
-                    'cloudinary_secure_url' => $uploadResult['secure_url'] ?? '',
+                    'cloudinary_secure_url' => $uploadResult['secure_url'] ?? $uploadResult['url'] ?? '',
                     'cloudinary_resource_type' => $uploadResult['resource_type'] ?? $fileType,
                     'cloudinary_format' => $uploadResult['format'] ?? null,
                     'width' => $uploadResult['width'] ?? null,
