@@ -110,11 +110,6 @@
                         $downloadFilename = $attachment->titulo_limpio . ($attachmentExtension ? '.' . $attachmentExtension : '');
                         $downloadUrl = $attachment->cloudinary_secure_url;
                         $viewUrl = $attachment->cloudinary_secure_url;
-
-                        if ($attachment->file_type === 'pdf') {
-                            $downloadUrl = $attachment->signedDownloadUrl($downloadFilename);
-                            $viewUrl = $attachment->signedViewUrl();
-                        }
                     @endphp
                     <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                         <div>
