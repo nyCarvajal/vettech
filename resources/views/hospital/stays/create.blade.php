@@ -36,15 +36,22 @@
                 </dl>
             </div>
         @else
-            <label class="block text-sm font-medium text-gray-700" for="patient_id">Paciente ID</label>
-            <input
+            <label class="block text-sm font-medium text-gray-700" for="patient_id">Paciente</label>
+            <select
                 id="patient_id"
                 name="patient_id"
-                placeholder="Paciente ID"
-                value="{{ old('patient_id', request('patient_id')) }}"
                 class="border p-2 w-full rounded-lg"
                 required
             >
+                <option value="">Busca y selecciona un paciente</option>
+                @foreach($patients as $patientOption)
+                    <option value="{{ $patientOption->id }}" @selected(old('patient_id', request('patient_id')) == $patientOption->id)>
+                        {{ $patientOption->display_name }}
+                        · Raza: {{ optional($patientOption->breed)->name ?? 'Sin raza' }}
+                        · Tutor: {{ optional($patientOption->owner)->name ?? 'Sin tutor' }} ({{ optional($patientOption->owner)->document ?? 'N/D' }})
+                    </option>
+                @endforeach
+            </select>
         @endif
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">

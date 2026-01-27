@@ -351,6 +351,16 @@
 @endpush
 
 @section('content')
+@php
+    $featureDefaults = \App\Models\Clinica::featureDefaults();
+    $featureEnabled = function (string $key) use ($clinica, $featureDefaults): bool {
+        if ($clinica) {
+            return $clinica->featureEnabled($key, $featureDefaults[$key] ?? true);
+        }
+
+        return $featureDefaults[$key] ?? true;
+    };
+@endphp
 <div class="patient-dashboard">
     <div class="dashboard-header">
         <div>
@@ -358,26 +368,32 @@
             <h1 class="dashboard-title">Panel clínico del paciente</h1>
         </div>
         <div class="dashboard-actions">
-            <a
-                href="{{ route('hospital.stays.create', ['patient_id' => $patient->id]) }}"
-                class="pill-action pill-action--primary"
-            >
-                Hospitalizar
-            </a>
-            <a
-                href="{{ route('groomings.create', ['patient_id' => $patient->id]) }}"
-                class="pill-action"
-            >
-                Enviar a peluquería
-            </a>
-            @can('create', \App\Models\Procedure::class)
+            @if ($featureEnabled('hospitalizacion'))
                 <a
-                    href="{{ route('procedures.create', ['patient_id' => $patient->id]) }}"
+                    href="{{ route('hospital.stays.create', ['patient_id' => $patient->id]) }}"
                     class="pill-action pill-action--primary"
                 >
-                    Nueva cirugía / procedimiento
+                    Hospitalizar
                 </a>
-            @endcan
+            @endif
+            @if ($featureEnabled('belleza'))
+                <a
+                    href="{{ route('groomings.create', ['patient_id' => $patient->id]) }}"
+                    class="pill-action"
+                >
+                    Enviar a peluquería
+                </a>
+            @endif
+            @if ($featureEnabled('cirugia'))
+                @can('create', \App\Models\Procedure::class)
+                    <a
+                        href="{{ route('procedures.create', ['patient_id' => $patient->id]) }}"
+                        class="pill-action pill-action--primary"
+                    >
+                        Nueva cirugía / procedimiento
+                    </a>
+                @endcan
+            @endif
             @can('create', \App\Models\TravelCertificate::class)
                 <a
                     href="{{ route('travel-certificates.create', ['patient_id' => $patient->id]) }}"

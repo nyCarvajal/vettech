@@ -142,6 +142,22 @@ class HistoriaClinicaController extends Controller
         return view('historias_clinicas.recetario', [
             'historia' => $historiaClinica,
             'products' => $products,
+            'pacientes' => collect(),
+        ]);
+    }
+
+    public function createRecetarioQuick()
+    {
+        $products = Product::orderBy('name')->get();
+        $pacientes = Paciente::with(['owner', 'breed'])
+            ->orderBy('nombres')
+            ->orderBy('apellidos')
+            ->get();
+
+        return view('historias_clinicas.recetario', [
+            'historia' => null,
+            'products' => $products,
+            'pacientes' => $pacientes,
         ]);
     }
 
@@ -159,29 +175,39 @@ class HistoriaClinicaController extends Controller
             'items.*.qty_requested' => ['required', 'numeric', 'min:1'],
         ]);
 
-        $prescription = Prescription::create([
-            'historia_clinica_id' => $historiaClinica->id,
-            'patient_id' => $historiaClinica->paciente_id,
-            'professional_id' => Auth::id(),
-            'status' => 'draft',
+        $this->persistRecetario($historiaClinica, $data['items']);
+
+        return redirect()->route('historias-clinicas.show', $historiaClinica)
+            ->with('success', 'Recetario creado correctamente.');
+    }
+
+    public function storeRecetarioQuick(Request $request)
+    {
+        $data = $request->validate([
+            'patient_id' => ['required', 'exists:pacientes,id'],
+            'items' => ['required', 'array', 'min:1'],
+            'items.*.is_manual' => ['boolean'],
+            'items.*.product_id' => ['required_without:items.*.manual_name', 'nullable', 'exists:products,id'],
+            'items.*.manual_name' => ['required_without:items.*.product_id', 'nullable', 'string', 'max:255'],
+            'items.*.dose' => ['nullable', 'string'],
+            'items.*.frequency' => ['nullable', 'string'],
+            'items.*.duration_days' => ['nullable', 'integer', 'min:1'],
+            'items.*.instructions' => ['nullable', 'string'],
+            'items.*.qty_requested' => ['required', 'numeric', 'min:1'],
         ]);
 
-        foreach ($data['items'] as $item) {
-            $isManual = (bool) ($item['is_manual'] ?? false);
+        $historiaClinica = HistoriaClinica::where('paciente_id', $data['patient_id'])
+            ->latest()
+            ->first();
 
-            PrescriptionItem::create([
-                'prescription_id' => $prescription->id,
-                'product_id' => $isManual ? null : ($item['product_id'] ?? null),
-                'manual_name' => $item['manual_name'] ?? null,
-                'is_manual' => $isManual,
-                'billable' => ! $isManual,
-                'dose' => $item['dose'] ?? '',
-                'frequency' => $item['frequency'] ?? '',
-                'duration_days' => $item['duration_days'] ?? 0,
-                'instructions' => $item['instructions'] ?? null,
-                'qty_requested' => $item['qty_requested'],
+        if (! $historiaClinica) {
+            $historiaClinica = HistoriaClinica::create([
+                'paciente_id' => $data['patient_id'],
+                'estado' => 'borrador',
             ]);
         }
+
+        $this->persistRecetario($historiaClinica, $data['items']);
 
         return redirect()->route('historias-clinicas.show', $historiaClinica)
             ->with('success', 'Recetario creado correctamente.');
@@ -258,6 +284,33 @@ class HistoriaClinicaController extends Controller
             'historia' => $historiaClinica,
             'pacientes' => $pacientes,
         ];
+    }
+
+    private function persistRecetario(HistoriaClinica $historiaClinica, array $items): void
+    {
+        $prescription = Prescription::create([
+            'historia_clinica_id' => $historiaClinica->id,
+            'patient_id' => $historiaClinica->paciente_id,
+            'professional_id' => Auth::id(),
+            'status' => 'draft',
+        ]);
+
+        foreach ($items as $item) {
+            $isManual = (bool) ($item['is_manual'] ?? false);
+
+            PrescriptionItem::create([
+                'prescription_id' => $prescription->id,
+                'product_id' => $isManual ? null : ($item['product_id'] ?? null),
+                'manual_name' => $item['manual_name'] ?? null,
+                'is_manual' => $isManual,
+                'billable' => ! $isManual,
+                'dose' => $item['dose'] ?? '',
+                'frequency' => $item['frequency'] ?? '',
+                'duration_days' => $item['duration_days'] ?? 0,
+                'instructions' => $item['instructions'] ?? null,
+                'qty_requested' => $item['qty_requested'],
+            ]);
+        }
     }
 
     private function validatedData(Request $request): array

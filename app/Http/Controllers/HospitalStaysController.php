@@ -27,6 +27,10 @@ class HospitalStaysController extends Controller
     public function create(): View
     {
         $cages = Cage::where('active', true)->get();
+        $patients = Patient::with(['owner', 'breed'])
+            ->orderBy('nombres')
+            ->orderBy('apellidos')
+            ->get();
 
         $patient = null;
         $patientId = request('patient_id') ?? session()->getOldInput('patient_id');
@@ -35,7 +39,7 @@ class HospitalStaysController extends Controller
             $patient = Patient::with(['owner', 'species'])->find($patientId);
         }
 
-        return view('hospital.stays.create', compact('cages', 'patient'));
+        return view('hospital.stays.create', compact('cages', 'patient', 'patients'));
     }
 
     public function store(HospitalStayRequest $request): RedirectResponse

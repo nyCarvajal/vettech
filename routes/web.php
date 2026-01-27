@@ -313,6 +313,10 @@ Route::get('clinica/perfil', [ClinicaController::class,'showOwn'])
   });
   Route::post('historias-clinicas/autoguardado', [HistoriaClinicaController::class, 'autoSave'])
        ->name('historias-clinicas.autosave');
+  Route::get('historias-clinicas/recetario', [HistoriaClinicaController::class, 'createRecetarioQuick'])
+        ->name('historias-clinicas.recetarios.quick');
+  Route::post('historias-clinicas/recetario', [HistoriaClinicaController::class, 'storeRecetarioQuick'])
+        ->name('historias-clinicas.recetarios.quick.store');
   Route::get('historias-clinicas/{historiaClinica}/pdf', [HistoriaClinicaController::class, 'pdf'])
         ->name('historias-clinicas.pdf');
   Route::get('historias-clinicas/{historiaClinica}/adjuntos', [ClinicalAttachmentController::class, 'index'])
@@ -445,12 +449,14 @@ Route::middleware([Authenticate::class, ConnectTenantDB::class, SubstituteBindin
         Route::post('cash/sessions/{cashSession}/close', [\App\Http\Controllers\CashSessionsController::class, 'close'])->name('cash.sessions.close');
         Route::post('cash/movements', [\App\Http\Controllers\CashMovementsController::class, 'store'])->name('cash.movements.store');
 
-        Route::resource('procedures', \App\Http\Controllers\ProcedureController::class);
-        Route::post('procedures/{procedure}/status', [\App\Http\Controllers\ProcedureController::class, 'changeStatus'])->name('procedures.change-status');
-        Route::post('procedures/{procedure}/attachments', [\App\Http\Controllers\ProcedureAttachmentController::class, 'store'])->name('procedures.attachments.store');
-        Route::delete('procedures/{procedure}/attachments/{attachment}', [\App\Http\Controllers\ProcedureAttachmentController::class, 'destroy'])->name('procedures.attachments.destroy');
-        Route::post('procedures/{procedure}/consent/link', [\App\Http\Controllers\ProcedureConsentController::class, 'linkSignedConsent'])->name('procedures.consent.link');
-        Route::post('procedures/{procedure}/consent/create', [\App\Http\Controllers\ProcedureConsentController::class, 'createFromTemplate'])->name('procedures.consent.create');
+        Route::middleware('feature:cirugia')->group(function () {
+            Route::resource('procedures', \App\Http\Controllers\ProcedureController::class);
+            Route::post('procedures/{procedure}/status', [\App\Http\Controllers\ProcedureController::class, 'changeStatus'])->name('procedures.change-status');
+            Route::post('procedures/{procedure}/attachments', [\App\Http\Controllers\ProcedureAttachmentController::class, 'store'])->name('procedures.attachments.store');
+            Route::delete('procedures/{procedure}/attachments/{attachment}', [\App\Http\Controllers\ProcedureAttachmentController::class, 'destroy'])->name('procedures.attachments.destroy');
+            Route::post('procedures/{procedure}/consent/link', [\App\Http\Controllers\ProcedureConsentController::class, 'linkSignedConsent'])->name('procedures.consent.link');
+            Route::post('procedures/{procedure}/consent/create', [\App\Http\Controllers\ProcedureConsentController::class, 'createFromTemplate'])->name('procedures.consent.create');
+        });
 
         Route::resource('consent-templates', ConsentTemplateController::class)->middleware('feature:plantillas_consentimientos');
 

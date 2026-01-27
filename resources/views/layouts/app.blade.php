@@ -179,14 +179,14 @@
                                 $featureEnabled('facturacion_pos') ? ['label' => 'Facturación POS', 'route' => 'invoices.pos'] : null,
                                 $featureEnabled('tutores') ? ['label' => 'Tutores', 'route' => 'owners.index'] : null,
                                 $featureEnabled('pacientes') ? ['label' => 'Pacientes', 'route' => 'patients.index'] : null,
+                                ['label' => 'Inventario', 'route' => 'items.index'],
                             ]),
                         ],
                         [
                             'title' => 'SERVICIOS / CLÍNICA',
                             'items' => array_filter([
-                                $featureEnabled('dispensacion') ? ['label' => 'Dispensación', 'route' => 'dispensations.index'] : null,
-                                $featureEnabled('hospitalizacion') ? ['label' => 'Hospitalización 24/7', 'route' => 'hospital.index'] : null,
-                                $featureEnabled('belleza') ? ['label' => 'Sala de belleza', 'route' => 'groomings.index'] : null,
+                                 $featureEnabled('hospitalizacion') ? ['label' => 'Hospitalización 24/7', 'route' => 'hospital.index'] : null,
+                                $featureEnabled('belleza') ? ['label' => 'Peluquería', 'route' => 'groomings.index'] : null,
                                 $featureEnabled('consentimientos') ? ['label' => 'Consentimientos', 'route' => 'consents.index'] : null,
                                 $featureEnabled('plantillas_consentimientos') ? ['label' => 'Plantillas de consentimientos', 'route' => 'consent-templates.index'] : null,
                             ]),
