@@ -4,10 +4,17 @@
 <div class="container py-4">
     <div class="d-flex align-items-center mb-3">
         <div class="flex-grow-1">
-            <p class="text-muted mb-1">Historia clínica #{{ $historia->id }}</p>
-            <h1 class="h4 mb-0">Nuevo recetario</h1>
+            @if ($historia)
+                <p class="text-muted mb-1">Historia clínica #{{ $historia->id }}</p>
+                <h1 class="h4 mb-0">Nuevo recetario</h1>
+            @else
+                <p class="text-muted mb-1">Selecciona el paciente</p>
+                <h1 class="h4 mb-0">Nuevo recetario</h1>
+            @endif
         </div>
-        <span class="badge bg-light text-dark px-3 py-2">Paciente: {{ optional($historia->paciente)->nombres }} {{ optional($historia->paciente)->apellidos }}</span>
+        @if ($historia)
+            <span class="badge bg-light text-dark px-3 py-2">Paciente: {{ optional($historia->paciente)->nombres }} {{ optional($historia->paciente)->apellidos }}</span>
+        @endif
     </div>
 
     <div class="alert alert-info d-flex align-items-center gap-2">
@@ -17,8 +24,25 @@
         </div>
     </div>
 
-    <form method="post" action="{{ route('historias-clinicas.recetarios.store', $historia) }}">
+    <form method="post" action="{{ $historia ? route('historias-clinicas.recetarios.store', $historia) : route('historias-clinicas.recetarios.quick.store') }}">
         @csrf
+        @if (! $historia)
+            <div class="card shadow-sm mb-3">
+                <div class="card-body">
+                    <label class="form-label">Paciente</label>
+                    <select name="patient_id" class="form-select" required>
+                        <option value="">Busca y selecciona un paciente</option>
+                        @foreach(($pacientes ?? collect()) as $paciente)
+                            <option value="{{ $paciente->id }}" @selected(old('patient_id') == $paciente->id)>
+                                {{ $paciente->display_name }}
+                                · Raza: {{ optional($paciente->breed)->name ?? 'Sin raza' }}
+                                · Tutor: {{ optional($paciente->owner)->name ?? 'Sin tutor' }} ({{ optional($paciente->owner)->document ?? 'N/D' }})
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+            </div>
+        @endif
         <div id="items-wrapper">
             <div class="card shadow-sm mb-3 prescription-item">
                 <div class="card-header bg-white d-flex justify-content-between align-items-center">
@@ -73,7 +97,11 @@
         <div class="d-flex justify-content-between align-items-center">
             <button type="button" class="btn btn-outline-secondary" id="add-row"><i class="bi bi-plus-lg me-1"></i>Agregar otro medicamento</button>
             <div class="d-flex gap-2">
-                <a href="{{ route('historias-clinicas.show', $historia) }}" class="btn btn-link">Cancelar</a>
+                @if ($historia)
+                    <a href="{{ route('historias-clinicas.show', $historia) }}" class="btn btn-link">Cancelar</a>
+                @else
+                    <a href="{{ route('dashboard') }}" class="btn btn-link">Cancelar</a>
+                @endif
                 <button type="submit" class="btn btn-primary">Guardar recetario</button>
             </div>
         </div>

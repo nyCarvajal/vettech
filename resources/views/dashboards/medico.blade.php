@@ -8,7 +8,7 @@
             'actions' => [
                 ['label' => 'Nueva consulta', 'route' => route('historias-clinicas.create')],
                 ['label' => 'Agendar control', 'route' => route('reservas.create'), 'variant' => 'secondary'],
-                ['label' => 'Crear fórmula', 'route' => route('prescriptions.create'), 'variant' => 'ghost'],
+                ['label' => 'Crear fórmula', 'route' => route('historias-clinicas.recetarios.quick'), 'variant' => 'ghost'],
             ],
         ]),
     ])
@@ -111,7 +111,7 @@
             @if (Route::has('hospital.stays.create'))
                 <x-button variant="secondary" href="{{ route('hospital.stays.create') }}">Hospitalizar paciente</x-button>
             @endif
-            <x-button variant="ghost" href="{{ route('prescriptions.create') }}">Crear fórmula</x-button>
+            <x-button variant="ghost" href="{{ route('historias-clinicas.recetarios.quick') }}">Crear fórmula</x-button>
             <x-button variant="secondary" href="{{ route('reservas.create') }}">Agendar control</x-button>
         </div>
     </x-card>

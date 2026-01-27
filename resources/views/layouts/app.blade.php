@@ -179,6 +179,7 @@
                                 $featureEnabled('facturacion_pos') ? ['label' => 'Facturación POS', 'route' => 'invoices.pos'] : null,
                                 $featureEnabled('tutores') ? ['label' => 'Tutores', 'route' => 'owners.index'] : null,
                                 $featureEnabled('pacientes') ? ['label' => 'Pacientes', 'route' => 'patients.index'] : null,
+                                ['label' => 'Inventario', 'route' => 'items.index'],
                             ]),
                         ],
                         [
