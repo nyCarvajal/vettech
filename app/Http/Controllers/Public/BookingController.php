@@ -10,16 +10,18 @@ use App\Models\Clinica;
 use App\Models\Reserva;
 use App\Models\Tipocita;
 use App\Models\User;
+use App\Support\RoleLabelResolver;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
-use App\Support\RoleLabelResolver;
 
 class BookingController extends Controller
 {
@@ -504,19 +506,19 @@ class BookingController extends Controller
         $stylists = collect();
 
         foreach ($this->connectionsFor($clinica) as $connection) {
-            $connectionStylists = User::on($connection)
-                ->where('clinica_id', $clinica->id)
-                ->whereIn('role', [11, '11', 'groomer'])
-                ->orderBy('nombre')
-                ->orderBy('apellidos')
-                ->get();
+            $connectionStylists = $this->applyUserNameOrdering(
+                User::on($connection)
+                    ->where('clinica_id', $clinica->id)
+                    ->whereIn('role', [11, '11', 'groomer']),
+                $connection
+            )->get();
 
             if ($connectionStylists->isEmpty()) {
-                $connectionStylists = User::on($connection)
-                    ->where('clinica_id', $clinica->id)
-                    ->orderBy('nombre')
-                    ->orderBy('apellidos')
-                    ->get();
+                $connectionStylists = $this->applyUserNameOrdering(
+                    User::on($connection)
+                        ->where('clinica_id', $clinica->id),
+                    $connection
+                )->get();
             }
 
             if ($connectionStylists->isNotEmpty()) {
@@ -525,6 +527,34 @@ class BookingController extends Controller
         }
 
         return $stylists->unique('id')->values();
+    }
+
+    private function applyUserNameOrdering(Builder $query, string $connection): Builder
+    {
+        $schema = Schema::connection($connection);
+        $columns = [];
+
+        if ($schema->hasColumn('users', 'nombres')) {
+            $columns[] = 'nombres';
+        }
+
+        if ($schema->hasColumn('users', 'apellidos')) {
+            $columns[] = 'apellidos';
+        }
+
+        if (empty($columns) && $schema->hasColumn('users', 'nombre')) {
+            $columns[] = 'nombre';
+        }
+
+        if (empty($columns)) {
+            return $query->orderBy('id');
+        }
+
+        foreach ($columns as $column) {
+            $query->orderBy($column);
+        }
+
+        return $query;
     }
 
     private function normalizeStylistId($value): ?int
