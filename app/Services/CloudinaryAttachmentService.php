@@ -47,6 +47,7 @@ class CloudinaryAttachmentService
             'transformation' => $transformation,
             'format' => $fileType === 'image' ? 'webp' : ($fileType === 'pdf' ? 'pdf' : null),
             'overwrite' => false,
+            'access_mode' => $fileType === 'pdf' ? 'public' : null,
         ]);
 
         $upload = $cloudinary->uploadApi()->upload($file->getRealPath(), $options);
