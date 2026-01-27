@@ -5,12 +5,20 @@ namespace App\Http\Controllers\WhatsApp;
 use App\Http\Controllers\Controller;
 use App\Models\ExamReferral;
 use App\Models\Prescription;
+use App\Services\CloudinaryAttachmentService;
 use App\Services\WhatsApp\OneMsgClient;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Str;
 
 class DocumentSendController extends Controller
 {
-    public function sendPrescription(Prescription $prescription, OneMsgClient $client): RedirectResponse
+    public function sendPrescription(
+        Prescription $prescription,
+        OneMsgClient $client,
+        CloudinaryAttachmentService $cloudinaryAttachmentService
+    ): RedirectResponse
     {
         $prescription->load(['historiaClinica.paciente.owner']);
 
@@ -20,8 +28,8 @@ class DocumentSendController extends Controller
             return back()->with('error', 'No hay WhatsApp del tutor registrado.');
         }
 
-        $url = route('historias-clinicas.recetarios.print', $prescription);
         $filename = 'recetario-' . $prescription->id . '.pdf';
+        $url = $this->uploadPrescriptionToCloudinary($prescription, $filename, $cloudinaryAttachmentService);
         $caption = $this->prescriptionCaption($prescription);
 
         $template = config('services.onemsg.templates.recetario');
@@ -42,7 +50,11 @@ class DocumentSendController extends Controller
         return back()->with('success', 'Recetario enviado por WhatsApp.');
     }
 
-    public function sendExamReferral(ExamReferral $examReferral, OneMsgClient $client): RedirectResponse
+    public function sendExamReferral(
+        ExamReferral $examReferral,
+        OneMsgClient $client,
+        CloudinaryAttachmentService $cloudinaryAttachmentService
+    ): RedirectResponse
     {
         $examReferral->load(['historiaClinica.paciente.owner']);
 
@@ -52,8 +64,8 @@ class DocumentSendController extends Controller
             return back()->with('error', 'No hay WhatsApp del tutor registrado.');
         }
 
-        $url = route('historias-clinicas.remisiones.print', $examReferral);
         $filename = 'remision-' . $examReferral->id . '.pdf';
+        $url = $this->uploadExamReferralToCloudinary($examReferral, $filename, $cloudinaryAttachmentService);
         $caption = $this->examReferralCaption($examReferral);
 
         $template = config('services.onemsg.templates.remision');
@@ -109,6 +121,102 @@ class DocumentSendController extends Controller
         $mensaje .= "\nSi tienes dudas, estamos atentos.";
 
         return $mensaje;
+    }
+
+    private function uploadPrescriptionToCloudinary(
+        Prescription $prescription,
+        string $filename,
+        CloudinaryAttachmentService $cloudinaryAttachmentService
+    ): string {
+        $prescription->load([
+            'items.product',
+            'historiaClinica.paciente.owner',
+            'historiaClinica.paciente.species',
+            'historiaClinica.paciente.breed',
+            'professional',
+        ]);
+
+        $pdf = Pdf::loadView('historias_clinicas.recetario_pdf', compact('prescription'))
+            ->setPaper([0, 0, 396, 612]);
+
+        $historiaClinica = $prescription->historiaClinica;
+
+        return $this->uploadPdfToCloudinary(
+            $pdf->output(),
+            $filename,
+            $historiaClinica?->paciente_id,
+            $historiaClinica?->id,
+            'recetario-' . $prescription->id,
+            $cloudinaryAttachmentService
+        );
+    }
+
+    private function uploadExamReferralToCloudinary(
+        ExamReferral $examReferral,
+        string $filename,
+        CloudinaryAttachmentService $cloudinaryAttachmentService
+    ): string {
+        $examReferral->load(['historiaClinica.paciente', 'author']);
+
+        $pdf = Pdf::loadView('historias_clinicas.remision_pdf', compact('examReferral'))
+            ->setPaper([0, 0, 396, 612]);
+
+        $historiaClinica = $examReferral->historiaClinica;
+
+        return $this->uploadPdfToCloudinary(
+            $pdf->output(),
+            $filename,
+            $historiaClinica?->paciente_id,
+            $historiaClinica?->id,
+            'remision-' . $examReferral->id,
+            $cloudinaryAttachmentService
+        );
+    }
+
+    private function uploadPdfToCloudinary(
+        string $pdfContent,
+        string $filename,
+        ?int $pacienteId,
+        ?int $historiaId,
+        string $publicIdBase,
+        CloudinaryAttachmentService $cloudinaryAttachmentService
+    ): string {
+        $tenantKey = function_exists('tenant') ? tenant('id') : null;
+        if (! $tenantKey && app()->bound('tenancy')) {
+            $tenantKey = optional(app('tenancy')->tenant)->getTenantKey();
+        }
+
+        $tenantKey = $tenantKey ?? config('database.connections.tenant.database') ?? 'tenant';
+        $folder = $cloudinaryAttachmentService->buildFolderPath(
+            $tenantKey,
+            $pacienteId ?? 0,
+            $historiaId ?? 0
+        );
+
+        $tmpPath = tempnam(sys_get_temp_dir(), 'pdf-');
+        file_put_contents($tmpPath, $pdfContent);
+
+        $uploadedFile = new UploadedFile(
+            $tmpPath,
+            $filename,
+            'application/pdf',
+            null,
+            true
+        );
+
+        try {
+            $upload = $cloudinaryAttachmentService->upload(
+                $uploadedFile,
+                $folder,
+                'pdf',
+                $publicIdBase . '-' . Str::random(6),
+                $filename
+            );
+        } finally {
+            @unlink($tmpPath);
+        }
+
+        return $upload['secure_url'] ?? '';
     }
 
     private function prescriptionBodyParams(Prescription $prescription): array
