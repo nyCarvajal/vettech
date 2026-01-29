@@ -2,7 +2,6 @@
 
 namespace App\Services;
 
-use Cloudinary\Cloudinary as CloudinarySdk;
 use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Str;
@@ -26,8 +25,6 @@ class CloudinaryAttachmentService
     ): array
     {
         $this->ensureCloudinaryConfigured();
-        $cloudinary = $this->cloudinary();
-
         $resourceType = $this->resourceTypeFromFileType($fileType);
 
         $transformation = null;
@@ -50,11 +47,7 @@ class CloudinaryAttachmentService
             'overwrite' => false,
         ]);
 
-        if ($fileType === 'pdf') {
-            $upload = Cloudinary::upload($file->getRealPath(), $options);
-        } else {
-            $upload = $cloudinary->uploadApi()->upload($file->getRealPath(), $options);
-        }
+        $upload = Cloudinary::upload($file->getRealPath(), $options);
 
         return $this->normalizeUploadResponse($upload);
     }
@@ -63,8 +56,7 @@ class CloudinaryAttachmentService
     {
         try {
             $this->ensureCloudinaryConfigured();
-            $cloudinary = $this->cloudinary();
-            $cloudinary->uploadApi()->destroy($publicId, ['resource_type' => $resourceType]);
+            Cloudinary::destroy($publicId, ['resource_type' => $resourceType]);
         } catch (Throwable $exception) {
             report($exception);
         }
@@ -90,11 +82,6 @@ class CloudinaryAttachmentService
             'pdf' => 'raw',
             default => 'image',
         };
-    }
-
-    private function cloudinary(): CloudinarySdk
-    {
-        return new CloudinarySdk(config('cloudinary'));
     }
 
     private function normalizeUploadResponse($upload): array
