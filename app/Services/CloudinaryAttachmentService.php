@@ -43,11 +43,10 @@ class CloudinaryAttachmentService
             'folder' => $folder,
             'resource_type' => $resourceType,
             'public_id' => $publicId,
-            'access_mode' => 'public',
-            'transformation' => $transformation,
-            'format' => $fileType === 'image' ? 'webp' : ($fileType === 'pdf' ? 'pdf' : null),
-            'overwrite' => false,
             'access_mode' => $fileType === 'pdf' ? 'public' : null,
+            'transformation' => $transformation,
+            'format' => $fileType === 'image' ? 'webp' : null,
+            'overwrite' => false,
         ]);
 
         $upload = $cloudinary->uploadApi()->upload($file->getRealPath(), $options);
@@ -83,7 +82,7 @@ class CloudinaryAttachmentService
     {
         return match ($fileType) {
             'video' => 'video',
-            'pdf' => 'image',
+            'pdf' => 'raw',
             default => 'image',
         };
     }
