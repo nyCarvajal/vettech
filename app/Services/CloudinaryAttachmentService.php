@@ -51,7 +51,7 @@ class CloudinaryAttachmentService
         ]);
 
         if ($fileType === 'pdf') {
-            $upload = Cloudinary::uploadApi()->upload($file->getRealPath(), $options);
+            $upload = Cloudinary::upload($file->getRealPath(), $options);
         } else {
             $upload = $cloudinary->uploadApi()->upload($file->getRealPath(), $options);
         }
