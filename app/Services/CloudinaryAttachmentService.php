@@ -75,6 +75,15 @@ class CloudinaryAttachmentService
         }
     }
 
+    private function configureCloudinary(): void
+    {
+        Cloudinary::config([
+            'cloud' => config('cloudinary.cloud'),
+            'url' => config('cloudinary.url'),
+            'upload' => config('cloudinary.upload'),
+        ]);
+    }
+
     private function resourceTypeFromFileType(string $fileType): string
     {
         return match ($fileType) {
