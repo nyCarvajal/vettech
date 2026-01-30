@@ -25,7 +25,7 @@ class CloudinaryAttachmentService
     ): array
     {
         $this->ensureCloudinaryConfigured();
-        $this->configureCloudinary();
+        $cloudinary = $this->cloudinary();
         $resourceType = $this->resourceTypeFromFileType($fileType);
 
         $transformation = null;
@@ -112,5 +112,10 @@ class CloudinaryAttachmentService
         }
 
         return (array) $upload;
+    }
+
+    private function cloudinary(): CloudinarySdk
+    {
+        return new CloudinarySdk(config('cloudinary'));
     }
 }
