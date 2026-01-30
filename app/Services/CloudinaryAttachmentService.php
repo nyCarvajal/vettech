@@ -25,6 +25,7 @@ class CloudinaryAttachmentService
     ): array
     {
         $this->ensureCloudinaryConfigured();
+        $this->configureCloudinary();
         $resourceType = $this->resourceTypeFromFileType($fileType);
 
         $transformation = null;
@@ -56,6 +57,7 @@ class CloudinaryAttachmentService
     {
         try {
             $this->ensureCloudinaryConfigured();
+            $this->configureCloudinary();
             Cloudinary::uploadApi()->destroy($publicId, ['resource_type' => $resourceType]);
         } catch (Throwable $exception) {
             report($exception);
@@ -73,6 +75,15 @@ class CloudinaryAttachmentService
         if (empty($cloudConfig['cloud_name']) || empty($cloudConfig['api_key']) || empty($cloudConfig['api_secret'])) {
             throw new \RuntimeException('Cloudinary credentials missing. Set CLOUDINARY_URL or CLOUDINARY_API_KEY/SECRET.');
         }
+    }
+
+    private function configureCloudinary(): void
+    {
+        Cloudinary::config([
+            'cloud' => config('cloudinary.cloud'),
+            'url' => config('cloudinary.url'),
+            'upload' => config('cloudinary.upload'),
+        ]);
     }
 
     private function resourceTypeFromFileType(string $fileType): string
