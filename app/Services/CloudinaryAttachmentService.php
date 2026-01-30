@@ -2,7 +2,6 @@
 
 namespace App\Services;
 
-use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Str;
 use Throwable;
@@ -114,8 +113,8 @@ class CloudinaryAttachmentService
         return (array) $upload;
     }
 
-    private function cloudinary(): CloudinarySdk
+    private function cloudinary(): \Cloudinary\Cloudinary
     {
-        return new CloudinarySdk(config('cloudinary'));
+        return new \Cloudinary\Cloudinary(config('cloudinary'));
     }
 }
