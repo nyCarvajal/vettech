@@ -113,8 +113,8 @@ class CloudinaryAttachmentService
         return (array) $upload;
     }
 
-    private function cloudinary(): CloudinarySdk
+    private function cloudinary(): \Cloudinary\Cloudinary
     {
-        return new CloudinarySdk(config('cloudinary'));
+        return new \Cloudinary\Cloudinary(config('cloudinary'));
     }
 }
