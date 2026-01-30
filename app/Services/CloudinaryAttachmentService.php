@@ -47,7 +47,7 @@ class CloudinaryAttachmentService
             'overwrite' => false,
         ]);
 
-        $upload = $cloudinary->uploadApi()->upload($file->getRealPath(), $options);
+        $upload = Cloudinary::uploadApi()->upload($file->getRealPath(), $options);
 
         return $this->normalizeUploadResponse($upload);
     }
@@ -56,8 +56,8 @@ class CloudinaryAttachmentService
     {
         try {
             $this->ensureCloudinaryConfigured();
-            $cloudinary = $this->cloudinary();
-            $cloudinary->uploadApi()->destroy($publicId, ['resource_type' => $resourceType]);
+            $this->configureCloudinary();
+            Cloudinary::uploadApi()->destroy($publicId, ['resource_type' => $resourceType]);
         } catch (Throwable $exception) {
             report($exception);
         }
@@ -74,6 +74,15 @@ class CloudinaryAttachmentService
         if (empty($cloudConfig['cloud_name']) || empty($cloudConfig['api_key']) || empty($cloudConfig['api_secret'])) {
             throw new \RuntimeException('Cloudinary credentials missing. Set CLOUDINARY_URL or CLOUDINARY_API_KEY/SECRET.');
         }
+    }
+
+    private function configureCloudinary(): void
+    {
+        Cloudinary::config([
+            'cloud' => config('cloudinary.cloud'),
+            'url' => config('cloudinary.url'),
+            'upload' => config('cloudinary.upload'),
+        ]);
     }
 
     private function resourceTypeFromFileType(string $fileType): string
