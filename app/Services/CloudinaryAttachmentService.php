@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use Cloudinary\Cloudinary as CloudinarySdk;
+use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Str;
 use Throwable;
@@ -25,8 +25,7 @@ class CloudinaryAttachmentService
     ): array
     {
         $this->ensureCloudinaryConfigured();
-        $cloudinary = $this->cloudinary();
-
+        $this->configureCloudinary();
         $resourceType = $this->resourceTypeFromFileType($fileType);
 
         $transformation = null;
@@ -43,14 +42,13 @@ class CloudinaryAttachmentService
             'folder' => $folder,
             'resource_type' => $resourceType,
             'public_id' => $publicId,
-            'access_mode' => 'public',
-            'transformation' => $transformation,
-            'format' => $fileType === 'image' ? 'webp' : ($fileType === 'pdf' ? 'pdf' : null),
-            'overwrite' => false,
             'access_mode' => $fileType === 'pdf' ? 'public' : null,
+            'transformation' => $transformation,
+            'format' => $fileType === 'image' ? 'webp' : null,
+            'overwrite' => false,
         ]);
 
-        $upload = $cloudinary->uploadApi()->upload($file->getRealPath(), $options);
+        $upload = Cloudinary::uploadApi()->upload($file->getRealPath(), $options);
 
         return $this->normalizeUploadResponse($upload);
     }
@@ -59,8 +57,8 @@ class CloudinaryAttachmentService
     {
         try {
             $this->ensureCloudinaryConfigured();
-            $cloudinary = $this->cloudinary();
-            $cloudinary->uploadApi()->destroy($publicId, ['resource_type' => $resourceType]);
+            $this->configureCloudinary();
+            Cloudinary::uploadApi()->destroy($publicId, ['resource_type' => $resourceType]);
         } catch (Throwable $exception) {
             report($exception);
         }
@@ -79,18 +77,22 @@ class CloudinaryAttachmentService
         }
     }
 
+    private function configureCloudinary(): void
+    {
+        Cloudinary::config([
+            'cloud' => config('cloudinary.cloud'),
+            'url' => config('cloudinary.url'),
+            'upload' => config('cloudinary.upload'),
+        ]);
+    }
+
     private function resourceTypeFromFileType(string $fileType): string
     {
         return match ($fileType) {
             'video' => 'video',
-            'pdf' => 'image',
+            'pdf' => 'raw',
             default => 'image',
         };
-    }
-
-    private function cloudinary(): CloudinarySdk
-    {
-        return new CloudinarySdk(config('cloudinary'));
     }
 
     private function normalizeUploadResponse($upload): array
