@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Str;
 use Throwable;
@@ -24,7 +25,6 @@ class CloudinaryAttachmentService
     ): array
     {
         $this->ensureCloudinaryConfigured();
-        $cloudinary = $this->cloudinary();
         $resourceType = $this->resourceTypeFromFileType($fileType);
 
         $transformation = null;
@@ -47,7 +47,7 @@ class CloudinaryAttachmentService
             'overwrite' => false,
         ]);
 
-        $upload = Cloudinary::uploadApi()->upload($file->getRealPath(), $options);
+        $upload = Cloudinary::upload($file->getRealPath(), $options);
 
         return $this->normalizeUploadResponse($upload);
     }
@@ -56,8 +56,7 @@ class CloudinaryAttachmentService
     {
         try {
             $this->ensureCloudinaryConfigured();
-            $this->configureCloudinary();
-            Cloudinary::uploadApi()->destroy($publicId, ['resource_type' => $resourceType]);
+            Cloudinary::destroy($publicId, ['resource_type' => $resourceType]);
         } catch (Throwable $exception) {
             report($exception);
         }
@@ -113,8 +112,5 @@ class CloudinaryAttachmentService
         return (array) $upload;
     }
 
-    private function cloudinary(): \Cloudinary\Cloudinary
-    {
-        return new \Cloudinary\Cloudinary(config('cloudinary'));
-    }
+    
 }
