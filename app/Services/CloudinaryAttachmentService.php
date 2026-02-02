@@ -83,12 +83,23 @@ class CloudinaryAttachmentService
             return;
         }
 
-        $cloud = config('cloudinary.cloud');
+        $cloud = config('cloudinary.cloud', []);
+        $cloudName = $cloud['cloud_name'] ?? null;
+        $apiKey = $cloud['api_key'] ?? null;
+        $apiSecret = $cloud['api_secret'] ?? null;
+
+        if (! is_string($cloudName) || $cloudName === ''
+            || ! is_string($apiKey) || $apiKey === ''
+            || ! is_string($apiSecret) || $apiSecret === ''
+        ) {
+            throw new \RuntimeException('Cloudinary credentials missing. Set CLOUDINARY_URL or CLOUDINARY_API_KEY/SECRET.');
+        }
+
         \Cloudinary\Configuration\Configuration::instance([
             'cloud' => [
-                'cloud_name' => $cloud['cloud_name'] ?? null,
-                'api_key' => $cloud['api_key'] ?? null,
-                'api_secret' => $cloud['api_secret'] ?? null,
+                'cloud_name' => $cloudName,
+                'api_key' => $apiKey,
+                'api_secret' => $apiSecret,
             ],
             'url' => config('cloudinary.url', []),
             'upload' => config('cloudinary.upload', []),
