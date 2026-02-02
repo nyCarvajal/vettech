@@ -10,6 +10,7 @@ use App\Models\Clinica;
 use App\Models\Reserva;
 use App\Models\Tipocita;
 use App\Models\User;
+use App\Support\RoleLabelResolver;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -19,7 +20,7 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
-use App\Support\RoleLabelResolver;
+use Illuminate\Support\Collection;
 
 class BookingController extends Controller
 {
@@ -507,24 +508,27 @@ class BookingController extends Controller
             $connectionStylists = User::on($connection)
                 ->where('clinica_id', $clinica->id)
                 ->whereIn('role', [11, '11', 'groomer'])
-                ->orderBy('nombre')
-                ->orderBy('apellidos')
                 ->get();
 
             if ($connectionStylists->isEmpty()) {
                 $connectionStylists = User::on($connection)
                     ->where('clinica_id', $clinica->id)
-                    ->orderBy('nombre')
-                    ->orderBy('apellidos')
                     ->get();
             }
 
             if ($connectionStylists->isNotEmpty()) {
-                $stylists = $stylists->merge($connectionStylists);
+                $stylists = $stylists->merge($this->sortStylists($connectionStylists));
             }
         }
 
         return $stylists->unique('id')->values();
+    }
+
+    private function sortStylists(Collection $stylists): Collection
+    {
+        return $stylists
+            ->sortBy(fn (User $user) => Str::lower((string) ($user->name ?? '')))
+            ->values();
     }
 
     private function normalizeStylistId($value): ?int
