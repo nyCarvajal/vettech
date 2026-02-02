@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+use App\Facades\Cloudinary;
+use Cloudinary\Cloudinary as CloudinarySdk;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Str;
 use Throwable;
@@ -48,7 +50,7 @@ class CloudinaryAttachmentService
         ]);
 
         if ($fileType === 'pdf') {
-            $upload = \CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary::upload($file->getRealPath(), $options);
+            $upload = Cloudinary::upload($file->getRealPath(), $options);
         } else {
             $upload = $cloudinary->uploadApi()->upload($file->getRealPath(), $options);
         }
