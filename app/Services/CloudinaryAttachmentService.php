@@ -47,7 +47,7 @@ class CloudinaryAttachmentService
             'overwrite' => false,
         ]);
 
-        $upload = $cloudinary->uploadApi()->upload($file->getRealPath(), $options);
+        $upload = CloudinaryFacade::uploadApi()->upload($file->getRealPath(), $options);
 
         return $this->normalizeUploadResponse($upload);
     }
@@ -56,8 +56,8 @@ class CloudinaryAttachmentService
     {
         try {
             $this->ensureCloudinaryConfigured();
-            $cloudinary = $this->cloudinary();
-            $cloudinary->uploadApi()->destroy($publicId, ['resource_type' => $resourceType]);
+            $this->configureCloudinary();
+            CloudinaryFacade::uploadApi()->destroy($publicId, ['resource_type' => $resourceType]);
         } catch (Throwable $exception) {
             report($exception);
         }
@@ -74,6 +74,35 @@ class CloudinaryAttachmentService
         if (empty($cloudConfig['cloud_name']) || empty($cloudConfig['api_key']) || empty($cloudConfig['api_secret'])) {
             throw new \RuntimeException('Cloudinary credentials missing. Set CLOUDINARY_URL or CLOUDINARY_API_KEY/SECRET.');
         }
+    }
+
+    private function configureCloudinary(): void
+    {
+        if (! class_exists(\Cloudinary\Configuration\Configuration::class)) {
+            return;
+        }
+
+        $cloud = config('cloudinary.cloud', []);
+        $cloudName = $cloud['cloud_name'] ?? null;
+        $apiKey = $cloud['api_key'] ?? null;
+        $apiSecret = $cloud['api_secret'] ?? null;
+
+        if (! is_string($cloudName) || $cloudName === ''
+            || ! is_string($apiKey) || $apiKey === ''
+            || ! is_string($apiSecret) || $apiSecret === ''
+        ) {
+            throw new \RuntimeException('Cloudinary credentials missing. Set CLOUDINARY_URL or CLOUDINARY_API_KEY/SECRET.');
+        }
+
+        \Cloudinary\Configuration\Configuration::instance([
+            'cloud' => [
+                'cloud_name' => $cloudName,
+                'api_key' => $apiKey,
+                'api_secret' => $apiSecret,
+            ],
+            'url' => config('cloudinary.url', []),
+            'upload' => config('cloudinary.upload', []),
+        ]);
     }
 
     private function resourceTypeFromFileType(string $fileType): string
