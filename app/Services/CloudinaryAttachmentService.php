@@ -39,7 +39,7 @@ class CloudinaryAttachmentService
             $transformation = [['quality' => 'auto:eco']];
         }
 
-        $options = array_filter([
+        $options = [
             'folder' => $folder,
             'resource_type' => $resourceType,
             'public_id' => $publicId,
@@ -47,7 +47,15 @@ class CloudinaryAttachmentService
             'transformation' => $transformation,
             'format' => $fileType === 'image' ? 'webp' : null,
             'overwrite' => false,
-        ]);
+        ];
+
+        if ($fileType === 'pdf') {
+            $options['use_filename'] = true;
+            $options['unique_filename'] = false;
+            $options['filename_override'] = $filenameOverride ?: $file->getClientOriginalName();
+        }
+
+        $options = array_filter($options, static fn ($value) => $value !== null);
 
         if ($fileType === 'pdf') {
             $upload = Cloudinary::upload($file->getRealPath(), $options);
