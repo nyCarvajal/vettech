@@ -47,7 +47,11 @@ class CloudinaryAttachmentService
             'overwrite' => false,
         ]);
 
-        $upload = CloudinaryFacade::uploadApi()->upload($file->getRealPath(), $options);
+        if ($fileType === 'pdf') {
+            $upload = \CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary::upload($file->getRealPath(), $options);
+        } else {
+            $upload = $cloudinary->uploadApi()->upload($file->getRealPath(), $options);
+        }
 
         return $this->normalizeUploadResponse($upload);
     }
