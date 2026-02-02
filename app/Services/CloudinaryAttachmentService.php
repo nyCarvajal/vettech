@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Facades\Cloudinary;
 use Cloudinary\Cloudinary as CloudinarySdk;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Str;
@@ -39,7 +40,7 @@ class CloudinaryAttachmentService
             $transformation = [['quality' => 'auto:eco']];
         }
 
-        $options = array_filter([
+        $options = [
             'folder' => $folder,
             'resource_type' => $resourceType,
             'public_id' => $publicId,
@@ -47,9 +48,32 @@ class CloudinaryAttachmentService
             'transformation' => $transformation,
             'format' => $fileType === 'image' ? 'webp' : null,
             'overwrite' => false,
-        ]);
+        ];
 
-        $upload = $cloudinary->uploadApi()->upload($file->getRealPath(), $options);
+        if ($fileType === 'pdf') {
+            $pdfFilename = $filenameOverride ?: $file->getClientOriginalName();
+            $pdfFilename = is_string($pdfFilename) ? trim($pdfFilename) : '';
+
+            if ($pdfFilename === '') {
+                $pdfFilename = ($publicId ?: 'document') . '.pdf';
+            }
+
+            if (! str_ends_with(strtolower($pdfFilename), '.pdf')) {
+                $pdfFilename .= '.pdf';
+            }
+
+            $options['use_filename'] = true;
+            $options['unique_filename'] = false;
+            $options['filename_override'] = $pdfFilename;
+        }
+
+        $options = array_filter($options, static fn ($value) => $value !== null);
+
+        if ($fileType === 'pdf') {
+            $upload = Cloudinary::upload($file->getRealPath(), $options);
+        } else {
+            $upload = $cloudinary->uploadApi()->upload($file->getRealPath(), $options);
+        }
 
         return $this->normalizeUploadResponse($upload);
     }
