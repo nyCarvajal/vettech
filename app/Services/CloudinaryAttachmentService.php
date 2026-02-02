@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Facades\Cloudinary;
 use Cloudinary\Cloudinary as CloudinarySdk;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Str;
@@ -49,7 +50,11 @@ class CloudinaryAttachmentService
             'overwrite' => false,
         ]);
 
-        $upload = $cloudinary->uploadApi()->upload($file->getRealPath(), $options);
+        if ($fileType === 'pdf') {
+            $upload = Cloudinary::upload($file->getRealPath(), $options);
+        } else {
+            $upload = $cloudinary->uploadApi()->upload($file->getRealPath(), $options);
+        }
 
         return $this->normalizeUploadResponse($upload);
     }
