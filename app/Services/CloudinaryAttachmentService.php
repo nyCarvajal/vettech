@@ -74,7 +74,13 @@ class CloudinaryAttachmentService
             $upload = $cloudinary->uploadApi()->upload($file->getRealPath(), $options);
         }
 
-        return $this->normalizeUploadResponse($upload);
+        $normalized = $this->normalizeUploadResponse($upload);
+
+        if ($fileType === 'pdf') {
+            $normalized = $this->ensurePdfUrls($normalized, $publicId);
+        }
+
+        return $normalized;
     }
 
     public function delete(string $publicId, string $resourceType = 'image'): void
@@ -158,20 +164,43 @@ class CloudinaryAttachmentService
         return (array) $upload;
     }
 
-    private function cloudinary(): \Cloudinary\Cloudinary
+    private function ensurePdfUrls(array $upload, ?string $fallbackPublicId): array
     {
-        $cloud = config('cloudinary.cloud', []);
+        if (empty($upload['public_id']) && $fallbackPublicId) {
+            $upload['public_id'] = $fallbackPublicId;
+        }
 
-        return new \Cloudinary\Cloudinary([
-            'cloud' => [
-                'cloud_name' => $cloud['cloud_name'] ?? null,
-                'api_key' => $cloud['api_key'] ?? null,
-                'api_secret' => $cloud['api_secret'] ?? null,
-            ],
-            'url' => config('cloudinary.url', []),
-            'upload' => config('cloudinary.upload', []),
-        ]);
+        if (! empty($upload['secure_url']) || ! empty($upload['url'])) {
+            return $upload;
+        }
+
+        $publicId = $upload['public_id'] ?? null;
+        $cloudName = config('cloudinary.cloud.cloud_name');
+        if (! $publicId || ! $cloudName) {
+            return $upload;
+        }
+
+        $format = $upload['format'] ?? 'pdf';
+        $publicIdForUrl = $publicId;
+        if (! str_ends_with($publicIdForUrl, '.' . $format)) {
+            $publicIdForUrl .= '.' . $format;
+        }
+
+        $scheme = config('cloudinary.url.secure', true) ? 'https' : 'http';
+        $version = $upload['version'] ?? null;
+        $versionSegment = $version ? 'v' . $version . '/' : '';
+
+        $url = sprintf(
+            '%s://res.cloudinary.com/%s/raw/upload/%s%s',
+            $scheme,
+            $cloudName,
+            $versionSegment,
+            $publicIdForUrl
+        );
+
+        $upload['secure_url'] = $url;
+        $upload['url'] = $url;
+
+        return $upload;
     }
-
-    
 }
