@@ -26,7 +26,8 @@ class CloudinaryAttachmentService
     ): array
     {
         $this->ensureCloudinaryConfigured();
-        $cloudinary = $this->cloudinary();
+        $cloudinary = new CloudinarySdk(config('cloudinary'));
+
         $resourceType = $this->resourceTypeFromFileType($fileType);
 
         $transformation = null;
@@ -50,9 +51,20 @@ class CloudinaryAttachmentService
         ];
 
         if ($fileType === 'pdf') {
+            $pdfFilename = $filenameOverride ?: $file->getClientOriginalName();
+            $pdfFilename = is_string($pdfFilename) ? trim($pdfFilename) : '';
+
+            if ($pdfFilename === '') {
+                $pdfFilename = ($publicId ?: 'document') . '.pdf';
+            }
+
+            if (! str_ends_with(strtolower($pdfFilename), '.pdf')) {
+                $pdfFilename .= '.pdf';
+            }
+
             $options['use_filename'] = true;
             $options['unique_filename'] = false;
-            $options['filename_override'] = $filenameOverride ?: $file->getClientOriginalName();
+            $options['filename_override'] = $pdfFilename;
         }
 
         $options = array_filter($options, static fn ($value) => $value !== null);
@@ -63,15 +75,21 @@ class CloudinaryAttachmentService
             $upload = $cloudinary->uploadApi()->upload($file->getRealPath(), $options);
         }
 
-        return $this->normalizeUploadResponse($upload);
+        $normalized = $this->normalizeUploadResponse($upload);
+
+        if ($fileType === 'pdf') {
+            $normalized = $this->ensurePdfUrls($normalized, $publicId);
+        }
+
+        return $normalized;
     }
 
     public function delete(string $publicId, string $resourceType = 'image'): void
     {
         try {
             $this->ensureCloudinaryConfigured();
-            $this->configureCloudinary();
-            CloudinaryFacade::uploadApi()->destroy($publicId, ['resource_type' => $resourceType]);
+            $cloudinary = new CloudinarySdk(config('cloudinary'));
+            $cloudinary->uploadApi()->destroy($publicId, ['resource_type' => $resourceType]);
         } catch (Throwable $exception) {
             report($exception);
         }
@@ -148,20 +166,43 @@ class CloudinaryAttachmentService
         return (array) $upload;
     }
 
-    private function cloudinary(): \Cloudinary\Cloudinary
+    private function ensurePdfUrls(array $upload, ?string $fallbackPublicId): array
     {
-        $cloud = config('cloudinary.cloud', []);
+        if (empty($upload['public_id']) && $fallbackPublicId) {
+            $upload['public_id'] = $fallbackPublicId;
+        }
 
-        return new \Cloudinary\Cloudinary([
-            'cloud' => [
-                'cloud_name' => $cloud['cloud_name'] ?? null,
-                'api_key' => $cloud['api_key'] ?? null,
-                'api_secret' => $cloud['api_secret'] ?? null,
-            ],
-            'url' => config('cloudinary.url', []),
-            'upload' => config('cloudinary.upload', []),
-        ]);
+        if (! empty($upload['secure_url']) || ! empty($upload['url'])) {
+            return $upload;
+        }
+
+        $publicId = $upload['public_id'] ?? null;
+        $cloudName = config('cloudinary.cloud.cloud_name');
+        if (! $publicId || ! $cloudName) {
+            return $upload;
+        }
+
+        $format = $upload['format'] ?? 'pdf';
+        $publicIdForUrl = $publicId;
+        if (! str_ends_with($publicIdForUrl, '.' . $format)) {
+            $publicIdForUrl .= '.' . $format;
+        }
+
+        $scheme = config('cloudinary.url.secure', true) ? 'https' : 'http';
+        $version = $upload['version'] ?? null;
+        $versionSegment = $version ? 'v' . $version . '/' : '';
+
+        $url = sprintf(
+            '%s://res.cloudinary.com/%s/raw/upload/%s%s',
+            $scheme,
+            $cloudName,
+            $versionSegment,
+            $publicIdForUrl
+        );
+
+        $upload['secure_url'] = $url;
+        $upload['url'] = $url;
+
+        return $upload;
     }
-
-    
 }
