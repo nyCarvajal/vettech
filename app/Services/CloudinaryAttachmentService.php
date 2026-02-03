@@ -142,6 +142,7 @@ class CloudinaryAttachmentService
         return match ($fileType) {
             'video' => 'video',
             'pdf' => 'raw',
+            'document' => 'raw',
             default => 'image',
         };
     }
