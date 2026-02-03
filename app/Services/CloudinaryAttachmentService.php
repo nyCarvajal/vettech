@@ -27,7 +27,6 @@ class CloudinaryAttachmentService
     {
         $this->ensureCloudinaryConfigured();
         $cloudinary = $this->cloudinary();
-
         $resourceType = $this->resourceTypeFromFileType($fileType);
 
         $transformation = null;
@@ -88,8 +87,8 @@ class CloudinaryAttachmentService
     {
         try {
             $this->ensureCloudinaryConfigured();
-            $cloudinary = $this->cloudinary();
-            $cloudinary->uploadApi()->destroy($publicId, ['resource_type' => $resourceType]);
+            $this->configureCloudinary();
+            CloudinaryFacade::uploadApi()->destroy($publicId, ['resource_type' => $resourceType]);
         } catch (Throwable $exception) {
             report($exception);
         }
@@ -108,6 +107,35 @@ class CloudinaryAttachmentService
         }
     }
 
+    private function configureCloudinary(): void
+    {
+        if (! class_exists(\Cloudinary\Configuration\Configuration::class)) {
+            return;
+        }
+
+        $cloud = config('cloudinary.cloud', []);
+        $cloudName = $cloud['cloud_name'] ?? null;
+        $apiKey = $cloud['api_key'] ?? null;
+        $apiSecret = $cloud['api_secret'] ?? null;
+
+        if (! is_string($cloudName) || $cloudName === ''
+            || ! is_string($apiKey) || $apiKey === ''
+            || ! is_string($apiSecret) || $apiSecret === ''
+        ) {
+            throw new \RuntimeException('Cloudinary credentials missing. Set CLOUDINARY_URL or CLOUDINARY_API_KEY/SECRET.');
+        }
+
+        \Cloudinary\Configuration\Configuration::instance([
+            'cloud' => [
+                'cloud_name' => $cloudName,
+                'api_key' => $apiKey,
+                'api_secret' => $apiSecret,
+            ],
+            'url' => config('cloudinary.url', []),
+            'upload' => config('cloudinary.upload', []),
+        ]);
+    }
+
     private function resourceTypeFromFileType(string $fileType): string
     {
         return match ($fileType) {
@@ -115,11 +143,6 @@ class CloudinaryAttachmentService
             'pdf' => 'raw',
             default => 'image',
         };
-    }
-
-    private function cloudinary(): CloudinarySdk
-    {
-        return new CloudinarySdk(config('cloudinary'));
     }
 
     private function normalizeUploadResponse($upload): array
