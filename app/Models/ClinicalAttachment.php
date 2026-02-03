@@ -76,7 +76,7 @@ class ClinicalAttachment extends BaseModel
         $version = $this->extractCloudinaryVersion();
 
         $format = $this->cloudinary_format ?? ($this->file_type === 'pdf' ? 'pdf' : null);
-        if ($format) {
+        if ($format && $this->file_type !== 'pdf') {
             $asset = $asset->format($format);
         }
 
