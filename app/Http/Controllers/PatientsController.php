@@ -50,6 +50,23 @@ class PatientsController extends Controller
         $species = Species::orderBy('name')->get();
         $owners = Owner::orderBy('name')->get();
         $breeds = Breed::orderBy('name')->get();
+        $ownersData = $owners->map(function ($owner) {
+            return [
+                'id' => $owner->id,
+                'name' => $owner->name,
+                'document' => $owner->document,
+                'phone' => $owner->phone,
+                'whatsapp' => $owner->whatsapp,
+                'email' => $owner->email,
+            ];
+        })->values();
+        $breedsData = $breeds->map(function ($breed) {
+            return [
+                'id' => $breed->id,
+                'name' => $breed->name,
+                'species_id' => $breed->species_id,
+            ];
+        })->values();
 
         $patient = new Patient([
             'owner_id' => $request->integer('owner_id') ?: null,
@@ -62,6 +79,8 @@ class PatientsController extends Controller
             'species' => $species,
             'owners' => $owners,
             'breeds' => $breeds,
+            'ownersData' => $ownersData,
+            'breedsData' => $breedsData,
             'tutoresIniciales' => $this->buildTutorPayload($patient),
         ]);
     }
@@ -125,6 +144,23 @@ class PatientsController extends Controller
         $species = Species::orderBy('name')->get();
         $owners = Owner::orderBy('name')->get();
         $breeds = Breed::orderBy('name')->get();
+        $ownersData = $owners->map(function ($owner) {
+            return [
+                'id' => $owner->id,
+                'name' => $owner->name,
+                'document' => $owner->document,
+                'phone' => $owner->phone,
+                'whatsapp' => $owner->whatsapp,
+                'email' => $owner->email,
+            ];
+        })->values();
+        $breedsData = $breeds->map(function ($breed) {
+            return [
+                'id' => $breed->id,
+                'name' => $breed->name,
+                'species_id' => $breed->species_id,
+            ];
+        })->values();
 
         $patient->load('tutors');
 
@@ -133,6 +169,8 @@ class PatientsController extends Controller
             'species' => $species,
             'owners' => $owners,
             'breeds' => $breeds,
+            'ownersData' => $ownersData,
+            'breedsData' => $breedsData,
             'tutoresIniciales' => $this->buildTutorPayload($patient),
         ]);
     }
