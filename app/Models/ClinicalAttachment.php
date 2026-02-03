@@ -73,7 +73,7 @@ class ClinicalAttachment extends BaseModel
         $asset = $isPdf
             ? $cloudinary->raw($this->cloudinary_public_id)
             : $cloudinary->image($this->cloudinary_public_id);
-        $asset = $asset->deliveryType($isPdf ? 'public' : 'authenticated');
+        $asset = $asset->deliveryType($isPdf ? 'upload' : 'authenticated');
         $version = $this->extractCloudinaryVersion();
 
         $format = $this->cloudinary_format ?? ($isPdf ? 'pdf' : null);

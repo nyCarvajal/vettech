@@ -44,7 +44,7 @@ class CloudinaryAttachmentService
             'folder' => $folder,
             'resource_type' => $resourceType,
             'public_id' => $publicId,
-            'access_mode' => $fileType === 'pdf' ? 'public' : null,
+            'type' => $fileType === 'pdf' ? 'upload' : null,
             'transformation' => $transformation,
             'format' => $fileType === 'image' ? 'webp' : null,
             'overwrite' => false,
