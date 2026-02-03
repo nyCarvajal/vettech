@@ -69,18 +69,19 @@ class ClinicalAttachment extends BaseModel
         }
 
         $cloudinary = new CloudinarySdk(config('cloudinary'));
-        $asset = $this->file_type === 'pdf'
+        $isPdf = $this->file_type === 'pdf';
+        $asset = $isPdf
             ? $cloudinary->raw($this->cloudinary_public_id)
             : $cloudinary->image($this->cloudinary_public_id);
-        $asset = $asset->deliveryType('authenticated');
+        $asset = $asset->deliveryType($isPdf ? 'public' : 'authenticated');
         $version = $this->extractCloudinaryVersion();
 
-        $format = $this->cloudinary_format ?? ($this->file_type === 'pdf' ? 'pdf' : null);
-        if ($format && $this->file_type !== 'pdf') {
+        $format = $this->cloudinary_format ?? ($isPdf ? 'pdf' : null);
+        if ($format && ! $isPdf) {
             $asset = $asset->format($format);
         }
 
-        if ($downloadFilename && $this->file_type !== 'pdf') {
+        if ($downloadFilename && ! $isPdf) {
             $asset = $asset->addFlag('attachment:' . $downloadFilename);
         }
 
@@ -88,7 +89,9 @@ class ClinicalAttachment extends BaseModel
             $asset = $asset->version($version);
         }
 
-        $asset = $asset->signUrl(true);
+        if (! $isPdf) {
+            $asset = $asset->signUrl(true);
+        }
 
         return (string) $asset->toUrl();
     }
