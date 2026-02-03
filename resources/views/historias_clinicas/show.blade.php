@@ -66,8 +66,8 @@
     <div class="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
         <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between pb-4">
             <div>
-                <h3 class="text-lg font-semibold text-gray-900">Adjuntos</h3>
-                <p class="text-sm text-gray-600">Imágenes, PDFs y videos vinculados a la historia clínica.</p>
+                <h3 class="text-lg font-semibold text-gray-900">Paraclínicos y adjuntos</h3>
+                <p class="text-sm text-gray-600">Adjunta resultados, imágenes y documentos de apoyo del examen.</p>
             </div>
             <button
                 type="button"
@@ -96,6 +96,11 @@
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M7 3h8l4 4v14H7z"/><path d="M7 3v4h4"/></svg>
                                 <span class="text-sm font-semibold">PDF</span>
                             </div>
+                        @elseif($attachment->file_type === 'document')
+                            <div class="flex flex-col items-center text-gray-500">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 3h9l5 5v13H6z"/><path d="M15 3v6h6"/></svg>
+                                <span class="text-sm font-semibold">DOC</span>
+                            </div>
                         @else
                             <div class="flex flex-col items-center text-gray-500">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 17v-7l8-4 8 4v7l-8 4z"/><path d="M10 14v-4l4 2z"/></svg>
@@ -108,8 +113,12 @@
                         $attachmentExtension = $attachment->cloudinary_format
                             ?? ($attachment->file_type === 'pdf' ? 'pdf' : $attachment->file_type);
                         $downloadFilename = $attachment->titulo_limpio . ($attachmentExtension ? '.' . $attachmentExtension : '');
-                        $downloadUrl = $attachment->cloudinary_secure_url;
-                        $viewUrl = $attachment->cloudinary_secure_url;
+                        $downloadUrl = $attachment->file_type === 'pdf'
+                            ? $attachment->signedDownloadUrl($attachment->titulo_limpio . '.pdf')
+                            : $attachment->cloudinary_secure_url;
+                        $viewUrl = $attachment->file_type === 'pdf'
+                            ? $attachment->signedViewUrl()
+                            : $attachment->cloudinary_secure_url;
                     @endphp
                     <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                         <div>
@@ -122,6 +131,8 @@
                                 <button type="button" class="rounded-full border border-emerald-200 px-3 py-1 text-emerald-700 hover:bg-emerald-50 transition" onclick="window.open('{{ $attachment->cloudinary_secure_url }}','_blank')">Ver</button>
                             @elseif($attachment->file_type === 'pdf')
                                 <a class="rounded-full border border-blue-200 px-3 py-1 text-blue-700 hover:bg-blue-50 transition" href="{{ $viewUrl }}" target="_blank" rel="noopener">Ver</a>
+                            @elseif($attachment->file_type === 'document')
+                                <a class="rounded-full border border-indigo-200 px-3 py-1 text-indigo-700 hover:bg-indigo-50 transition" href="{{ $viewUrl }}" target="_blank" rel="noopener">Descargar</a>
                             @else
                                 <a class="rounded-full border border-indigo-200 px-3 py-1 text-indigo-700 hover:bg-indigo-50 transition" href="{{ $attachment->cloudinary_secure_url }}" target="_blank" rel="noopener">Reproducir</a>
                             @endif
@@ -154,6 +165,56 @@
                     <p class="text-base md:col-span-2"><strong class="text-gray-900">Antecedentes / Enfermedad actual:</strong> {{ $historia->enfermedad_actual ?: 'Sin registrar' }}</p>
                     <p class="text-base"><strong class="text-gray-900">Antecedentes farmacológicos:</strong> {{ $historia->antecedentes_farmacologicos ?: 'N/D' }}</p>
                     <p class="text-base"><strong class="text-gray-900">Antecedentes patológicos:</strong> {{ $historia->antecedentes_patologicos ?: 'N/D' }}</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="lg:col-span-3">
+            <div class="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+                <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between pb-4">
+                    <h3 class="text-lg font-semibold text-gray-900">Examen físico (ECOP)</h3>
+                    <span class="w-full rounded-full bg-slate-50 px-3 py-1 text-center text-xs font-semibold uppercase tracking-wide text-slate-700 md:w-auto">Orden clínico</span>
+                </div>
+                <div class="grid gap-4 text-sm text-gray-700 md:grid-cols-2">
+                    <div>
+                        <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">E. Evaluación general</p>
+                        <p class="mt-2"><strong>T°:</strong> {{ $historia->temperatura ?? 'N/D' }} °C</p>
+                        <p><strong>Peso:</strong> {{ $historia->peso ?? 'N/D' }} Kg</p>
+                        <p><strong>FC:</strong> {{ $historia->frecuencia_cardiaca ?? 'N/D' }} Lpm</p>
+                        <p><strong>FR:</strong> {{ $historia->frecuencia_respiratoria ?? 'N/D' }} Rpm</p>
+                        <p><strong>TA:</strong> {{ $historia->tension_arterial ?? 'N/D' }}</p>
+                        <p><strong>Sat O₂:</strong> {{ $historia->saturacion_oxigeno ?? 'N/D' }} %</p>
+                        <p><strong>TRC:</strong> {{ $historia->trc ?? 'N/D' }}</p>
+                        <p><strong>Mucosas:</strong> {{ $historia->mucosas ?? 'N/D' }}</p>
+                        <p><strong>Hidratación:</strong> {{ $historia->hidratacion ?? 'N/D' }}</p>
+                        <p><strong>Condición corporal:</strong> {{ $historia->condicion_corporal ?? 'N/D' }}</p>
+                    </div>
+                    <div>
+                        <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">C. Condición clínica</p>
+                        <p class="mt-2"><strong>Estado mental:</strong> {{ $historia->estado_mental ?? 'N/D' }}</p>
+                        <p><strong>Postura:</strong> {{ $historia->postura ?? 'N/D' }}</p>
+                        <p><strong>Marcha:</strong> {{ $historia->marcha ?? 'N/D' }}</p>
+                        <p><strong>Dolor:</strong> {{ $historia->dolor ?? 'N/D' }}</p>
+                    </div>
+                    <div class="md:col-span-2">
+                        <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">O. Observaciones por sistemas</p>
+                        <div class="mt-2 grid gap-2 md:grid-cols-2">
+                            <p><strong>Piel:</strong> {{ $historia->examen_piel ?? 'N/D' }}</p>
+                            <p><strong>Ojos:</strong> {{ $historia->examen_ojos ?? 'N/D' }}</p>
+                            <p><strong>Oídos:</strong> {{ $historia->examen_oidos ?? 'N/D' }}</p>
+                            <p><strong>Boca:</strong> {{ $historia->examen_boca ?? 'N/D' }}</p>
+                            <p><strong>Cabeza/cuello:</strong> {{ $historia->examen_cabeza_cuello ?? 'N/D' }}</p>
+                            <p><strong>Ganglios:</strong> {{ $historia->examen_ganglios ?? 'N/D' }}</p>
+                            <p><strong>Cardio-respiratorio:</strong> {{ $historia->examen_torax ?? 'N/D' }}</p>
+                            <p><strong>Corazón:</strong> {{ $historia->examen_corazon ?? 'N/D' }}</p>
+                            <p><strong>Gastrointestinal:</strong> {{ $historia->examen_abdomen ?? 'N/D' }}</p>
+                            <p><strong>Genitourinario:</strong> {{ $historia->examen_genitales ?? 'N/D' }}</p>
+                            <p><strong>Neurológico:</strong> {{ $historia->examen_neurologico ?? 'N/D' }}</p>
+                            <p><strong>Músculo-esquelético:</strong> {{ $historia->examen_extremidades ?? 'N/D' }}</p>
+                            <p><strong>Mamas:</strong> {{ $historia->examen_mama ?? 'N/D' }}</p>
+                        </div>
+                        <p class="mt-3 text-xs text-gray-500">P. Plan e impresión diagnóstica: ver sección de plan clínico.</p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -307,7 +368,7 @@
         <div class="flex items-start justify-between">
             <div>
                 <h3 class="text-lg font-semibold text-gray-900">Nuevo adjunto</h3>
-                <p class="text-sm text-gray-600">Formatos permitidos: JPG, PNG, WEBP, PDF, MP4, WEBM, MOV. Máx 10MB.</p>
+                <p class="text-sm text-gray-600">Formatos permitidos: JPG, PNG, WEBP, HEIC, PDF, DOC, DOCX, XLS, XLSX, ZIP, MP4, WEBM, MOV. Máx {{ config('clinical_attachments.max_size_kb', 20480) / 1024 }}MB.</p>
             </div>
             <button type="button" id="close-attachment-modal" class="text-gray-500 hover:text-gray-800">✕</button>
         </div>
@@ -321,8 +382,12 @@
             </div>
             <div>
                 <label class="block text-sm font-semibold text-gray-800">Archivos</label>
-                <input type="file" name="files[]" id="attachment-files" accept=".jpg,.jpeg,.png,.webp,.pdf,.mp4,.webm,.mov" multiple required class="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none" />
-                <p class="mt-1 text-xs text-gray-500">Tamaño máximo por archivo: 10MB.</p>
+                <div id="drop-zone" class="mt-2 flex flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-emerald-200 bg-emerald-50/40 px-4 py-6 text-center text-sm text-emerald-700">
+                    <p class="font-semibold">Arrastra y suelta tus archivos aquí</p>
+                    <p class="text-xs text-emerald-800/80">o haz clic para seleccionar</p>
+                    <input type="file" name="files[]" id="attachment-files" accept=".jpg,.jpeg,.png,.webp,.heic,.heif,.pdf,.doc,.docx,.xls,.xlsx,.zip,.mp4,.webm,.mov" multiple required class="mt-3 w-full max-w-xs rounded-lg border border-emerald-200 bg-white px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none" />
+                </div>
+                <p class="mt-1 text-xs text-gray-500">Tamaño máximo por archivo: {{ config('clinical_attachments.max_size_kb', 20480) / 1024 }}MB.</p>
                 <div id="file-errors" class="mt-2 text-xs text-rose-600"></div>
             </div>
 
@@ -344,7 +409,8 @@
     const preview = document.getElementById('sanitized-preview');
     const fileInput = document.getElementById('attachment-files');
     const fileErrors = document.getElementById('file-errors');
-    const maxSizeBytes = 10 * 1024 * 1024;
+    const dropZone = document.getElementById('drop-zone');
+    const maxSizeBytes = {{ config('clinical_attachments.max_size_kb', 20480) }} * 1024;
 
     const sanitizeTitle = (value) => {
         const ascii = value.normalize('NFD').replace(/[^\x00-\x7F]/g, '');
@@ -359,10 +425,26 @@
     const validateFiles = () => {
         fileErrors.textContent = '';
         const files = Array.from(fileInput.files || []);
-        const allowed = ['image/jpeg','image/png','image/webp','application/pdf','video/mp4','video/webm','video/quicktime'];
+        const allowed = [
+            'image/jpeg',
+            'image/png',
+            'image/webp',
+            'image/heic',
+            'image/heif',
+            'application/pdf',
+            'application/msword',
+            'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            'application/vnd.ms-excel',
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            'application/zip',
+            'application/x-zip-compressed',
+            'video/mp4',
+            'video/webm',
+            'video/quicktime',
+        ];
         for (const file of files) {
             if (file.size > maxSizeBytes) {
-                fileErrors.textContent = `"${file.name}" supera los 10MB.`;
+                fileErrors.textContent = `"${file.name}" supera el tamaño permitido.`;
                 return false;
             }
             if (!allowed.includes(file.type)) {
@@ -388,6 +470,22 @@
     });
 
     fileInput?.addEventListener('change', validateFiles);
+
+    if (dropZone) {
+        dropZone.addEventListener('dragover', (event) => {
+            event.preventDefault();
+            dropZone.classList.add('bg-emerald-100');
+        });
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('bg-emerald-100');
+        });
+        dropZone.addEventListener('drop', (event) => {
+            event.preventDefault();
+            dropZone.classList.remove('bg-emerald-100');
+            fileInput.files = event.dataTransfer.files;
+            validateFiles();
+        });
+    }
 
     document.getElementById('attachment-form')?.addEventListener('submit', (event) => {
         if (!validateFiles()) {
