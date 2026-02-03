@@ -108,8 +108,12 @@
                         $attachmentExtension = $attachment->cloudinary_format
                             ?? ($attachment->file_type === 'pdf' ? 'pdf' : $attachment->file_type);
                         $downloadFilename = $attachment->titulo_limpio . ($attachmentExtension ? '.' . $attachmentExtension : '');
-                        $downloadUrl = $attachment->cloudinary_secure_url;
-                        $viewUrl = $attachment->cloudinary_secure_url;
+                        $downloadUrl = $attachment->file_type === 'pdf'
+                            ? $attachment->signedDownloadUrl($attachment->titulo_limpio . '.pdf')
+                            : $attachment->cloudinary_secure_url;
+                        $viewUrl = $attachment->file_type === 'pdf'
+                            ? $attachment->signedViewUrl()
+                            : $attachment->cloudinary_secure_url;
                     @endphp
                     <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                         <div>
