@@ -50,9 +50,20 @@ class CloudinaryAttachmentService
         ];
 
         if ($fileType === 'pdf') {
+            $pdfFilename = $filenameOverride ?: $file->getClientOriginalName();
+            $pdfFilename = is_string($pdfFilename) ? trim($pdfFilename) : '';
+
+            if ($pdfFilename === '') {
+                $pdfFilename = ($publicId ?: 'document') . '.pdf';
+            }
+
+            if (! str_ends_with(strtolower($pdfFilename), '.pdf')) {
+                $pdfFilename .= '.pdf';
+            }
+
             $options['use_filename'] = true;
             $options['unique_filename'] = false;
-            $options['filename_override'] = $filenameOverride ?: $file->getClientOriginalName();
+            $options['filename_override'] = $pdfFilename;
         }
 
         $options = array_filter($options, static fn ($value) => $value !== null);
