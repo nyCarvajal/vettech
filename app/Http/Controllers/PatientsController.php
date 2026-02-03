@@ -120,7 +120,14 @@ class PatientsController extends Controller
 
     public function show(Request $request, Patient $patient): View
     {
-        $patient->load(['owner', 'species', 'breed', 'lastEncounter', 'hospitalStays' => fn ($q) => $q->latest('admitted_at')]);
+        $patient->load([
+            'owner',
+            'tutors',
+            'species',
+            'breed',
+            'lastEncounter',
+            'hospitalStays' => fn ($q) => $q->latest('admitted_at'),
+        ]);
         $activeStay = $patient->hospitalStays->firstWhere('status', 'active');
 
         $filters = [
