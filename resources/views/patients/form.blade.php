@@ -542,7 +542,7 @@
             const fillBreeds = () => {
                 const currentSpecies = speciesSelect?.value ? Number(speciesSelect.value) : null;
                 breedOptions.innerHTML = '';
-                breedsData.filter((breed) => !currentSpecies || breed.species_id === currentSpecies)
+                breedsData.filter((breed) => !currentSpecies || Number(breed.species_id) === currentSpecies)
                     .forEach((breed) => {
                         const option = document.createElement('option');
                         option.value = breed.name;
@@ -553,7 +553,7 @@
             const syncBreedSelection = () => {
                 const name = normalize(breedInput.value);
                 const currentSpecies = speciesSelect?.value ? Number(speciesSelect.value) : null;
-                const match = breedsData.find((breed) => normalize(breed.name) === name && (!currentSpecies || breed.species_id === currentSpecies));
+                const match = breedsData.find((breed) => normalize(breed.name) === name && (!currentSpecies || Number(breed.species_id) === currentSpecies));
                 if (match) {
                     breedIdInput.value = match.id;
                     breedCreateBtn.classList.add('d-none');
