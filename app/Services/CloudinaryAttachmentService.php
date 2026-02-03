@@ -26,7 +26,8 @@ class CloudinaryAttachmentService
     ): array
     {
         $this->ensureCloudinaryConfigured();
-        $cloudinary = $this->cloudinary();
+        $cloudinary = new CloudinarySdk(config('cloudinary'));
+
         $resourceType = $this->resourceTypeFromFileType($fileType);
 
         $transformation = null;
@@ -87,8 +88,8 @@ class CloudinaryAttachmentService
     {
         try {
             $this->ensureCloudinaryConfigured();
-            $this->configureCloudinary();
-            CloudinaryFacade::uploadApi()->destroy($publicId, ['resource_type' => $resourceType]);
+            $cloudinary = new CloudinarySdk(config('cloudinary'));
+            $cloudinary->uploadApi()->destroy($publicId, ['resource_type' => $resourceType]);
         } catch (Throwable $exception) {
             report($exception);
         }
