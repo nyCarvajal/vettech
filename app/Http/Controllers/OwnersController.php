@@ -30,7 +30,10 @@ class OwnersController extends Controller
             });
         }
 
-        $owners = $query->withCount('patients')->orderBy('name')->paginate(15)->withQueryString();
+        $owners = $query->withCount(['patients', 'tutoredPatients'])
+            ->orderBy('name')
+            ->paginate(15)
+            ->withQueryString();
 
         return view('owners.index', compact('owners', 'search'));
     }
@@ -59,14 +62,27 @@ class OwnersController extends Controller
 
     public function show(Owner $owner): View
     {
-        $owner->load(['patients.species', 'patients.breed', 'patients.lastEncounter']);
+        $owner->load([
+            'patients.species',
+            'patients.breed',
+            'patients.lastEncounter',
+            'tutoredPatients.species',
+            'tutoredPatients.breed',
+            'tutoredPatients.lastEncounter',
+        ]);
 
-        $timelines = $owner->patients->mapWithKeys(function ($patient) {
+        $patients = $owner->patients
+            ->concat($owner->tutoredPatients)
+            ->unique('id')
+            ->values();
+
+        $timelines = $patients->mapWithKeys(function ($patient) {
             return [$patient->id => $this->timelineService->forPatient($patient, ['limit' => 5])];
         });
 
         return view('owners.show', [
             'owner' => $owner->load(['departamento', 'municipio']),
+            'patients' => $patients,
             'timelines' => $timelines,
         ]);
     }
