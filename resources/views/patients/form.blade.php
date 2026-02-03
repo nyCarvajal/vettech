@@ -37,27 +37,39 @@
                                 <span class="badge bg-mint-soft text-mint"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M8 2a4 4 0 0 0-4 4c0 1.657 1 3 2 4.5S7 13 8 13s2-.843 2-2.5 2-2.843 2-4.5a4 4 0 0 0-4-4Z"/><path d="M3.8 13a5.7 5.7 0 0 1 8.4 0A7 7 0 0 1 8 15a7 7 0 0 1-4.2-2Z"/></svg></span>
                                 <div>
                                     <p class="mb-0 text-muted small">Paso 1</p>
-                                    <h6 class="mb-0 fw-semibold text-purple">Selecciona el tutor</h6>
+                                    <h6 class="mb-0 fw-semibold text-purple">Tutor(es) del paciente</h6>
                                 </div>
                             </div>
-                            <div class="mb-2">
-                                <label class="form-label text-muted">Buscar por nombre o cédula</label>
+                            <div class="mb-3">
+                                <label class="form-label text-muted">Buscar tutor existente (nombre, teléfono, email o documento)</label>
                                 <div class="input-group">
-                                <span class="input-group-text input-icon-mint">
+                                    <span class="input-group-text input-icon-mint">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M11 6a5 5 0 1 1-10 0 5 5 0 0 1 10 0Z"/><path d="M15.854 15.146 11.5 10.793" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
                                     </span>
-                                    <input type="search" id="ownerSearch" class="form-control" placeholder="Ej: Laura Gómez o 123456" aria-label="Buscar tutor">
+                                    <input type="search" id="tutorSearch" class="form-control" placeholder="Ej: Laura Gómez · 3115559999 · 123456" aria-label="Buscar tutor">
                                 </div>
+                                <div id="tutorSearchResults" class="list-group mt-2"></div>
                             </div>
-                            <label class="form-label text-muted">Tutor asignado</label>
-                            <select name="owner_id" id="ownerSelect" class="form-select fancy-select" required>
-                                <option value="">Selecciona un tutor</option>
-                                @foreach($owners as $owner)
-                                    <option value="{{ $owner->id }}" data-search="{{ strtolower($owner->name . ' ' . ($owner->document ?? '')) }}" @selected(old('owner_id', $patient->owner_id) == $owner->id)>
-                                        {{ $owner->name }} — {{ $owner->document ? 'CC ' . $owner->document : 'Sin documento' }}
-                                    </option>
-                                @endforeach
-                            </select>
+                            <button type="button" class="btn btn-outline-purple w-100 mb-3" id="openTutorModal">Agregar tutor</button>
+
+                            <label class="form-label text-muted mb-2">Tutores asociados</label>
+                            <div class="table-responsive tutor-table">
+                                <table class="table table-sm align-middle mb-0">
+                                    <thead>
+                                        <tr class="text-muted small">
+                                            <th>Tutor</th>
+                                            <th>Parentesco</th>
+                                            <th class="text-center">Principal</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tutoresBody"></tbody>
+                                </table>
+                            </div>
+                            <input type="hidden" name="tutores_json" id="tutoresJson" value="{{ old('tutores_json') }}">
+                            @error('tutores_json')
+                                <div class="text-danger small mt-2">{{ $message }}</div>
+                            @enderror
                         </div>
                     </div>
                     <div class="col-lg-8">
@@ -106,13 +118,18 @@
                                         <span class="input-group-text input-icon-purple">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M4 4a4 4 0 0 1 8 0c0 2-2 5-4 5S4 6 4 4Z"/><path d="M6 11c0 1 1 3 2 3s2-2 2-3"/></svg>
                                         </span>
-                                        <select name="breed_id" class="form-select fancy-select">
-                                            <option value="">Selecciona raza</option>
-                                            @foreach($breeds as $breed)
-                                                <option value="{{ $breed->id }}" @selected(old('breed_id', $patient->breed_id) == $breed->id)>{{ $breed->name }}</option>
-                                            @endforeach
-                                        </select>
+                                        <input type="text" name="breed_name" id="breedInput" class="form-control" list="breedOptions"
+                                            value="{{ old('breed_name', $patient->breed?->name) }}" placeholder="Busca o escribe una raza">
+                                        <input type="hidden" name="breed_id" id="breedId" value="{{ old('breed_id', $patient->breed_id) }}">
+                                        <datalist id="breedOptions"></datalist>
                                     </div>
+                                    <div class="form-text text-muted" id="breedHelp">Selecciona del catálogo o agrega una nueva raza.</div>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary mt-2 d-none" id="breedCreateBtn">
+                                        Agregar raza: <span id="breedCreateLabel"></span>
+                                    </button>
+                                    @error('breed_name')
+                                        <div class="text-danger small mt-1">{{ $message }}</div>
+                                    @enderror
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label">Edad</label>
@@ -226,6 +243,72 @@
     </div>
 </div>
 
+<div class="tutor-modal" id="tutorModal" aria-hidden="true">
+    <div class="tutor-modal__backdrop" data-close-modal></div>
+    <div class="tutor-modal__content">
+        <div class="d-flex justify-content-between align-items-start mb-3">
+            <div>
+                <h5 class="mb-1">Nuevo tutor</h5>
+                <p class="text-muted small mb-0">Registra los datos básicos para asociarlos al paciente.</p>
+            </div>
+            <button type="button" class="btn-close" aria-label="Cerrar" data-close-modal></button>
+        </div>
+        <div class="row g-3">
+            <div class="col-md-6">
+                <label class="form-label">Nombres</label>
+                <input type="text" class="form-control" id="tutorNombres" placeholder="Nombres">
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Apellidos</label>
+                <input type="text" class="form-control" id="tutorApellidos" placeholder="Apellidos">
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Documento</label>
+                <input type="text" class="form-control" id="tutorDocumento" placeholder="Cédula o NIT">
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Teléfono</label>
+                <input type="text" class="form-control" id="tutorTelefono" placeholder="Número de contacto">
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">WhatsApp</label>
+                <input type="text" class="form-control" id="tutorWhatsapp" placeholder="Número WhatsApp">
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Email</label>
+                <input type="email" class="form-control" id="tutorEmail" placeholder="Correo electrónico">
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Dirección</label>
+                <input type="text" class="form-control" id="tutorDireccion" placeholder="Dirección principal">
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Ciudad</label>
+                <input type="text" class="form-control" id="tutorCiudad" placeholder="Ciudad">
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Parentesco</label>
+                <input type="text" class="form-control" id="tutorParentesco" placeholder="Ej: propietario, cuidador">
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Principal</label>
+                <select class="form-select" id="tutorPrincipal">
+                    <option value="1">Sí, es el principal</option>
+                    <option value="0">No, es secundario</option>
+                </select>
+            </div>
+            <div class="col-12">
+                <label class="form-label">Observaciones</label>
+                <textarea class="form-control" id="tutorObservaciones" rows="2" placeholder="Notas internas"></textarea>
+            </div>
+        </div>
+        <div class="d-flex justify-content-end gap-2 mt-4">
+            <button type="button" class="btn btn-outline-secondary" data-close-modal>Cancelar</button>
+            <button type="button" class="btn btn-gradient" id="guardarTutor">Agregar tutor</button>
+        </div>
+    </div>
+</div>
+
 @push('styles')
     <style>
         .patient-form .text-purple { color: #6f42c1; }
@@ -244,23 +327,276 @@
         .patient-form .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
         .patient-form .dot-mint { background: #2ac9a5; }
         .patient-form .dot-purple { background: #6f42c1; }
+        .patient-form .tutor-table { max-height: 260px; overflow-y: auto; border-radius: 12px; border: 1px solid #ede7ff; background: #fff; }
+        .tutor-modal { position: fixed; inset: 0; display: none; align-items: center; justify-content: center; z-index: 1050; }
+        .tutor-modal.is-open { display: flex; }
+        .tutor-modal__backdrop { position: absolute; inset: 0; background: rgba(15, 23, 42, 0.5); }
+        .tutor-modal__content { position: relative; background: #fff; border-radius: 16px; padding: 24px; width: min(720px, 92vw); max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 40px rgba(15, 23, 42, 0.18); }
     </style>
 @endpush
 
 @push('scripts')
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const searchInput = document.getElementById('ownerSearch');
-            const ownerSelect = document.getElementById('ownerSelect');
+            const ownersData = @json($owners->map(fn ($owner) => [
+                'id' => $owner->id,
+                'name' => $owner->name,
+                'document' => $owner->document,
+                'phone' => $owner->phone,
+                'whatsapp' => $owner->whatsapp,
+                'email' => $owner->email,
+            ]));
+            const tutorSearch = document.getElementById('tutorSearch');
+            const tutorSearchResults = document.getElementById('tutorSearchResults');
+            const tutorsBody = document.getElementById('tutoresBody');
+            const tutorsJsonInput = document.getElementById('tutoresJson');
+            const modal = document.getElementById('tutorModal');
+            const openTutorModal = document.getElementById('openTutorModal');
+            const guardarTutor = document.getElementById('guardarTutor');
+            const breedInput = document.getElementById('breedInput');
+            const breedIdInput = document.getElementById('breedId');
+            const breedOptions = document.getElementById('breedOptions');
+            const breedCreateBtn = document.getElementById('breedCreateBtn');
+            const breedCreateLabel = document.getElementById('breedCreateLabel');
+            const speciesSelect = document.querySelector('select[name="species_id"]');
+            const breedsData = @json($breeds->map(fn ($breed) => [
+                'id' => $breed->id,
+                'name' => $breed->name,
+                'species_id' => $breed->species_id,
+            ]));
 
-            searchInput?.addEventListener('input', (event) => {
-                const term = event.target.value.toLowerCase();
-                Array.from(ownerSelect.options).forEach(option => {
-                    if (!option.value) return; // skip placeholder
-                    const matches = option.dataset.search?.includes(term);
-                    option.hidden = term && !matches;
+            let tutors = [];
+
+            const normalize = (value) => (value || '').trim().toLowerCase().replace(/\s+/g, ' ');
+
+            const updateTutorsJson = () => {
+                tutorsJsonInput.value = JSON.stringify(tutors);
+            };
+
+            const renderTutors = () => {
+                tutorsBody.innerHTML = '';
+                tutors.forEach((tutor, index) => {
+                    const row = document.createElement('tr');
+                    const principalChecked = tutor.es_principal ? 'checked' : '';
+                    row.innerHTML = `
+                        <td>
+                            <div class="fw-semibold">${tutor.nombre ?? ''}</div>
+                            <div class="text-muted small">${tutor.documento ?? 'Sin documento'} · ${tutor.telefono ?? 'Sin teléfono'}</div>
+                        </td>
+                        <td>
+                            <input type="text" class="form-control form-control-sm" value="${tutor.parentesco ?? ''}" data-parentesco="${index}" placeholder="Ej: propietario">
+                        </td>
+                        <td class="text-center">
+                            <input type="radio" name="tutor_principal" value="${index}" ${principalChecked} data-principal="${index}">
+                        </td>
+                        <td class="text-end">
+                            <button type="button" class="btn btn-sm btn-link text-danger" data-remove="${index}">Quitar</button>
+                        </td>
+                    `;
+                    tutorsBody.appendChild(row);
+                });
+                updateTutorsJson();
+            };
+
+            const ensurePrincipal = () => {
+                if (!tutors.some((tutor) => tutor.es_principal) && tutors.length > 0) {
+                    tutors[0].es_principal = true;
+                }
+            };
+
+            const openModal = () => {
+                modal.classList.add('is-open');
+                modal.setAttribute('aria-hidden', 'false');
+            };
+
+            const closeModal = () => {
+                modal.classList.remove('is-open');
+                modal.setAttribute('aria-hidden', 'true');
+            };
+
+            const fillModalDefaults = () => {
+                document.getElementById('tutorNombres').value = '';
+                document.getElementById('tutorApellidos').value = '';
+                document.getElementById('tutorDocumento').value = '';
+                document.getElementById('tutorTelefono').value = '';
+                document.getElementById('tutorWhatsapp').value = '';
+                document.getElementById('tutorEmail').value = '';
+                document.getElementById('tutorDireccion').value = '';
+                document.getElementById('tutorCiudad').value = '';
+                document.getElementById('tutorParentesco').value = '';
+                document.getElementById('tutorObservaciones').value = '';
+                document.getElementById('tutorPrincipal').value = tutors.length === 0 ? '1' : '0';
+            };
+
+            openTutorModal?.addEventListener('click', () => {
+                fillModalDefaults();
+                openModal();
+            });
+
+            modal?.addEventListener('click', (event) => {
+                if (event.target.hasAttribute('data-close-modal')) {
+                    closeModal();
+                }
+            });
+
+            guardarTutor?.addEventListener('click', () => {
+                const nombres = document.getElementById('tutorNombres').value.trim();
+                const apellidos = document.getElementById('tutorApellidos').value.trim();
+                const nombreCompleto = [nombres, apellidos].filter(Boolean).join(' ');
+                if (!nombreCompleto) {
+                    return;
+                }
+
+                tutors.push({
+                    key: `nuevo-${Date.now()}`,
+                    id: null,
+                    nombre: nombreCompleto,
+                    nombres,
+                    apellidos,
+                    documento: document.getElementById('tutorDocumento').value.trim() || null,
+                    telefono: document.getElementById('tutorTelefono').value.trim() || null,
+                    whatsapp: document.getElementById('tutorWhatsapp').value.trim() || null,
+                    email: document.getElementById('tutorEmail').value.trim() || null,
+                    direccion: document.getElementById('tutorDireccion').value.trim() || null,
+                    ciudad: document.getElementById('tutorCiudad').value.trim() || null,
+                    observaciones: document.getElementById('tutorObservaciones').value.trim() || null,
+                    parentesco: document.getElementById('tutorParentesco').value.trim() || null,
+                    es_principal: document.getElementById('tutorPrincipal').value === '1',
+                    is_new: true,
+                });
+                ensurePrincipal();
+                renderTutors();
+                closeModal();
+            });
+
+            tutorSearch?.addEventListener('input', (event) => {
+                const term = normalize(event.target.value);
+                tutorSearchResults.innerHTML = '';
+                if (!term) {
+                    return;
+                }
+                const matches = ownersData.filter((owner) => {
+                    const haystack = normalize([owner.name, owner.document, owner.phone, owner.email].join(' '));
+                    return haystack.includes(term);
+                }).slice(0, 5);
+                matches.forEach((owner) => {
+                    const item = document.createElement('button');
+                    item.type = 'button';
+                    item.className = 'list-group-item list-group-item-action';
+                    item.textContent = `${owner.name} · ${owner.document ?? 'Sin documento'} · ${owner.phone ?? 'Sin teléfono'}`;
+                    item.addEventListener('click', () => {
+                        if (tutors.some((tutor) => tutor.id === owner.id)) {
+                            tutorSearch.value = '';
+                            tutorSearchResults.innerHTML = '';
+                            return;
+                        }
+                        tutors.push({
+                            key: `owner-${owner.id}`,
+                            id: owner.id,
+                            nombre: owner.name,
+                            documento: owner.document,
+                            telefono: owner.phone,
+                            whatsapp: owner.whatsapp,
+                            email: owner.email,
+                            parentesco: null,
+                            es_principal: tutors.length === 0,
+                            is_new: false,
+                        });
+                        ensurePrincipal();
+                        renderTutors();
+                        tutorSearch.value = '';
+                        tutorSearchResults.innerHTML = '';
+                    });
+                    tutorSearchResults.appendChild(item);
                 });
             });
+
+            tutorsBody?.addEventListener('input', (event) => {
+                const index = event.target.getAttribute('data-parentesco');
+                if (index !== null) {
+                    tutors[index].parentesco = event.target.value;
+                    updateTutorsJson();
+                }
+            });
+
+            tutorsBody?.addEventListener('change', (event) => {
+                const index = event.target.getAttribute('data-principal');
+                if (index !== null) {
+                    tutors = tutors.map((tutor, idx) => ({
+                        ...tutor,
+                        es_principal: idx === Number(index),
+                    }));
+                    renderTutors();
+                }
+            });
+
+            tutorsBody?.addEventListener('click', (event) => {
+                const index = event.target.getAttribute('data-remove');
+                if (index !== null) {
+                    tutors.splice(index, 1);
+                    ensurePrincipal();
+                    renderTutors();
+                }
+            });
+
+            const fillBreeds = () => {
+                const currentSpecies = speciesSelect?.value ? Number(speciesSelect.value) : null;
+                breedOptions.innerHTML = '';
+                breedsData.filter((breed) => !currentSpecies || breed.species_id === currentSpecies)
+                    .forEach((breed) => {
+                        const option = document.createElement('option');
+                        option.value = breed.name;
+                        breedOptions.appendChild(option);
+                    });
+            };
+
+            const syncBreedSelection = () => {
+                const name = normalize(breedInput.value);
+                const currentSpecies = speciesSelect?.value ? Number(speciesSelect.value) : null;
+                const match = breedsData.find((breed) => normalize(breed.name) === name && (!currentSpecies || breed.species_id === currentSpecies));
+                if (match) {
+                    breedIdInput.value = match.id;
+                    breedCreateBtn.classList.add('d-none');
+                } else {
+                    breedIdInput.value = '';
+                    if (name) {
+                        breedCreateLabel.textContent = breedInput.value.trim();
+                        breedCreateBtn.classList.remove('d-none');
+                    } else {
+                        breedCreateBtn.classList.add('d-none');
+                    }
+                }
+            };
+
+            breedInput?.addEventListener('input', syncBreedSelection);
+            speciesSelect?.addEventListener('change', () => {
+                fillBreeds();
+                syncBreedSelection();
+            });
+
+            breedCreateBtn?.addEventListener('click', () => {
+                breedCreateBtn.classList.add('btn-outline-success');
+                breedCreateBtn.classList.remove('btn-outline-secondary');
+            });
+
+            const oldTutors = tutorsJsonInput.value;
+            if (oldTutors) {
+                try {
+                    const parsed = JSON.parse(oldTutors);
+                    if (Array.isArray(parsed)) {
+                        tutors = parsed;
+                    }
+                } catch (error) {
+                    tutors = [];
+                }
+            } else {
+                tutors = @json($tutoresIniciales);
+            }
+
+            ensurePrincipal();
+            renderTutors();
+            fillBreeds();
+            syncBreedSelection();
         });
     </script>
 @endpush

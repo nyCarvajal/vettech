@@ -18,6 +18,7 @@ class OwnerFactory extends Factory
             'email' => $this->faker->safeEmail(),
             'document' => $this->faker->unique()->numerify('#########'),
             'address' => $this->faker->streetAddress(),
+            'city' => $this->faker->city(),
             'notes' => $this->faker->sentence(),
         ];
     }

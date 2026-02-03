@@ -290,17 +290,42 @@
     <div class="card-body">
         <div class="d-flex align-items-center justify-content-between mb-3">
             <div>
-                <p class="tag-label mb-1">3. Examen físico</p>
-                <h5 class="section-title mb-0">Signos vitales y valoración general</h5>
+                <p class="tag-label mb-1">3. Examen físico (ECOP)</p>
+                <h5 class="section-title mb-0">Estructura ordenada por ECOP</h5>
             </div>
-            <span class="divider-label"><i class="ri-heart-pulse-line"></i> Valores actuales</span>
+            <span class="divider-label"><i class="ri-heart-pulse-line"></i> Evaluación clínica</span>
+        </div>
+        <p class="text-muted small mb-3">E: Evaluación general · C: Condición clínica · O: Observaciones por sistemas · P: Plan (ver sección 6).</p>
+        <div class="mb-3">
+            <span class="badge-soft">E. Evaluación general</span>
         </div>
         <div class="row g-3 mb-3">
+            <div class="col-sm-6 col-lg-3">
+                <label class="form-label" for="temperatura">Temperatura (°C)</label>
+                <div class="metric-chip">
+                    <input type="number" step="0.1" class="form-control soft" name="temperatura" id="temperatura"
+                        value="{{ old('temperatura', $historia->temperatura) }}" placeholder="°C">
+                </div>
+            </div>
+            <div class="col-sm-6 col-lg-3">
+                <label class="form-label" for="peso">Peso</label>
+                <div class="metric-chip">
+                    <input type="number" step="0.01" class="form-control soft" name="peso" id="peso"
+                        value="{{ old('peso', $historia->peso) }}" placeholder="Kg">
+                </div>
+            </div>
             <div class="col-sm-6 col-lg-3">
                 <label class="form-label" for="frecuencia_cardiaca">Frecuencia cardiaca</label>
                 <div class="metric-chip">
                     <input type="number" class="form-control soft" name="frecuencia_cardiaca" id="frecuencia_cardiaca"
                         value="{{ old('frecuencia_cardiaca', $historia->frecuencia_cardiaca) }}" placeholder="Lpm">
+                </div>
+            </div>
+            <div class="col-sm-6 col-lg-3">
+                <label class="form-label" for="frecuencia_respiratoria">Frecuencia respiratoria</label>
+                <div class="metric-chip">
+                    <input type="number" class="form-control soft" name="frecuencia_respiratoria" id="frecuencia_respiratoria"
+                        value="{{ old('frecuencia_respiratoria', $historia->frecuencia_respiratoria) }}" placeholder="Rpm">
                 </div>
             </div>
             <div class="col-sm-6 col-lg-3">
@@ -318,21 +343,97 @@
                 </div>
             </div>
             <div class="col-sm-6 col-lg-3">
-                <label class="form-label" for="frecuencia_respiratoria">Frecuencia respiratoria</label>
+                <label class="form-label" for="trc">TRC</label>
                 <div class="metric-chip">
-                    <input type="number" class="form-control soft" name="frecuencia_respiratoria" id="frecuencia_respiratoria"
-                        value="{{ old('frecuencia_respiratoria', $historia->frecuencia_respiratoria) }}" placeholder="Rpm">
+                    <input type="text" class="form-control soft" name="trc" id="trc"
+                        value="{{ old('trc', $historia->trc) }}" placeholder="Segundos">
+                </div>
+            </div>
+            <div class="col-sm-6 col-lg-3">
+                <label class="form-label" for="mucosas">Mucosas</label>
+                <div class="metric-chip">
+                    <input type="text" class="form-control soft" name="mucosas" id="mucosas"
+                        value="{{ old('mucosas', $historia->mucosas) }}" placeholder="Color, humedad">
+                </div>
+            </div>
+            <div class="col-sm-6 col-lg-3">
+                <label class="form-label" for="hidratacion">Hidratación</label>
+                <div class="metric-chip">
+                    <input type="text" class="form-control soft" name="hidratacion" id="hidratacion"
+                        value="{{ old('hidratacion', $historia->hidratacion) }}" placeholder="Normal, leve, severa">
+                </div>
+            </div>
+            <div class="col-sm-6 col-lg-3">
+                <label class="form-label" for="condicion_corporal">Condición corporal</label>
+                <div class="metric-chip">
+                    <input type="text" class="form-control soft" name="condicion_corporal" id="condicion_corporal"
+                        value="{{ old('condicion_corporal', $historia->condicion_corporal) }}" placeholder="Score o nota">
                 </div>
             </div>
         </div>
+
+        <div class="mt-4 mb-3">
+            <span class="badge-soft">C. Condición clínica</span>
+        </div>
+        <div class="row g-3 mb-3">
+            <div class="col-md-6">
+                <label class="form-label" for="estado_mental">Estado mental</label>
+                <textarea class="form-control textarea-soft" name="estado_mental" id="estado_mental" rows="2"
+                    placeholder="Alerta, deprimido, estupor">{{ old('estado_mental', $historia->estado_mental) }}</textarea>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label" for="postura">Postura</label>
+                <textarea class="form-control textarea-soft" name="postura" id="postura" rows="2"
+                    placeholder="Normal, encorvado, decúbito">{{ old('postura', $historia->postura) }}</textarea>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label" for="marcha">Marcha</label>
+                <textarea class="form-control textarea-soft" name="marcha" id="marcha" rows="2"
+                    placeholder="Normal, claudicación, ataxia">{{ old('marcha', $historia->marcha) }}</textarea>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label" for="dolor">Dolor</label>
+                <textarea class="form-control textarea-soft" name="dolor" id="dolor" rows="2"
+                    placeholder="Escala, localización, respuesta">{{ old('dolor', $historia->dolor) }}</textarea>
+            </div>
+        </div>
+
+        <div class="mt-4 mb-3">
+            <span class="badge-soft">O. Observaciones por sistemas</span>
+        </div>
         <div class="row g-3">
+            <div class="col-md-6">
+                <label class="form-label" for="examen_piel">Piel y faneras</label>
+                <textarea class="form-control textarea-soft" name="examen_piel" id="examen_piel" rows="2"
+                    placeholder="Lesiones, prurito, ectoparásitos">{{ old('examen_piel', $historia->examen_piel) }}</textarea>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label" for="examen_ojos">Ojos</label>
+                <textarea class="form-control textarea-soft" name="examen_ojos" id="examen_ojos" rows="2"
+                    placeholder="Secreción, pupilas, visión">{{ old('examen_ojos', $historia->examen_ojos) }}</textarea>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label" for="examen_oidos">Oídos</label>
+                <textarea class="form-control textarea-soft" name="examen_oidos" id="examen_oidos" rows="2"
+                    placeholder="Otitis, secreción, dolor">{{ old('examen_oidos', $historia->examen_oidos) }}</textarea>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label" for="examen_boca">Boca</label>
+                <textarea class="form-control textarea-soft" name="examen_boca" id="examen_boca" rows="2"
+                    placeholder="Encías, dentición, halitosis">{{ old('examen_boca', $historia->examen_boca) }}</textarea>
+            </div>
             <div class="col-md-6">
                 <label class="form-label" for="examen_cabeza_cuello">Cabeza y cuello</label>
                 <textarea class="form-control textarea-soft" name="examen_cabeza_cuello" id="examen_cabeza_cuello" rows="2"
-                    placeholder="Mucosas, ganglios, cavidad oral">{{ old('examen_cabeza_cuello', $historia->examen_cabeza_cuello) }}</textarea>
+                    placeholder="Masas, dolor, simetría">{{ old('examen_cabeza_cuello', $historia->examen_cabeza_cuello) }}</textarea>
             </div>
             <div class="col-md-6">
-                <label class="form-label" for="examen_torax">Tórax</label>
+                <label class="form-label" for="examen_ganglios">Ganglios</label>
+                <textarea class="form-control textarea-soft" name="examen_ganglios" id="examen_ganglios" rows="2"
+                    placeholder="Tamaño, dolor, consistencia">{{ old('examen_ganglios', $historia->examen_ganglios) }}</textarea>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label" for="examen_torax">Cardio-respiratorio</label>
                 <textarea class="form-control textarea-soft" name="examen_torax" id="examen_torax" rows="2"
                     placeholder="Auscultación pulmonar y cardiaca">{{ old('examen_torax', $historia->examen_torax) }}</textarea>
             </div>
@@ -342,35 +443,35 @@
                     placeholder="Ruidos, soplos, ritmo">{{ old('examen_corazon', $historia->examen_corazon) }}</textarea>
             </div>
             <div class="col-md-6">
-                <label class="form-label" for="examen_mama">Mamas</label>
-                <textarea class="form-control textarea-soft" name="examen_mama" id="examen_mama" rows="2"
-                    placeholder="Hallazgos mamarios">{{ old('examen_mama', $historia->examen_mama) }}</textarea>
-            </div>
-            <div class="col-md-6">
-                <label class="form-label" for="examen_abdomen">Abdomen</label>
+                <label class="form-label" for="examen_abdomen">Gastrointestinal</label>
                 <textarea class="form-control textarea-soft" name="examen_abdomen" id="examen_abdomen" rows="2"
                     placeholder="Dolor, masas, motilidad">{{ old('examen_abdomen', $historia->examen_abdomen) }}</textarea>
             </div>
             <div class="col-md-6">
-                <label class="form-label" for="examen_genitales">Genitales</label>
+                <label class="form-label" for="examen_genitales">Genitourinario</label>
                 <textarea class="form-control textarea-soft" name="examen_genitales" id="examen_genitales" rows="2"
                     placeholder="Secreciones, integridad">{{ old('examen_genitales', $historia->examen_genitales) }}</textarea>
             </div>
             <div class="col-md-6">
                 <label class="form-label" for="examen_neurologico">Neurológico</label>
                 <textarea class="form-control textarea-soft" name="examen_neurologico" id="examen_neurologico" rows="2"
-                    placeholder="Reflejos, estado mental">{{ old('examen_neurologico', $historia->examen_neurologico) }}</textarea>
+                    placeholder="Reflejos, respuesta, convulsiones">{{ old('examen_neurologico', $historia->examen_neurologico) }}</textarea>
             </div>
             <div class="col-md-6">
-                <label class="form-label" for="examen_extremidades">Extremidades / locomotor</label>
+                <label class="form-label" for="examen_extremidades">Músculo-esquelético</label>
                 <textarea class="form-control textarea-soft" name="examen_extremidades" id="examen_extremidades" rows="2"
                     placeholder="Claudicaciones, dolor, movilidad">{{ old('examen_extremidades', $historia->examen_extremidades) }}</textarea>
             </div>
-            <div class="col-md-12">
-                <label class="form-label" for="examen_piel">Piel y faneras</label>
-                <textarea class="form-control textarea-soft" name="examen_piel" id="examen_piel" rows="2"
-                    placeholder="Lesiones, prurito, ectoparásitos">{{ old('examen_piel', $historia->examen_piel) }}</textarea>
+            <div class="col-md-6">
+                <label class="form-label" for="examen_mama">Mamas</label>
+                <textarea class="form-control textarea-soft" name="examen_mama" id="examen_mama" rows="2"
+                    placeholder="Hallazgos mamarios">{{ old('examen_mama', $historia->examen_mama) }}</textarea>
             </div>
+        </div>
+
+        <div class="mt-4">
+            <span class="badge-soft">P. Plan e impresión diagnóstica</span>
+            <p class="text-muted small mb-0">El plan clínico se documenta en la sección 6 para evitar duplicidades.</p>
         </div>
     </div>
 </div>
