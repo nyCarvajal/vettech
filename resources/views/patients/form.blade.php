@@ -338,14 +338,16 @@
 @push('scripts')
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const ownersData = @json($owners->map(fn ($owner) => [
-                'id' => $owner->id,
-                'name' => $owner->name,
-                'document' => $owner->document,
-                'phone' => $owner->phone,
-                'whatsapp' => $owner->whatsapp,
-                'email' => $owner->email,
-            ]));
+            const ownersData = @json($owners->map(function ($owner) {
+                return [
+                    'id' => $owner->id,
+                    'name' => $owner->name,
+                    'document' => $owner->document,
+                    'phone' => $owner->phone,
+                    'whatsapp' => $owner->whatsapp,
+                    'email' => $owner->email,
+                ];
+            }));
             const tutorSearch = document.getElementById('tutorSearch');
             const tutorSearchResults = document.getElementById('tutorSearchResults');
             const tutorsBody = document.getElementById('tutoresBody');
@@ -359,11 +361,13 @@
             const breedCreateBtn = document.getElementById('breedCreateBtn');
             const breedCreateLabel = document.getElementById('breedCreateLabel');
             const speciesSelect = document.querySelector('select[name="species_id"]');
-            const breedsData = @json($breeds->map(fn ($breed) => [
-                'id' => $breed->id,
-                'name' => $breed->name,
-                'species_id' => $breed->species_id,
-            ]));
+            const breedsData = @json($breeds->map(function ($breed) {
+                return [
+                    'id' => $breed->id,
+                    'name' => $breed->name,
+                    'species_id' => $breed->species_id,
+                ];
+            }));
 
             let tutors = [];
 
