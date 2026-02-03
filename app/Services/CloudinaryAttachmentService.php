@@ -108,6 +108,35 @@ class CloudinaryAttachmentService
         }
     }
 
+    private function configureCloudinary(): void
+    {
+        if (! class_exists(\Cloudinary\Configuration\Configuration::class)) {
+            return;
+        }
+
+        $cloud = config('cloudinary.cloud', []);
+        $cloudName = $cloud['cloud_name'] ?? null;
+        $apiKey = $cloud['api_key'] ?? null;
+        $apiSecret = $cloud['api_secret'] ?? null;
+
+        if (! is_string($cloudName) || $cloudName === ''
+            || ! is_string($apiKey) || $apiKey === ''
+            || ! is_string($apiSecret) || $apiSecret === ''
+        ) {
+            throw new \RuntimeException('Cloudinary credentials missing. Set CLOUDINARY_URL or CLOUDINARY_API_KEY/SECRET.');
+        }
+
+        \Cloudinary\Configuration\Configuration::instance([
+            'cloud' => [
+                'cloud_name' => $cloudName,
+                'api_key' => $apiKey,
+                'api_secret' => $apiSecret,
+            ],
+            'url' => config('cloudinary.url', []),
+            'upload' => config('cloudinary.upload', []),
+        ]);
+    }
+
     private function resourceTypeFromFileType(string $fileType): string
     {
         return match ($fileType) {
