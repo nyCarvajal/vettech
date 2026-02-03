@@ -80,7 +80,7 @@ class ClinicalAttachment extends BaseModel
             $asset = $asset->format($format);
         }
 
-        if ($downloadFilename) {
+        if ($downloadFilename && $this->file_type !== 'pdf') {
             $asset = $asset->addFlag('attachment:' . $downloadFilename);
         }
 
