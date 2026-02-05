@@ -18,7 +18,7 @@ return Application::configure(basePath: dirname(__DIR__))
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
     )
-    ->withMiddleware(function (MiddlewareConfigurator $middleware) {
+    ->withMiddleware(function (MiddlewareConfigurator $middleware) use ($roleMiddlewareClass, $permissionMiddlewareClass, $roleOrPermissionMiddlewareClass) {
         // Esto añade tu middleware al final del stack global
         $middleware->append(ConnectTenantDB::class);
 
