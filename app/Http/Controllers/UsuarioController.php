@@ -121,7 +121,7 @@ class UsuarioController extends Controller
         $signatureData = $this->processSignatureUpload($request, $user);
 
         $updateData = [
-            'nombre' => $data['nombre'],
+            'nombres' => trim($data['nombre'] . ' ' . $data['apellidos']),
             'apellidos' => $data['apellidos'],
             'email' => $data['email'],
             'tipo_identificacion' => $data['tipo_identificacion'],
@@ -145,6 +145,7 @@ class UsuarioController extends Controller
             ->route('users.index')
             ->with('success', 'Usuario actualizado correctamente.');
     }
+
 
     public function destroy(User $user)
     {
