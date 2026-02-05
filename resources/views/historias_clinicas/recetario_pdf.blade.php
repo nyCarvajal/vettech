@@ -21,7 +21,7 @@
         $clinicAddress = $clinica->direccion ?? $clinica->address ?? null;
         $clinicPhone = $clinica->telefono ?? $clinica->phone ?? null;
         $professional = $prescription->professional;
-        $signatureUrl = $professional?->firma_medica_url;
+        $signatureUrl = $professional?->firma_medica_url ?? $professional?->firma;
         $signatureText = $professional?->firma_medica_texto;
     @endphp
     <style>
@@ -179,9 +179,14 @@
             color: var(--ink);
         }
         .rx-head span { color: var(--primary); font-size: 15px; }
-        .rx-table { width: 100%; border-collapse: collapse; }
+        .rx-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
         .rx-table th { text-align: left; font-size: 11px; letter-spacing: 0.4px; text-transform: uppercase; color: var(--muted); padding: 8px 10px; background: #f9fafc; }
         .rx-table td { padding: 8px 10px; border-top: 1px solid var(--line); font-size: 12px; vertical-align: top; }
+        .rx-table th,
+        .rx-table td {
+            overflow-wrap: anywhere;
+            word-break: break-word;
+        }
         .rx-table .name { font-weight: 700; color: var(--ink); }
         .rx-table .muted { color: var(--muted); font-weight: 500; }
         .footer {
@@ -315,11 +320,11 @@
                 <table class="rx-table">
                     <thead>
                         <tr>
-                            <th style="width:26%;">Medicamento</th>
+                            <th style="width:24%;">Medicamento</th>
                             <th style="width:18%;">Dosis / Frecuencia</th>
-                            <th style="width:12%;">Duración</th>
-                            <th style="width:12%;">Cantidad</th>
-                            <th>Instrucciones</th>
+                            <th style="width:10%;">Duración</th>
+                            <th style="width:10%;">Cantidad</th>
+                            <th style="width:38%;">Instrucciones</th>
                         </tr>
                     </thead>
                     <tbody>
