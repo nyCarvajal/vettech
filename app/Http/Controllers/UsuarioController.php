@@ -138,7 +138,10 @@ class UsuarioController extends Controller
             $updateData['password'] = Hash::make($data['password']);
         }
 
-        $user->update($updateData);
+        DB::connection('mysql')
+            ->table('users')
+            ->where('id', $user->id)
+            ->update($updateData);
 
         return redirect()
             ->route('users.index')
