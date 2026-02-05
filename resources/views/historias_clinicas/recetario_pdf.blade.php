@@ -21,6 +21,13 @@
         $clinicAddress = $clinica->direccion ?? $clinica->address ?? null;
         $clinicPhone = $clinica->telefono ?? $clinica->phone ?? null;
         $professional = $prescription->professional;
+        if (! $professional && $prescription->professional_id) {
+            $professional = \App\Models\Usuario::query()->find($prescription->professional_id);
+        }
+
+        $professionalName = $professional?->name
+            ?? $professional?->nombre_completo
+            ?? trim(($professional?->nombre ?? '') . ' ' . ($professional?->apellidos ?? ''));
         $signatureUrl = $professional?->firma_medica_url ?? $professional?->firma;
         $signatureText = $professional?->firma_medica_texto;
     @endphp
@@ -354,7 +361,7 @@
                     <img src="{{ $signatureUrl }}" alt="Firma médica">
                 @endif
                 <div class="signature-line"></div>
-                <div style="font-weight:700;">{{ optional($prescription->professional)->name ?? 'Profesional N/D' }}</div>
+                <div style="font-weight:700;">{{ $professionalName !== '' ? $professionalName : 'Profesional N/D' }}</div>
                 @if ($signatureText)
                     <div class="tiny">{{ $signatureText }}</div>
                 @else
