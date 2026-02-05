@@ -12,6 +12,16 @@ use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
 
+$roleMiddlewareClass = class_exists('\\Spatie\\Permission\\Middleware\\RoleMiddleware')
+    ? '\\Spatie\\Permission\\Middleware\\RoleMiddleware'
+    : '\\Spatie\\Permission\\Middlewares\\RoleMiddleware';
+$permissionMiddlewareClass = class_exists('\\Spatie\\Permission\\Middleware\\PermissionMiddleware')
+    ? '\\Spatie\\Permission\\Middleware\\PermissionMiddleware'
+    : '\\Spatie\\Permission\\Middlewares\\PermissionMiddleware';
+$roleOrPermissionMiddlewareClass = class_exists('\\Spatie\\Permission\\Middleware\\RoleOrPermissionMiddleware')
+    ? '\\Spatie\\Permission\\Middleware\\RoleOrPermissionMiddleware'
+    : '\\Spatie\\Permission\\Middlewares\\RoleOrPermissionMiddleware';
+
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
         web: __DIR__.'/../routes/web.php',
@@ -34,9 +44,9 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'ensureRole' => EnsureRole::class,
             'feature' => EnsureClinicFeatureEnabled::class,
-            'role' => \Spatie\Permission\Middlewares\RoleMiddleware::class,
-            'permission' => \Spatie\Permission\Middlewares\PermissionMiddleware::class,
-            'role_or_permission' => \Spatie\Permission\Middlewares\RoleOrPermissionMiddleware::class,
+            'role' => $roleMiddlewareClass,
+            'permission' => $permissionMiddlewareClass,
+            'role_or_permission' => $roleOrPermissionMiddlewareClass,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
