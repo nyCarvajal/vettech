@@ -122,7 +122,6 @@ class UsuarioController extends Controller
 
         $updateData = [
             'nombres' => trim($data['nombre'] . ' ' . $data['apellidos']),
-            'apellidos' => $data['apellidos'],
             'email' => $data['email'],
             'tipo_identificacion' => $data['tipo_identificacion'],
             'numero_identificacion' => $data['numero_identificacion'],
