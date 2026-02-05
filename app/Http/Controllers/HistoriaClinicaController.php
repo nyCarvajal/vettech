@@ -58,7 +58,7 @@ class HistoriaClinicaController extends Controller
     {
         $historiaClinica->load(['paraclinicos', 'diagnosticos', 'paciente.owner']);
 
-        $prescriptions = Prescription::with(['items.product', 'professional'])
+        $prescriptions = Prescription::with(['items.product'])
             ->where('historia_clinica_id', $historiaClinica->id)
             ->latest()
             ->get();
@@ -230,7 +230,6 @@ class HistoriaClinicaController extends Controller
                 'historiaClinica.paciente.owner',
                 'historiaClinica.paciente.species',
                 'historiaClinica.paciente.breed',
-                'professional',
             ]);
 
             $clinica = optional(Auth::user())->clinica;
