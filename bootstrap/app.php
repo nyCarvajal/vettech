@@ -12,18 +12,13 @@ use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
 
-// Variables defensivas para evitar warnings en closures/caché vieja.
-$roleMiddlewareClass = \App\Http\Middleware\RoleMiddlewareBridge::class;
-$permissionMiddlewareClass = \App\Http\Middleware\PermissionMiddlewareBridge::class;
-$roleOrPermissionMiddlewareClass = \App\Http\Middleware\RoleOrPermissionMiddlewareBridge::class;
-
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
         web: __DIR__.'/../routes/web.php',
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
     )
-    ->withMiddleware(function (MiddlewareConfigurator $middleware) use ($roleMiddlewareClass, $permissionMiddlewareClass, $roleOrPermissionMiddlewareClass) {
+    ->withMiddleware(function (MiddlewareConfigurator $middleware) {
         $middleware->append(ConnectTenantDB::class);
 
         $middleware->priority([
@@ -36,9 +31,9 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'ensureRole' => EnsureRole::class,
             'feature' => EnsureClinicFeatureEnabled::class,
-            'role' => $roleMiddlewareClass,
-            'permission' => $permissionMiddlewareClass,
-            'role_or_permission' => $roleOrPermissionMiddlewareClass,
+            'role' => \App\Http\Middleware\RoleMiddlewareBridge::class,
+            'permission' => \App\Http\Middleware\PermissionMiddlewareBridge::class,
+            'role_or_permission' => \App\Http\Middleware\RoleOrPermissionMiddlewareBridge::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
