@@ -11,6 +11,7 @@ use App\Models\Product;
 use App\Services\BillingService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Barryvdh\DomPDF\Facade\Pdf;
 
 class HistoriaClinicaController extends Controller
@@ -57,7 +58,7 @@ class HistoriaClinicaController extends Controller
     {
         $historiaClinica->load(['paraclinicos', 'diagnosticos', 'paciente.owner']);
 
-        $prescriptions = Prescription::with(['items.product', 'professional'])
+        $prescriptions = Prescription::with(['items.product'])
             ->where('historia_clinica_id', $historiaClinica->id)
             ->latest()
             ->get();
@@ -223,18 +224,40 @@ class HistoriaClinicaController extends Controller
 
     public function imprimirRecetario(Prescription $prescription)
     {
-        $prescription->load([
-            'items.product',
-            'historiaClinica.paciente.owner',
-            'historiaClinica.paciente.species',
-            'historiaClinica.paciente.breed',
-            'professional',
-        ]);
+        try {
+            $prescription->load([
+                'items.product',
+                'historiaClinica.paciente.owner',
+                'historiaClinica.paciente.species',
+                'historiaClinica.paciente.breed',
+            ]);
 
-        $pdf = Pdf::loadView('historias_clinicas.recetario_pdf', compact('prescription'))
-            ->setPaper([0, 0, 396, 612]);
+            $clinica = optional(Auth::user())->clinica;
 
-        return $pdf->stream('recetario-' . $prescription->id . '.pdf');
+            $pdf = Pdf::loadView('historias_clinicas.recetario_pdf', compact('prescription', 'clinica'))
+                ->setPaper([0, 0, 396, 612]);
+
+            return $pdf->stream('recetario-' . $prescription->id . '.pdf');
+        } catch (\Throwable $exception) {
+            $context = [
+                'prescription_id' => $prescription->id,
+                'user_id' => Auth::id(),
+                'message' => $exception->getMessage(),
+                'file' => $exception->getFile(),
+                'line' => $exception->getLine(),
+                'trace' => $exception->getTraceAsString(),
+            ];
+
+            Log::channel('single')->error('Error generando recetario PDF', $context);
+
+            @file_put_contents(
+                storage_path('logs/laravel.log'),
+                '[' . now()->toDateTimeString() . "] recetario_pdf_error " . json_encode($context) . PHP_EOL,
+                FILE_APPEND
+            );
+
+            throw $exception;
+        }
     }
 
     public function createRemision(HistoriaClinica $historiaClinica)

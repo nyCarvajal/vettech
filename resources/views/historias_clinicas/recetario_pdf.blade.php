@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     @php
-        $primaryColor = $clinica->primary_color ?? $clinica->color ?? '#5e4cfa';
+        $safeClinica = $clinica ?? null;
+        $primaryColor = $safeClinica?->primary_color ?? $safeClinica?->color ?? '#5e4cfa';
         $primaryHex = ltrim($primaryColor, '#');
         if (strlen($primaryHex) === 3) {
             $primaryHex = sprintf('%s%s%s%s%s%s', $primaryHex[0], $primaryHex[0], $primaryHex[1], $primaryHex[1], $primaryHex[2], $primaryHex[2]);
@@ -16,12 +17,15 @@
                 hexdec(substr($primaryHex, 4, 2)),
             ]);
         }
-        $clinicName = $clinica->nombre ?? $clinica->name ?? config('app.name');
-        $clinicNit = $clinica->nit ?? null;
-        $clinicAddress = $clinica->direccion ?? $clinica->address ?? null;
-        $clinicPhone = $clinica->telefono ?? $clinica->phone ?? null;
+        $clinicName = $safeClinica?->nombre ?? $safeClinica?->name ?? config('app.name');
+        $clinicNit = $safeClinica?->nit ?? null;
+        $clinicAddress = $safeClinica?->direccion ?? $safeClinica?->address ?? null;
+        $clinicPhone = $safeClinica?->telefono ?? $safeClinica?->phone ?? null;
         $professional = $prescription->professional;
-        $signatureUrl = $professional?->firma_medica_url ?? $professional?->firma;
+
+        $professionalName = trim(($professional?->nombres ?? '') . ' ' . ($professional?->apellidos ?? ''));
+        $professionalDocument = trim(($professional?->tipo_identificacion ?? '') . ' ' . ($professional?->numero_identificacion ?? ''));
+        $signatureUrl = $professional?->firma_medica_url;
         $signatureText = $professional?->firma_medica_texto;
     @endphp
     <style>
@@ -209,8 +213,8 @@
         <div class="header">
             @php
                 $clinicLogoPath = null;
-                if ($clinica->logo_path) {
-                    $storageLogoPath = storage_path('app/public/' . ltrim($clinica->logo_path, '/'));
+                if ($safeClinica?->logo_path) {
+                    $storageLogoPath = storage_path('app/public/' . ltrim($safeClinica->logo_path, '/'));
                     if (is_readable($storageLogoPath)) {
                         $clinicLogoPath = $storageLogoPath;
                     }
@@ -354,7 +358,10 @@
                     <img src="{{ $signatureUrl }}" alt="Firma médica">
                 @endif
                 <div class="signature-line"></div>
-                <div style="font-weight:700;">{{ optional($prescription->professional)->name ?? 'Profesional N/D' }}</div>
+                <div style="font-weight:700;">{{ $professionalName !== '' ? $professionalName : 'Profesional N/D' }}</div>
+                @if ($professionalDocument !== '')
+                    <div class="tiny">{{ $professionalDocument }}</div>
+                @endif
                 @if ($signatureText)
                     <div class="tiny">{{ $signatureText }}</div>
                 @else
