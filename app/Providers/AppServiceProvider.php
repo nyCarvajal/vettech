@@ -17,6 +17,14 @@ use Carbon\Carbon;
 
 class AppServiceProvider extends ServiceProvider
 {
+
+    public function register(): void
+    {
+        $this->app->bind('permission', \App\Http\Middleware\PermissionMiddlewareBridge::class);
+        $this->app->bind('role', \App\Http\Middleware\RoleMiddlewareBridge::class);
+        $this->app->bind('role_or_permission', \App\Http\Middleware\RoleOrPermissionMiddlewareBridge::class);
+    }
+
     public function boot()
     {
         Event::listen(RouteMatched::class, function (RouteMatched $event) {
