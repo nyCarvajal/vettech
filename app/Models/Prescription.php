@@ -19,7 +19,7 @@ class Prescription extends BaseModel
 
     public function professional()
     {
-        return $this->belongsTo(User::class, 'professional_id');
+        return $this->belongsTo(Usuario::class, 'professional_id');
     }
 
     public function dispensations()
