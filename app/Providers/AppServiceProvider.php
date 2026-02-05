@@ -17,6 +17,34 @@ use Carbon\Carbon;
 
 class AppServiceProvider extends ServiceProvider
 {
+
+    public function register(): void
+    {
+        $aliases = [
+            'permission' => [
+                '\Spatie\Permission\Middleware\PermissionMiddleware',
+                '\Spatie\Permission\Middlewares\PermissionMiddleware',
+            ],
+            'role' => [
+                '\Spatie\Permission\Middleware\RoleMiddleware',
+                '\Spatie\Permission\Middlewares\RoleMiddleware',
+            ],
+            'role_or_permission' => [
+                '\Spatie\Permission\Middleware\RoleOrPermissionMiddleware',
+                '\Spatie\Permission\Middlewares\RoleOrPermissionMiddleware',
+            ],
+        ];
+
+        foreach ($aliases as $alias => $candidates) {
+            foreach ($candidates as $class) {
+                if (class_exists($class)) {
+                    $this->app->bind($alias, $class);
+                    break;
+                }
+            }
+        }
+    }
+
     public function boot()
     {
         Event::listen(RouteMatched::class, function (RouteMatched $event) {
