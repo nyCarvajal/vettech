@@ -20,29 +20,9 @@ class AppServiceProvider extends ServiceProvider
 
     public function register(): void
     {
-        $aliases = [
-            'permission' => [
-                '\Spatie\Permission\Middleware\PermissionMiddleware',
-                '\Spatie\Permission\Middlewares\PermissionMiddleware',
-            ],
-            'role' => [
-                '\Spatie\Permission\Middleware\RoleMiddleware',
-                '\Spatie\Permission\Middlewares\RoleMiddleware',
-            ],
-            'role_or_permission' => [
-                '\Spatie\Permission\Middleware\RoleOrPermissionMiddleware',
-                '\Spatie\Permission\Middlewares\RoleOrPermissionMiddleware',
-            ],
-        ];
-
-        foreach ($aliases as $alias => $candidates) {
-            foreach ($candidates as $class) {
-                if (class_exists($class)) {
-                    $this->app->bind($alias, $class);
-                    break;
-                }
-            }
-        }
+        $this->app->bind('permission', \App\Http\Middleware\PermissionMiddlewareBridge::class);
+        $this->app->bind('role', \App\Http\Middleware\RoleMiddlewareBridge::class);
+        $this->app->bind('role_or_permission', \App\Http\Middleware\RoleOrPermissionMiddlewareBridge::class);
     }
 
     public function boot()
