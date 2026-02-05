@@ -12,6 +12,10 @@ use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
 
+// Variables defensivas para evitar warnings en closures/caché vieja.
+$roleMiddlewareClass = \App\Http\Middleware\RoleMiddlewareBridge::class;
+$permissionMiddlewareClass = \App\Http\Middleware\PermissionMiddlewareBridge::class;
+$roleOrPermissionMiddlewareClass = \App\Http\Middleware\RoleOrPermissionMiddlewareBridge::class;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -20,11 +24,8 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (MiddlewareConfigurator $middleware) use ($roleMiddlewareClass, $permissionMiddlewareClass, $roleOrPermissionMiddlewareClass) {
-        // Esto añade tu middleware al final del stack global
         $middleware->append(ConnectTenantDB::class);
 
-        // Garantiza que la sesión y la autenticación sucedan antes de conectar la BD
-        // del tenant, y que la conexión esté lista antes del route model binding.
         $middleware->priority([
             StartSession::class,
             Authenticate::class,
@@ -35,9 +36,9 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'ensureRole' => EnsureRole::class,
             'feature' => EnsureClinicFeatureEnabled::class,
-            'role' => \App\Http\Middleware\RoleMiddlewareBridge::class,
-            'permission' => \App\Http\Middleware\PermissionMiddlewareBridge::class,
-            'role_or_permission' => \App\Http\Middleware\RoleOrPermissionMiddlewareBridge::class,
+            'role' => $roleMiddlewareClass,
+            'permission' => $permissionMiddlewareClass,
+            'role_or_permission' => $roleOrPermissionMiddlewareClass,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
