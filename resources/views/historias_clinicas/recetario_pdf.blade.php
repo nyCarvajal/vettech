@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     @php
-        $primaryColor = $clinica->primary_color ?? $clinica->color ?? '#5e4cfa';
+        $safeClinica = $clinica ?? null;
+        $primaryColor = $safeClinica?->primary_color ?? $safeClinica?->color ?? '#5e4cfa';
         $primaryHex = ltrim($primaryColor, '#');
         if (strlen($primaryHex) === 3) {
             $primaryHex = sprintf('%s%s%s%s%s%s', $primaryHex[0], $primaryHex[0], $primaryHex[1], $primaryHex[1], $primaryHex[2], $primaryHex[2]);
@@ -16,10 +17,10 @@
                 hexdec(substr($primaryHex, 4, 2)),
             ]);
         }
-        $clinicName = $clinica->nombre ?? $clinica->name ?? config('app.name');
-        $clinicNit = $clinica->nit ?? null;
-        $clinicAddress = $clinica->direccion ?? $clinica->address ?? null;
-        $clinicPhone = $clinica->telefono ?? $clinica->phone ?? null;
+        $clinicName = $safeClinica?->nombre ?? $safeClinica?->name ?? config('app.name');
+        $clinicNit = $safeClinica?->nit ?? null;
+        $clinicAddress = $safeClinica?->direccion ?? $safeClinica?->address ?? null;
+        $clinicPhone = $safeClinica?->telefono ?? $safeClinica?->phone ?? null;
         $professional = $prescription->professional;
 
         $professionalName = trim(($professional?->nombres ?? '') . ' ' . ($professional?->apellidos ?? ''));
@@ -212,8 +213,8 @@
         <div class="header">
             @php
                 $clinicLogoPath = null;
-                if ($clinica->logo_path) {
-                    $storageLogoPath = storage_path('app/public/' . ltrim($clinica->logo_path, '/'));
+                if ($safeClinica?->logo_path) {
+                    $storageLogoPath = storage_path('app/public/' . ltrim($safeClinica->logo_path, '/'));
                     if (is_readable($storageLogoPath)) {
                         $clinicLogoPath = $storageLogoPath;
                     }
