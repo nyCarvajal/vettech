@@ -19,7 +19,7 @@ class Prescription extends BaseModel
 
     public function professional()
     {
-        $relation = $this->belongsTo(User::class, 'professional_id');
+        $relation = $this->belongsTo(Professional::class, 'professional_id');
 
         $relation->getRelated()->setConnection($this->getConnectionName());
 
