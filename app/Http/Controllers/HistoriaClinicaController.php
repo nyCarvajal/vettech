@@ -227,6 +227,7 @@ class HistoriaClinicaController extends Controller
         try {
             $prescription->load([
                 'items.product',
+                'professional',
                 'historiaClinica.paciente.owner',
                 'historiaClinica.paciente.species',
                 'historiaClinica.paciente.breed',

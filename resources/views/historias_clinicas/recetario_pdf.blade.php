@@ -23,7 +23,8 @@
         $clinicPhone = $safeClinica?->telefono ?? $safeClinica?->phone ?? null;
         $professional = $prescription->professional;
 
-        $professionalName = trim(($professional?->nombres ?? '') . ' ' . ($professional?->apellidos ?? ''));
+        $professionalName = $professional?->name
+            ?? trim(($professional?->nombres ?? $professional?->nombre ?? '') . ' ' . ($professional?->apellidos ?? ''));
         $professionalDocument = trim(($professional?->tipo_identificacion ?? '') . ' ' . ($professional?->numero_identificacion ?? ''));
         $signatureUrl = $professional?->firma_medica_url;
         $signatureText = $professional?->firma_medica_texto;
