@@ -46,12 +46,12 @@
         <div class="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
             <p class="text-xs font-semibold uppercase tracking-wider text-mint-700">Paciente</p>
             <h2 class="text-lg font-semibold text-gray-900">{{ $patientName }}</h2>
-            <p class="text-sm text-gray-600">{{ $historia->paciente->especie ?? 'Especie no definida' }}</p>
+            <p class="text-sm text-gray-600">{{ optional($historia->paciente)->especie ?? 'Especie no definida' }}</p>
         </div>
         <div class="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
             <p class="text-xs font-semibold uppercase tracking-wider text-mint-700">Tutor</p>
             <h2 class="text-lg font-semibold text-gray-900">{{ $tutor->name ?? 'Sin tutor' }}</h2>
-            <p class="text-sm text-gray-600">Tel: {{ $tutor->phone ?: 'N/D' }} · WhatsApp: {{ $tutor->whatsapp ?: 'N/D' }}</p>
+            <p class="text-sm text-gray-600">Tel: {{ optional($tutor)->phone ?: 'N/D' }} · WhatsApp: {{ optional($tutor)->whatsapp ?: 'N/D' }}</p>
         </div>
         <div class="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm col-span-full">
             <p class="text-xs font-semibold uppercase tracking-wider text-mint-700">Actividad</p>
@@ -286,9 +286,9 @@
                 </div>
                 <div class="space-y-2 text-sm text-gray-700">
                     <p class="font-semibold text-gray-900">{{ $tutor->name ?? 'Sin tutor' }}</p>
-                    <p class="text-gray-600">Tel: {{ $tutor->phone ?: 'N/D' }}</p>
-                    <p class="text-gray-600">WhatsApp: {{ $tutor->whatsapp ?: 'N/D' }}</p>
-                    <p class="text-gray-600">Correo: {{ $tutor->email ?: 'N/D' }}</p>
+                    <p class="text-gray-600">Tel: {{ optional($tutor)->phone ?: 'N/D' }}</p>
+                    <p class="text-gray-600">WhatsApp: {{ optional($tutor)->whatsapp ?: 'N/D' }}</p>
+                    <p class="text-gray-600">Correo: {{ optional($tutor)->email ?: 'N/D' }}</p>
                 </div>
             </div>
 
