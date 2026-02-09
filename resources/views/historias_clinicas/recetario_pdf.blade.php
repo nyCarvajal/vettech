@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     @php
-        $safeClinica = $clinica ?? null;
-        $primaryColor = $safeClinica?->primary_color ?? $safeClinica?->color ?? '#5e4cfa';
+        $primaryColor = $clinica->primary_color ?? $clinica->color ?? '#5e4cfa';
         $primaryHex = ltrim($primaryColor, '#');
         if (strlen($primaryHex) === 3) {
             $primaryHex = sprintf('%s%s%s%s%s%s', $primaryHex[0], $primaryHex[0], $primaryHex[1], $primaryHex[1], $primaryHex[2], $primaryHex[2]);
@@ -17,15 +16,11 @@
                 hexdec(substr($primaryHex, 4, 2)),
             ]);
         }
-        $clinicName = $safeClinica?->nombre ?? $safeClinica?->name ?? config('app.name');
-        $clinicNit = $safeClinica?->nit ?? null;
-        $clinicAddress = $safeClinica?->direccion ?? $safeClinica?->address ?? null;
-        $clinicPhone = $safeClinica?->telefono ?? $safeClinica?->phone ?? null;
+        $clinicName = $clinica->nombre ?? $clinica->name ?? config('app.name');
+        $clinicNit = $clinica->nit ?? null;
+        $clinicAddress = $clinica->direccion ?? $clinica->address ?? null;
+        $clinicPhone = $clinica->telefono ?? $clinica->phone ?? null;
         $professional = $prescription->professional;
-
-        $professionalName = $professional?->name
-            ?? trim(($professional?->nombres ?? $professional?->nombre ?? '') . ' ' . ($professional?->apellidos ?? ''));
-        $professionalDocument = trim(($professional?->tipo_identificacion ?? '') . ' ' . ($professional?->numero_identificacion ?? ''));
         $signatureUrl = $professional?->firma_medica_url;
         $signatureText = $professional?->firma_medica_texto;
     @endphp
@@ -222,8 +217,8 @@
         <div class="header">
             @php
                 $clinicLogoPath = null;
-                if ($safeClinica?->logo_path) {
-                    $storageLogoPath = storage_path('app/public/' . ltrim($safeClinica->logo_path, '/'));
+                if ($clinica->logo_path) {
+                    $storageLogoPath = storage_path('app/public/' . ltrim($clinica->logo_path, '/'));
                     if (is_readable($storageLogoPath)) {
                         $clinicLogoPath = $storageLogoPath;
                     }
@@ -333,11 +328,11 @@
                 <table class="rx-table">
                     <thead>
                         <tr>
-                            <th style="width:24%;">Medicamento</th>
+                            <th style="width:26%;">Medicamento</th>
                             <th style="width:18%;">Dosis / Frecuencia</th>
-                            <th style="width:10%;">Duración</th>
-                            <th style="width:10%;">Cantidad</th>
-                            <th style="width:38%;">Instrucciones</th>
+                            <th style="width:12%;">Duración</th>
+                            <th style="width:12%;">Cantidad</th>
+                            <th>Instrucciones</th>
                         </tr>
                     </thead>
                     <tbody>
