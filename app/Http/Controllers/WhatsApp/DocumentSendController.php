@@ -4,6 +4,7 @@ namespace App\Http\Controllers\WhatsApp;
 
 use App\Http\Controllers\Controller;
 use App\Models\ExamReferral;
+use App\Models\Professional;
 use App\Models\Prescription;
 use App\Models\User;
 use App\Services\CloudinaryAttachmentService;
