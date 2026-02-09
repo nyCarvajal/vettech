@@ -30,7 +30,7 @@
         $signatureText = $professional?->firma_medica_texto;
     @endphp
     <style>
-        @page { margin: 20px 24px; }
+        @page { size: letter; margin: 18mm 16mm; }
         :root {
             --primary: {{ $primaryColor }};
             --primary-rgb: {{ $primaryRgb }};
@@ -44,8 +44,8 @@
         body {
             font-family: 'DejaVu Sans', sans-serif;
             color: var(--ink);
-            font-size: 12px;
-            line-height: 1.45;
+            font-size: 11.5px;
+            line-height: 1.4;
             background: #fff;
         }
         .card {
@@ -57,26 +57,26 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: 16px;
-            padding: 16px 18px;
+            gap: 12px;
+            padding: 12px 16px;
             background: var(--primary);
             color: #fff;
         }
         .header-main {
             display: flex;
             align-items: center;
-            gap: 14px;
+            gap: 12px;
             min-width: 0;
             flex: 1 1 auto;
         }
         .brand-mark {
-            width: 52px;
-            height: 52px;
+            width: 46px;
+            height: 46px;
             border-radius: 12px;
             background: #fff;
             display: grid;
             place-items: center;
-            margin-right: 14px;
+            margin-right: 10px;
             overflow: hidden;
         }
         .brand-mark img {
@@ -92,8 +92,8 @@
             text-align: right;
             display: flex;
             flex-direction: column;
-            gap: 4px;
-            min-width: 180px;
+            gap: 3px;
+            min-width: 170px;
             flex: 0 1 40%;
         }
         .clinic-details strong {
@@ -106,8 +106,8 @@
             line-height: 1.3;
             word-break: break-word;
         }
-        .header h1 { margin: 0; font-size: 18px; letter-spacing: 0.2px; }
-        .header p { margin: 2px 0 0; color: rgba(255,255,255,0.82); font-size: 11px; }
+        .header h1 { margin: 0; font-size: 17px; letter-spacing: 0.2px; }
+        .header p { margin: 2px 0 0; color: rgba(255,255,255,0.82); font-size: 10.5px; }
         .meta-row {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -125,7 +125,7 @@
         .meta-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.6px; color: var(--muted); margin-bottom: 4px; }
         .meta-value { font-weight: 600; font-size: 12px; color: var(--ink); }
         .section {
-            padding: 14px 18px 6px;
+            padding: 12px 16px 6px;
         }
         .section-title {
             font-size: 12px;
@@ -152,7 +152,7 @@
         .grid-two {
             display: grid;
             grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 10px;
+            gap: 8px;
         }
         .info-card {
             border: 1px solid var(--line);
@@ -164,29 +164,30 @@
         .info-table {
             width: 100%;
             border-collapse: collapse;
+            table-layout: fixed;
         }
-        .info-table td { padding: 4px 0; vertical-align: top; font-size: 12px; }
-        .info-table .label { color: var(--muted); width: 38%; }
+        .info-table td { padding: 3px 4px 3px 0; vertical-align: top; font-size: 11.5px; }
+        .info-table .label { color: var(--muted); width: 32%; }
         .info-table .value { font-weight: 600; color: var(--ink); }
         .rx-block {
-            margin-top: 8px;
+            margin-top: 6px;
             border: 1px solid var(--line);
             border-radius: 10px;
             overflow: hidden;
         }
         .rx-head {
             background: linear-gradient(90deg, rgba(var(--primary-rgb), 0.12), rgba(68, 212, 183, 0.16));
-            padding: 10px 12px;
+            padding: 8px 12px;
             display: flex;
             align-items: center;
             gap: 8px;
             font-weight: 700;
             color: var(--ink);
         }
-        .rx-head span { color: var(--primary); font-size: 15px; }
+        .rx-head span { color: var(--primary); font-size: 14px; }
         .rx-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
-        .rx-table th { text-align: left; font-size: 11px; letter-spacing: 0.4px; text-transform: uppercase; color: var(--muted); padding: 8px 10px; background: #f9fafc; }
-        .rx-table td { padding: 8px 10px; border-top: 1px solid var(--line); font-size: 12px; vertical-align: top; }
+        .rx-table th { text-align: left; font-size: 10.5px; letter-spacing: 0.4px; text-transform: uppercase; color: var(--muted); padding: 7px 8px; background: #f9fafc; }
+        .rx-table td { padding: 7px 8px; border-top: 1px solid var(--line); font-size: 11.5px; vertical-align: top; }
         .rx-table th,
         .rx-table td {
             overflow-wrap: anywhere;
@@ -195,17 +196,17 @@
         .rx-table .name { font-weight: 700; color: var(--ink); }
         .rx-table .muted { color: var(--muted); font-weight: 500; }
         .footer {
-            margin-top: 12px;
-            padding: 12px 18px 16px;
+            margin-top: 10px;
+            padding: 10px 16px 14px;
             display: flex;
             align-items: center;
             justify-content: space-between;
             background: linear-gradient(110deg, rgba(var(--primary-rgb), 0.08), rgba(68, 212, 183, 0.08));
             border-top: 1px solid var(--line);
         }
-        .signature { margin-top: 28px; text-align: center; }
-        .signature img { max-height: 70px; object-fit: contain; display: block; margin: 0 auto 10px; }
-        .signature-line { height: 1px; background: var(--line); margin: 18px 0 8px; }
+        .signature { margin-top: 22px; text-align: center; }
+        .signature img { max-height: 64px; object-fit: contain; display: block; margin: 0 auto 8px; }
+        .signature-line { height: 1px; background: var(--line); margin: 14px 0 8px; }
         .tiny { font-size: 10px; color: var(--muted); }
     </style>
 </head>
