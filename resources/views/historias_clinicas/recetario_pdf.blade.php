@@ -3,12 +3,7 @@
 <head>
     <meta charset="UTF-8">
     @php
-<<<<<<< HEAD
-        $primaryColor = $clinica->primary_color ?? $clinica->primary_color ?? '#5e4cfa';
-=======
-        $safeClinica = $clinica ?? null;
-        $primaryColor = $safeClinica?->primary_color ?? $safeClinica?->color ?? '#5e4cfa';
->>>>>>> bc77f2429d7dbe57f0516a45d77acc5f061cffcb
+        $primaryColor = $clinica->primary_color ?? $clinica->color ?? '#5e4cfa';
         $primaryHex = ltrim($primaryColor, '#');
         if (strlen($primaryHex) === 3) {
             $primaryHex = sprintf('%s%s%s%s%s%s', $primaryHex[0], $primaryHex[0], $primaryHex[1], $primaryHex[1], $primaryHex[2], $primaryHex[2]);
@@ -21,15 +16,11 @@
                 hexdec(substr($primaryHex, 4, 2)),
             ]);
         }
-        $clinicName = $safeClinica?->nombre ?? $safeClinica?->name ?? config('app.name');
-        $clinicNit = $safeClinica?->nit ?? null;
-        $clinicAddress = $safeClinica?->direccion ?? $safeClinica?->address ?? null;
-        $clinicPhone = $safeClinica?->telefono ?? $safeClinica?->phone ?? null;
+        $clinicName = $clinica->nombre ?? $clinica->name ?? config('app.name');
+        $clinicNit = $clinica->nit ?? null;
+        $clinicAddress = $clinica->direccion ?? $clinica->address ?? null;
+        $clinicPhone = $clinica->telefono ?? $clinica->phone ?? null;
         $professional = $prescription->professional;
-
-        $professionalName = $professional?->name
-            ?? trim(($professional?->nombres ?? $professional?->nombre ?? '') . ' ' . ($professional?->apellidos ?? ''));
-        $professionalDocument = trim(($professional?->tipo_identificacion ?? '') . ' ' . ($professional?->numero_identificacion ?? ''));
         $signatureUrl = $professional?->firma_medica_url;
         $signatureText = $professional?->firma_medica_texto;
     @endphp
@@ -188,14 +179,9 @@
             color: var(--ink);
         }
         .rx-head span { color: var(--primary); font-size: 15px; }
-        .rx-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+        .rx-table { width: 100%; border-collapse: collapse; }
         .rx-table th { text-align: left; font-size: 11px; letter-spacing: 0.4px; text-transform: uppercase; color: var(--muted); padding: 8px 10px; background: #f9fafc; }
         .rx-table td { padding: 8px 10px; border-top: 1px solid var(--line); font-size: 12px; vertical-align: top; }
-        .rx-table th,
-        .rx-table td {
-            overflow-wrap: anywhere;
-            word-break: break-word;
-        }
         .rx-table .name { font-weight: 700; color: var(--ink); }
         .rx-table .muted { color: var(--muted); font-weight: 500; }
         .footer {
@@ -218,8 +204,8 @@
         <div class="header">
             @php
                 $clinicLogoPath = null;
-                if ($safeClinica?->logo_path) {
-                    $storageLogoPath = storage_path('app/public/' . ltrim($safeClinica->logo_path, '/'));
+                if ($clinica->logo_path) {
+                    $storageLogoPath = storage_path('app/public/' . ltrim($clinica->logo_path, '/'));
                     if (is_readable($storageLogoPath)) {
                         $clinicLogoPath = $storageLogoPath;
                     }
@@ -329,11 +315,11 @@
                 <table class="rx-table">
                     <thead>
                         <tr>
-                            <th style="width:24%;">Medicamento</th>
+                            <th style="width:26%;">Medicamento</th>
                             <th style="width:18%;">Dosis / Frecuencia</th>
-                            <th style="width:10%;">Duración</th>
-                            <th style="width:10%;">Cantidad</th>
-                            <th style="width:38%;">Instrucciones</th>
+                            <th style="width:12%;">Duración</th>
+                            <th style="width:12%;">Cantidad</th>
+                            <th>Instrucciones</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -363,10 +349,7 @@
                     <img src="{{ $signatureUrl }}" alt="Firma médica">
                 @endif
                 <div class="signature-line"></div>
-                <div style="font-weight:700;">{{ $professionalName !== '' ? $professionalName : 'Profesional N/D' }}</div>
-                @if ($professionalDocument !== '')
-                    <div class="tiny">{{ $professionalDocument }}</div>
-                @endif
+                <div style="font-weight:700;">{{ optional($prescription->professional)->name ?? 'Profesional N/D' }}</div>
                 @if ($signatureText)
                     <div class="tiny">{{ $signatureText }}</div>
                 @else
