@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\ExamReferral;
 use App\Models\HistoriaClinica;
 use App\Models\Paciente;
-use App\Models\Professional;
+use App\Models\User;
 use App\Models\Prescription;
 use App\Models\PrescriptionItem;
 use App\Models\Product;
@@ -264,13 +264,13 @@ class HistoriaClinicaController extends Controller
         }
     }
 
-    private function fetchProfessionalById(?int $professionalId): ?Professional
+    private function fetchProfessionalById(?int $professionalId): ?User
     {
         if (! $professionalId) {
             return null;
         }
 
-        return Professional::query()->whereKey($professionalId)->first();
+        return User::on('mysql')->whereKey($professionalId)->first();
     }
 
     public function createRemision(HistoriaClinica $historiaClinica)

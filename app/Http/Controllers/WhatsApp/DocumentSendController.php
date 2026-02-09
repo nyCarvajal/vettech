@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\ExamReferral;
 use App\Models\Professional;
 use App\Models\Prescription;
+use App\Models\User;
 use App\Services\CloudinaryAttachmentService;
 use App\Services\WhatsApp\OneMsgClient;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -284,12 +285,12 @@ class DocumentSendController extends Controller
         ];
     }
 
-    private function fetchProfessionalById(?int $professionalId): ?Professional
+    private function fetchProfessionalById(?int $professionalId): ?User
     {
         if (! $professionalId) {
             return null;
         }
 
-        return Professional::query()->whereKey($professionalId)->first();
+        return User::on('mysql')->whereKey($professionalId)->first();
     }
 }

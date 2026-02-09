@@ -10,6 +10,11 @@ class Professional extends BaseModel
 
     public $timestamps = false;
 
+    public function getConnectionName()
+    {
+        return 'mysql';
+    }
+
     public function getNameAttribute(): ?string
     {
         $firstName = $this->nombres ?? $this->nombre ?? '';
