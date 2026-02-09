@@ -293,7 +293,7 @@ class DocumentSendController extends Controller
         }
 
         $record = DB::connection('mysql')
-            ->table('usuarios')
+            ->table('users')
             ->where('id', $professionalId)
             ->first();
 

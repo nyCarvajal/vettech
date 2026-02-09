@@ -19,11 +19,7 @@ class Prescription extends BaseModel
 
     public function professional()
     {
-        $relation = $this->belongsTo(User::class, 'professional_id');
-        $relation->getRelated()->setConnection('mysql');
-        $relation->getRelated()->setTable('usuarios');
-
-        return $relation;
+        return $this->belongsTo(User::class, 'professional_id');
     }
 
     public function dispensations()
