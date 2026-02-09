@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\ExamReferral;
 use App\Models\HistoriaClinica;
 use App\Models\Paciente;
+use App\Models\Professional;
 use App\Models\Prescription;
 use App\Models\PrescriptionItem;
 use App\Models\Product;
@@ -227,16 +228,18 @@ class HistoriaClinicaController extends Controller
         try {
             $prescription->load([
                 'items.product',
-                'professional',
                 'historiaClinica.paciente.owner',
                 'historiaClinica.paciente.species',
                 'historiaClinica.paciente.breed',
             ]);
 
+            $professional = $this->fetchProfessionalById($prescription->professional_id);
+            $prescription->setRelation('professional', $professional);
+
             $clinica = optional(Auth::user())->clinica;
 
             $pdf = Pdf::loadView('historias_clinicas.recetario_pdf', compact('prescription', 'clinica'))
-                ->setPaper([0, 0, 396, 612]);
+                ->setPaper('letter');
 
             return $pdf->stream('recetario-' . $prescription->id . '.pdf');
         } catch (\Throwable $exception) {
@@ -259,6 +262,15 @@ class HistoriaClinicaController extends Controller
 
             throw $exception;
         }
+    }
+
+    private function fetchProfessionalById(?int $professionalId): ?Professional
+    {
+        if (! $professionalId) {
+            return null;
+        }
+
+        return Professional::query()->whereKey($professionalId)->first();
     }
 
     public function createRemision(HistoriaClinica $historiaClinica)
@@ -293,7 +305,7 @@ class HistoriaClinicaController extends Controller
         $examReferral->load(['historiaClinica.paciente', 'author']);
 
         $pdf = Pdf::loadView('historias_clinicas.remision_pdf', compact('examReferral'))
-            ->setPaper([0, 0, 396, 612]);
+            ->setPaper('letter');
 
         return $pdf->stream('remision-' . $examReferral->id . '.pdf');
     }
