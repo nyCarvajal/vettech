@@ -12,6 +12,7 @@ use App\Services\WhatsApp\OneMsgClient;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class DocumentSendController extends Controller
@@ -291,9 +292,19 @@ class DocumentSendController extends Controller
             return null;
         }
 
-        return User::on('mysql')
-            ->from('usuarios')
-            ->whereKey($professionalId)
+        $record = DB::connection('mysql')
+            ->table('usuarios')
+            ->where('id', $professionalId)
             ->first();
+
+        if (! $record) {
+            return null;
+        }
+
+        $user = new User();
+        $user->forceFill((array) $record);
+        $user->exists = true;
+
+        return $user;
     }
 }
