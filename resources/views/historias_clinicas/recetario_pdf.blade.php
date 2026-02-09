@@ -368,10 +368,7 @@
                     <div class="signature-text">{{ $signatureText }}</div>
                 @endif
                 <div class="signature-line"></div>
-                <div style="font-weight:700;">{{ $professionalName !== '' ? $professionalName : 'Profesional N/D' }}</div>
-                @if ($professionalDocument !== '')
-                    <div class="tiny">{{ $professionalDocument }}</div>
-                @endif
+               
                 <div class="tiny">{{ $signatureText ? 'Firma' : 'Firma y sello' }}</div>
             </div>
         </div>
