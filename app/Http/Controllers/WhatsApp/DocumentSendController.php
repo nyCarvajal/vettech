@@ -5,11 +5,13 @@ namespace App\Http\Controllers\WhatsApp;
 use App\Http\Controllers\Controller;
 use App\Models\ExamReferral;
 use App\Models\Prescription;
+use App\Models\User;
 use App\Services\CloudinaryAttachmentService;
 use App\Services\WhatsApp\OneMsgClient;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class DocumentSendController extends Controller
@@ -133,11 +135,13 @@ class DocumentSendController extends Controller
             'historiaClinica.paciente.owner',
             'historiaClinica.paciente.species',
             'historiaClinica.paciente.breed',
-            'professional',
         ]);
 
+        $professional = $this->fetchProfessionalById($prescription->professional_id);
+        $prescription->setRelation('professional', $professional);
+
         $pdf = Pdf::loadView('historias_clinicas.recetario_pdf', compact('prescription'))
-            ->setPaper([0, 0, 396, 612]);
+            ->setPaper('letter');
 
         $historiaClinica = $prescription->historiaClinica;
 
@@ -159,7 +163,7 @@ class DocumentSendController extends Controller
         $examReferral->load(['historiaClinica.paciente', 'author']);
 
         $pdf = Pdf::loadView('historias_clinicas.remision_pdf', compact('examReferral'))
-            ->setPaper([0, 0, 396, 612]);
+            ->setPaper('letter');
 
         $historiaClinica = $examReferral->historiaClinica;
 
@@ -279,5 +283,27 @@ class DocumentSendController extends Controller
                 ],
             ],
         ];
+    }
+
+    private function fetchProfessionalById(?int $professionalId): ?User
+    {
+        if (! $professionalId) {
+            return null;
+        }
+
+        $record = DB::connection('mysql')
+            ->table('usuarios')
+            ->where('id', $professionalId)
+            ->first();
+
+        if (! $record) {
+            return null;
+        }
+
+        $user = new User();
+        $user->forceFill((array) $record);
+        $user->exists = true;
+
+        return $user;
     }
 }

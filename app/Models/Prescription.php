@@ -19,10 +19,9 @@ class Prescription extends BaseModel
 
     public function professional()
     {
-        $relation = $this->belongsTo(Professional::class, 'professional_id');
-
-        // Los profesionales viven en la BD compartida (mysql), no en tenant.
+        $relation = $this->belongsTo(User::class, 'professional_id');
         $relation->getRelated()->setConnection('mysql');
+        $relation->getRelated()->setTable('usuarios');
 
         return $relation;
     }
