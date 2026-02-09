@@ -140,7 +140,7 @@ class DocumentSendController extends Controller
         $prescription->setRelation('professional', $professional);
 
         $pdf = Pdf::loadView('historias_clinicas.recetario_pdf', compact('prescription'))
-            ->setPaper([0, 0, 396, 612]);
+            ->setPaper('letter');
 
         $historiaClinica = $prescription->historiaClinica;
 
@@ -162,7 +162,7 @@ class DocumentSendController extends Controller
         $examReferral->load(['historiaClinica.paciente', 'author']);
 
         $pdf = Pdf::loadView('historias_clinicas.remision_pdf', compact('examReferral'))
-            ->setPaper([0, 0, 396, 612]);
+            ->setPaper('letter');
 
         $historiaClinica = $examReferral->historiaClinica;
 

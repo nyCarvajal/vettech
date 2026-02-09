@@ -239,7 +239,7 @@ class HistoriaClinicaController extends Controller
             $clinica = optional(Auth::user())->clinica;
 
             $pdf = Pdf::loadView('historias_clinicas.recetario_pdf', compact('prescription', 'clinica'))
-                ->setPaper([0, 0, 396, 612]);
+                ->setPaper('letter');
 
             return $pdf->stream('recetario-' . $prescription->id . '.pdf');
         } catch (\Throwable $exception) {
@@ -305,7 +305,7 @@ class HistoriaClinicaController extends Controller
         $examReferral->load(['historiaClinica.paciente', 'author']);
 
         $pdf = Pdf::loadView('historias_clinicas.remision_pdf', compact('examReferral'))
-            ->setPaper([0, 0, 396, 612]);
+            ->setPaper('letter');
 
         return $pdf->stream('remision-' . $examReferral->id . '.pdf');
     }
