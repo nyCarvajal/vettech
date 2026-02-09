@@ -202,6 +202,13 @@
         .signature { margin-top: 22px; text-align: center; }
         .signature img { max-height: 64px; object-fit: contain; display: block; margin: 0 auto 8px; }
         .signature-line { height: 1px; background: var(--line); margin: 14px 0 8px; }
+        .signature-text {
+            font-family: 'DejaVu Serif', 'Times New Roman', serif;
+            font-size: 18px;
+            color: var(--ink);
+            letter-spacing: 0.3px;
+            margin-bottom: 6px;
+        }
         .tiny { font-size: 10px; color: var(--muted); }
     </style>
 </head>
@@ -354,13 +361,15 @@
                 @if ($signatureUrl)
                     <img src="{{ $signatureUrl }}" alt="Firma médica">
                 @endif
-                <div class="signature-line"></div>
-                <div style="font-weight:700;">{{ optional($prescription->professional)->name ?? 'Profesional N/D' }}</div>
                 @if ($signatureText)
-                    <div class="tiny">{{ $signatureText }}</div>
-                @else
-                    <div class="tiny">Firma y sello</div>
+                    <div class="signature-text">{{ $signatureText }}</div>
                 @endif
+                <div class="signature-line"></div>
+                <div style="font-weight:700;">{{ $professionalName !== '' ? $professionalName : 'Profesional N/D' }}</div>
+                @if ($professionalDocument !== '')
+                    <div class="tiny">{{ $professionalDocument }}</div>
+                @endif
+                <div class="tiny">{{ $signatureText ? 'Firma' : 'Firma y sello' }}</div>
             </div>
         </div>
 
