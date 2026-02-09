@@ -297,7 +297,10 @@
                             <td class="label">Nombre</td>
                             <td class="value">{{ trim(optional($prescription->historiaClinica?->paciente)->nombres . ' ' . optional($prescription->historiaClinica?->paciente)->apellidos) ?: 'N/D' }}</td>
                             <td class="label">Edad</td>
-                            <td class="value">{{ optional($prescription->historiaClinica?->paciente)->edad ?? 'N/D' }}</td>
+                            @php($patientAge = optional($prescription->historiaClinica?->paciente))
+                            <td class="value">
+                                {{ $patientAge?->age_value ? trim($patientAge->age_value . ' ' . ($patientAge->age_unit ?? '')) : ($patientAge?->edad ?? 'N/D') }}
+                            </td>
                         </tr>
                         <tr>
                             <td class="label">Especie</td>
@@ -361,13 +364,15 @@
                 @if ($signatureUrl)
                     <img src="{{ $signatureUrl }}" alt="Firma médica">
                 @endif
-                <div class="signature-line"></div>
-                <div style="font-weight:700;">{{ optional($prescription->professional)->name ?? 'Profesional N/D' }}</div>
                 @if ($signatureText)
-                    <div class="tiny">{{ $signatureText }}</div>
-                @else
-                    <div class="tiny">Firma y sello</div>
+                    <div class="signature-text">{{ $signatureText }}</div>
                 @endif
+                <div class="signature-line"></div>
+                <div style="font-weight:700;">{{ $professionalName !== '' ? $professionalName : 'Profesional N/D' }}</div>
+                @if ($professionalDocument !== '')
+                    <div class="tiny">{{ $professionalDocument }}</div>
+                @endif
+                <div class="tiny">{{ $signatureText ? 'Firma' : 'Firma y sello' }}</div>
             </div>
         </div>
 
