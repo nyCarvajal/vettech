@@ -4,6 +4,8 @@ namespace App\Models;
 
 class Professional extends BaseModel
 {
+    protected $connection = 'mysql';
+
     protected $table = 'usuarios';
 
     public $timestamps = false;

@@ -288,7 +288,8 @@ class HistoriaClinicaController extends Controller
             'notes' => ['nullable', 'string'],
         ]);
 
-        $data['doctor_name'] = optional(Auth::user())->name ?: ($data['doctor_name'] ?? null);
+        $doctor = $this->fetchProfessionalById(Auth::id());
+        $data['doctor_name'] = $doctor?->name ?: ($data['doctor_name'] ?? null);
 
         ExamReferral::create($data + [
             'historia_clinica_id' => $historiaClinica->id,
