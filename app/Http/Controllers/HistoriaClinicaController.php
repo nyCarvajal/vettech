@@ -5,11 +5,13 @@ namespace App\Http\Controllers;
 use App\Models\ExamReferral;
 use App\Models\HistoriaClinica;
 use App\Models\Paciente;
+use App\Models\User;
 use App\Models\Prescription;
 use App\Models\PrescriptionItem;
 use App\Models\Product;
 use App\Services\BillingService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -227,16 +229,18 @@ class HistoriaClinicaController extends Controller
         try {
             $prescription->load([
                 'items.product',
-                'professional',
                 'historiaClinica.paciente.owner',
                 'historiaClinica.paciente.species',
                 'historiaClinica.paciente.breed',
             ]);
 
+            $professional = $this->fetchProfessionalById($prescription->professional_id);
+            $prescription->setRelation('professional', $professional);
+
             $clinica = optional(Auth::user())->clinica;
 
             $pdf = Pdf::loadView('historias_clinicas.recetario_pdf', compact('prescription', 'clinica'))
-                ->setPaper([0, 0, 396, 612]);
+                ->setPaper('letter');
 
             return $pdf->stream('recetario-' . $prescription->id . '.pdf');
         } catch (\Throwable $exception) {
@@ -261,6 +265,28 @@ class HistoriaClinicaController extends Controller
         }
     }
 
+    private function fetchProfessionalById(?int $professionalId): ?User
+    {
+        if (! $professionalId) {
+            return null;
+        }
+
+        $record = DB::connection('mysql')
+            ->table('users')
+            ->where('id', $professionalId)
+            ->first();
+
+        if (! $record) {
+            return null;
+        }
+
+        $user = new User();
+        $user->forceFill((array) $record);
+        $user->exists = true;
+
+        return $user;
+    }
+
     public function createRemision(HistoriaClinica $historiaClinica)
     {
         return view('historias_clinicas.remision', [
@@ -276,7 +302,8 @@ class HistoriaClinicaController extends Controller
             'notes' => ['nullable', 'string'],
         ]);
 
-        $data['doctor_name'] = optional(Auth::user())->name ?: ($data['doctor_name'] ?? null);
+        $doctor = $this->fetchProfessionalById(Auth::id());
+        $data['doctor_name'] = $doctor?->name ?: ($data['doctor_name'] ?? null);
 
         ExamReferral::create($data + [
             'historia_clinica_id' => $historiaClinica->id,
@@ -293,7 +320,7 @@ class HistoriaClinicaController extends Controller
         $examReferral->load(['historiaClinica.paciente', 'author']);
 
         $pdf = Pdf::loadView('historias_clinicas.remision_pdf', compact('examReferral'))
-            ->setPaper([0, 0, 396, 612]);
+            ->setPaper('letter');
 
         return $pdf->stream('remision-' . $examReferral->id . '.pdf');
     }
