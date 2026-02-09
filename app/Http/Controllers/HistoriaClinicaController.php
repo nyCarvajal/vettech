@@ -11,6 +11,7 @@ use App\Models\PrescriptionItem;
 use App\Models\Product;
 use App\Services\BillingService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -270,10 +271,20 @@ class HistoriaClinicaController extends Controller
             return null;
         }
 
-        return User::on('mysql')
-            ->from('usuarios')
-            ->whereKey($professionalId)
+        $record = DB::connection('mysql')
+            ->table('usuarios')
+            ->where('id', $professionalId)
             ->first();
+
+        if (! $record) {
+            return null;
+        }
+
+        $user = new User();
+        $user->forceFill((array) $record);
+        $user->exists = true;
+
+        return $user;
     }
 
     public function createRemision(HistoriaClinica $historiaClinica)
