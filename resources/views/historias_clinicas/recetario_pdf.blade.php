@@ -348,15 +348,13 @@
                 @if ($signatureUrl)
                     <img src="{{ $signatureUrl }}" alt="Firma médica">
                 @endif
-                @if ($signatureText)
-                    <div class="signature-text">{{ $signatureText }}</div>
-                @endif
                 <div class="signature-line"></div>
-                <div style="font-weight:700;">{{ $professionalName !== '' ? $professionalName : 'Profesional N/D' }}</div>
-                @if ($professionalDocument !== '')
-                    <div class="tiny">{{ $professionalDocument }}</div>
+                <div style="font-weight:700;">{{ optional($prescription->professional)->name ?? 'Profesional N/D' }}</div>
+                @if ($signatureText)
+                    <div class="tiny">{{ $signatureText }}</div>
+                @else
+                    <div class="tiny">Firma y sello</div>
                 @endif
-                <div class="tiny">{{ $signatureText ? 'Firma' : 'Firma y sello' }}</div>
             </div>
         </div>
 
