@@ -270,7 +270,10 @@ class HistoriaClinicaController extends Controller
             return null;
         }
 
-        return User::on('mysql')->whereKey($professionalId)->first();
+        return User::on('mysql')
+            ->from('usuarios')
+            ->whereKey($professionalId)
+            ->first();
     }
 
     public function createRemision(HistoriaClinica $historiaClinica)
