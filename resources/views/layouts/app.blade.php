@@ -194,6 +194,7 @@
                         [
                             'title' => 'CAJA Y REPORTES',
                             'items' => array_filter([
+                                $featureEnabled('arqueo_caja') ? ['label' => 'Cierres de Caja', 'route' => 'cash.closures.index'] : null,
                                 $featureEnabled('arqueo_caja') ? ['label' => 'Arqueo de caja', 'route' => 'cash.closures.create'] : null,
                                 $featureEnabled('reportes_basicos') ? [
                                     'label' => 'Reportes básicos',
