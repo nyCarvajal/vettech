@@ -25,7 +25,7 @@
         $signatureText = $professional?->firma_medica_texto;
     @endphp
     <style>
-        @page { size: letter; margin: 18mm 16mm; }
+        @page { size: letter; margin: 12mm 10mm; }
         :root {
             --primary: {{ $primaryColor }};
             --primary-rgb: {{ $primaryRgb }};
@@ -53,7 +53,7 @@
             align-items: center;
             justify-content: space-between;
             gap: 12px;
-            padding: 12px 16px;
+            padding: 8px 12px;
             background: var(--primary);
             color: #fff;
         }
@@ -65,13 +65,13 @@
             flex: 1 1 auto;
         }
         .brand-mark {
-            width: 46px;
-            height: 46px;
+            width: 64px;
+            height: 64px;
             border-radius: 12px;
             background: #fff;
             display: grid;
             place-items: center;
-            margin-right: 10px;
+            margin-right: 8px;
             overflow: hidden;
         }
         .brand-mark img {
@@ -120,7 +120,7 @@
         .meta-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.6px; color: var(--muted); margin-bottom: 4px; }
         .meta-value { font-weight: 600; font-size: 12px; color: var(--ink); }
         .section {
-            padding: 12px 16px 6px;
+            padding: 10px 12px 6px;
         }
         .section-title {
             font-size: 12px;
@@ -147,12 +147,12 @@
         .grid-two {
             display: grid;
             grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 8px;
+            gap: 6px;
         }
         .info-card {
             border: 1px solid var(--line);
             border-radius: 10px;
-            padding: 10px 12px;
+            padding: 8px 10px;
             background: #fff;
         }
         .info-card h3 { margin: 0 0 6px; font-size: 13px; color: var(--primary); }
@@ -161,8 +161,8 @@
             border-collapse: collapse;
             table-layout: fixed;
         }
-        .info-table td { padding: 3px 4px 3px 0; vertical-align: top; font-size: 11.5px; }
-        .info-table .label { color: var(--muted); width: 32%; }
+        .info-table td { padding: 2px 4px 2px 0; vertical-align: top; font-size: 11px; }
+        .info-table .label { color: var(--muted); width: 24%; white-space: nowrap; }
         .info-table .value { font-weight: 600; color: var(--ink); }
         .rx-block {
             margin-top: 6px;
