@@ -25,7 +25,7 @@
         $signatureText = $professional?->firma_medica_texto;
     @endphp
     <style>
-        @page { size: letter; margin: 12mm 10mm; }
+        @page { size: letter; margin: 8mm 8mm; }
         :root {
             --primary: {{ $primaryColor }};
             --primary-rgb: {{ $primaryRgb }};
@@ -52,8 +52,8 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: 12px;
-            padding: 8px 12px;
+            gap: 10px;
+            padding: 8px 10px;
             background: var(--primary);
             color: #fff;
         }
@@ -65,8 +65,8 @@
             flex: 1 1 auto;
         }
         .brand-mark {
-            width: 64px;
-            height: 64px;
+            width: 80px;
+            height: 80px;
             border-radius: 12px;
             background: #fff;
             display: grid;
@@ -88,7 +88,7 @@
             display: flex;
             flex-direction: column;
             gap: 3px;
-            min-width: 170px;
+            min-width: 130px;
             flex: 0 1 40%;
         }
         .clinic-details strong {
@@ -114,7 +114,7 @@
         .meta-card {
             border: 1px solid var(--line);
             border-radius: 10px;
-            padding: 10px 12px;
+            padding: 8px 10px;
             background: #fff;
         }
         .meta-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.6px; color: var(--muted); margin-bottom: 4px; }
