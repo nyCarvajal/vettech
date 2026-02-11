@@ -190,6 +190,27 @@
         }
         .rx-table .name { font-weight: 700; color: var(--ink); }
         .rx-table .muted { color: var(--muted); font-weight: 500; }
+        .observations-block {
+            margin-top: 8px;
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            padding: 8px 10px;
+            background: #fff;
+        }
+        .observations-block .title {
+            margin: 0 0 4px;
+            font-size: 10.5px;
+            letter-spacing: 0.4px;
+            text-transform: uppercase;
+            color: var(--muted);
+            font-weight: 700;
+        }
+        .observations-block .content {
+            margin: 0;
+            white-space: pre-line;
+            color: var(--ink);
+            font-size: 11.5px;
+        }
         .footer {
             margin-top: 10px;
             padding: 10px 16px 14px;
@@ -359,6 +380,13 @@
                     </tbody>
                 </table>
             </div>
+
+            @if($prescription->observations)
+                <div class="observations-block">
+                    <p class="title">Observaciones generales</p>
+                    <p class="content">{{ $prescription->observations }}</p>
+                </div>
+            @endif
 
             <div class="signature">
                 @if ($signatureUrl)

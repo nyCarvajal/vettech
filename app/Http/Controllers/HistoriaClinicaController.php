@@ -176,9 +176,10 @@ class HistoriaClinicaController extends Controller
             'items.*.duration_days' => ['nullable', 'integer', 'min:1'],
             'items.*.instructions' => ['nullable', 'string'],
             'items.*.qty_requested' => ['required', 'numeric', 'min:1'],
+            'observations' => ['nullable', 'string'],
         ]);
 
-        $this->persistRecetario($historiaClinica, $data['items']);
+        $this->persistRecetario($historiaClinica, $data['items'], $data['observations'] ?? null);
 
         return redirect()->route('historias-clinicas.show', $historiaClinica)
             ->with('success', 'Recetario creado correctamente.');
@@ -197,6 +198,7 @@ class HistoriaClinicaController extends Controller
             'items.*.duration_days' => ['nullable', 'integer', 'min:1'],
             'items.*.instructions' => ['nullable', 'string'],
             'items.*.qty_requested' => ['required', 'numeric', 'min:1'],
+            'observations' => ['nullable', 'string'],
         ]);
 
         $historiaClinica = HistoriaClinica::where('paciente_id', $data['patient_id'])
@@ -210,7 +212,7 @@ class HistoriaClinicaController extends Controller
             ]);
         }
 
-        $this->persistRecetario($historiaClinica, $data['items']);
+        $this->persistRecetario($historiaClinica, $data['items'], $data['observations'] ?? null);
 
         return redirect()->route('historias-clinicas.show', $historiaClinica)
             ->with('success', 'Recetario creado correctamente.');
@@ -337,13 +339,14 @@ class HistoriaClinicaController extends Controller
         ];
     }
 
-    private function persistRecetario(HistoriaClinica $historiaClinica, array $items): void
+    private function persistRecetario(HistoriaClinica $historiaClinica, array $items, ?string $observations = null): void
     {
         $prescription = Prescription::create([
             'historia_clinica_id' => $historiaClinica->id,
             'patient_id' => $historiaClinica->paciente_id,
             'professional_id' => Auth::id(),
             'status' => 'draft',
+            'observations' => $observations,
         ]);
 
         foreach ($items as $item) {
