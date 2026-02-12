@@ -9,7 +9,7 @@ class Prescription extends BaseModel
     use HasFactory;
 
     protected $fillable = [
-        'encounter_id', 'historia_clinica_id', 'patient_id', 'professional_id', 'status',
+        'encounter_id', 'historia_clinica_id', 'patient_id', 'professional_id', 'status', 'observations',
     ];
 
     public function items()

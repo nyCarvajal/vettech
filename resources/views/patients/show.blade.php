@@ -505,6 +505,41 @@
                         @endif
                     </div>
                 </div>
+                @php
+                    $tutorList = $patient->tutors;
+                    if ($tutorList->isEmpty() && $patient->owner) {
+                        $tutorList = collect([$patient->owner]);
+                    }
+                @endphp
+                <div class="mt-3">
+                    <p class="text-uppercase text-muted small mb-2">Tutores asociados</p>
+                    @if($tutorList->isEmpty())
+                        <p class="text-muted mb-0">Sin tutores adicionales registrados.</p>
+                    @else
+                        <ul class="list-unstyled mb-0">
+                            @foreach($tutorList as $tutor)
+                                @php
+                                    $isPrimary = $patient->owner_id === $tutor->id
+                                        || (bool) ($tutor->pivot->is_primary ?? false);
+                                @endphp
+                                <li class="d-flex justify-content-between align-items-center py-1">
+                                    <div>
+                                        <div class="fw-semibold">{{ $tutor->name }}</div>
+                                        <div class="text-muted small">{{ $tutor->phone ?: $tutor->whatsapp ?: 'Sin teléfono' }} · {{ $tutor->email ?: 'Sin correo' }}</div>
+                                    </div>
+                                    <div class="d-flex align-items-center gap-2">
+                                        @if($isPrimary)
+                                            <span class="badge bg-soft-primary text-primary">Principal</span>
+                                        @else
+                                            <span class="badge bg-soft-secondary text-secondary">Secundario</span>
+                                        @endif
+                                        <a href="{{ route('owners.show', $tutor) }}" class="btn btn-sm btn-outline-primary">Ver</a>
+                                    </div>
+                                </li>
+                            @endforeach
+                        </ul>
+                    @endif
+                </div>
             </div>
         </div>
     </div>
