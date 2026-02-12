@@ -7,6 +7,9 @@
     $contactPhone = $clinica->telefono ?? $clinica->phone ?? $clinica->whatsapp ?? null;
     $contactEmail = $clinica->correo ?? $clinica->email ?? null;
     $contactAddress = $clinica->direccion ?? $clinica->address ?? null;
+    $ownerName = trim((string) ($cliente->name ?? ''));
+    $ownerFirstName = $ownerName !== '' ? \Illuminate\Support\Str::before($ownerName, ' ') : '';
+    $ownerLastName = $ownerName !== '' ? trim(\Illuminate\Support\Str::after($ownerName, ' ')) : '';
 @endphp
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -205,14 +208,14 @@
                         <div class="row g-3">
                             <div class="col-md-6">
                                 <label class="form-label" for="appointment-first-name">Nombre</label>
-                                <input type="text" class="form-control @if($appointmentErrors?->has('nombres')) is-invalid @endif" id="appointment-first-name" name="nombres" value="{{ old('nombres', $cliente->nombres ?? '') }}" required>
+                                <input type="text" class="form-control @if($appointmentErrors?->has('nombres')) is-invalid @endif" id="appointment-first-name" name="nombres" value="{{ old('nombres', $ownerFirstName) }}" required>
                                 @if($appointmentErrors?->has('nombres'))
                                     <div class="invalid-feedback">{{ $appointmentErrors->first('nombres') }}</div>
                                 @endif
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label" for="appointment-last-name">Apellidos</label>
-                                <input type="text" class="form-control @if($appointmentErrors?->has('apellidos')) is-invalid @endif" id="appointment-last-name" name="apellidos" value="{{ old('apellidos', $cliente->apellidos ?? '') }}">
+                                <input type="text" class="form-control @if($appointmentErrors?->has('apellidos')) is-invalid @endif" id="appointment-last-name" name="apellidos" value="{{ old('apellidos', $ownerLastName) }}">
                                 @if($appointmentErrors?->has('apellidos'))
                                     <div class="invalid-feedback">{{ $appointmentErrors->first('apellidos') }}</div>
                                 @endif
@@ -323,7 +326,7 @@
                 <div class="card card-soft mb-4">
                     <div class="card-body p-4">
                         <h3 class="section-title mb-2">Tu cuenta</h3>
-                        <p class="text-muted mb-3">Sesión activa para {{ $cliente->correo ?? 'tu cuenta' }}.</p>
+                        <p class="text-muted mb-3">Sesión activa para {{ $cliente->email ?? 'tu cuenta' }}.</p>
                         <form method="POST" action="{{ route('public.booking.logout', $clinica) }}">
                             @csrf
                             <button type="submit" class="btn btn-outline-secondary w-100">Cerrar sesión</button>
@@ -344,6 +347,27 @@
                                     <div class="text-muted">{{ $contactPhone }}</div>
                                 </div>
                             </div>
+                        @endif
+                        @if($contactEmail)
+                            <div class="contact-item">
+                                <span class="contact-dot"></span>
+                                <div>
+                                    <div class="fw-semibold">Correo</div>
+                                    <div class="text-muted">{{ $contactEmail }}</div>
+                                </div>
+                            </div>
+                        @endif
+                        @if($contactAddress)
+                            <div class="contact-item">
+                                <span class="contact-dot"></span>
+                                <div>
+                                    <div class="fw-semibold">Dirección</div>
+                                    <div class="text-muted">{{ $contactAddress }}</div>
+                                </div>
+                            </div>
+                        @endif
+                        @if(! $contactPhone && ! $contactEmail && ! $contactAddress)
+                            <div class="text-muted">Agrega los datos de contacto de tu clínica para mostrarlos aquí.</div>
                         @endif
                         @if($contactEmail)
                             <div class="contact-item">
