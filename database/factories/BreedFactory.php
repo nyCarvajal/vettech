@@ -12,9 +12,12 @@ class BreedFactory extends Factory
 
     public function definition(): array
     {
+        $name = $this->faker->word();
+
         return [
             'species_id' => Species::factory(),
-            'name' => $this->faker->word(),
+            'name' => $name,
+            'normalized_name' => strtolower($name),
         ];
     }
 }
