@@ -7,10 +7,6 @@
     $contactPhone = $clinica->telefono ?? $clinica->phone ?? $clinica->whatsapp ?? null;
     $contactEmail = $clinica->correo ?? $clinica->email ?? null;
     $contactAddress = $clinica->direccion ?? $clinica->address ?? null;
-    $pets = collect();
-    if ($cliente) {
-        $pets = collect(data_get($cliente, 'pets', data_get($cliente, 'pacientes', data_get($cliente, 'mascotas', []))));
-    }
 @endphp
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -86,9 +82,6 @@
             border: none;
             box-shadow: 0 20px 40px rgba(15, 23, 42, 0.08);
         }
-        .card-muted {
-            background: linear-gradient(135deg, #ffffff, #f6f4ff);
-        }
         .section-title {
             font-weight: 700;
             font-size: 1.1rem;
@@ -100,40 +93,6 @@
         }
         .btn-primary:hover {
             filter: brightness(0.95);
-        }
-        .nav-pills .nav-link.active {
-            background: var(--purple-100);
-            color: var(--ink-900);
-        }
-        .pet-card {
-            border-radius: 20px;
-            border: 1px solid rgba(123, 109, 241, 0.15);
-            padding: 1.5rem;
-            background: #ffffff;
-        }
-        .pet-avatar {
-            width: 60px;
-            height: 60px;
-            border-radius: 18px;
-            background: var(--mint-100);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            color: var(--purple-500);
-        }
-        .pet-meta {
-            color: var(--ink-600);
-            font-size: 0.9rem;
-        }
-        .mini-card {
-            border-radius: 16px;
-            padding: 1rem;
-            background: #f8f7ff;
-            border: 1px dashed rgba(123, 109, 241, 0.2);
-        }
-        .mini-card h6 {
-            font-weight: 700;
         }
         .contact-item {
             display: flex;
@@ -332,78 +291,6 @@
                 </div>
             </div>
 
-            <div class="card card-soft card-muted">
-                <div class="card-body p-4">
-                    <div class="d-flex justify-content-between flex-wrap gap-3 align-items-center mb-3">
-                        <div>
-                            <h2 class="section-title mb-1">Mascotas del tutor</h2>
-                            <p class="text-muted mb-0">Consulta el historial clínico, vacunas y documentos de cada mascota.</p>
-                        </div>
-                        <div class="badge-soft">{{ $pets->count() }} mascotas</div>
-                    </div>
-
-                    @if(! $cliente)
-                        <div class="text-muted">
-                            Inicia sesión para ver tus mascotas, el carnet de vacunas, desparasitaciones y los documentos enviados por la clínica.
-                        </div>
-                    @elseif($pets->isEmpty())
-                        <div class="text-muted">
-                            Aún no hay mascotas vinculadas. Aquí aparecerán los pacientes registrados junto a su carnet de vacunas, desparasitaciones y documentos clínicos.
-                        </div>
-                    @else
-                        <div class="d-grid gap-3">
-                            @foreach($pets as $pet)
-                                <div class="pet-card">
-                                    <div class="d-flex align-items-start gap-3 flex-wrap">
-                                        <div class="pet-avatar">{{ \Illuminate\Support\Str::upper(substr($pet->nombres ?? $pet->name ?? 'M', 0, 1)) }}</div>
-                                        <div class="flex-grow-1">
-                                            <h3 class="h5 fw-bold mb-1">{{ $pet->nombres ?? $pet->name ?? 'Mascota' }}</h3>
-                                            <p class="pet-meta mb-2">
-                                                {{ $pet->species?->name ?? $pet->species?->nombre ?? 'Especie' }} ·
-                                                {{ $pet->breed?->name ?? $pet->breed?->nombre ?? 'Raza' }} ·
-                                                {{ $pet->edad ?? 'Edad por definir' }}
-                                            </p>
-                                            <div class="row g-3">
-                                                <div class="col-md-6">
-                                                    <div class="mini-card">
-                                                        <h6 class="mb-2">Carnet de vacunas</h6>
-                                                        <p class="text-muted mb-0">Sin registros por mostrar.</p>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <div class="mini-card">
-                                                        <h6 class="mb-2">Desparasitaciones</h6>
-                                                        <p class="text-muted mb-0">Sin registros por mostrar.</p>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-4">
-                                                    <div class="mini-card">
-                                                        <h6 class="mb-2">Recetas</h6>
-                                                        <p class="text-muted mb-0">Espacio para agregar recetas médicas.</p>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-4">
-                                                    <div class="mini-card">
-                                                        <h6 class="mb-2">Remisiones</h6>
-                                                        <p class="text-muted mb-0">Registra remisiones y especialistas.</p>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-4">
-                                                    <div class="mini-card">
-                                                        <h6 class="mb-2">Documentos enviados</h6>
-                                                        <p class="text-muted mb-0">Recetas, remisiones y consentimientos informados.</p>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            @endforeach
-                        </div>
-                    @endif
-                </div>
-            </div>
-        </div>
 
         <div class="col-lg-4">
             @if(! $cliente)
@@ -479,6 +366,26 @@
                         @if(! $contactPhone && ! $contactEmail && ! $contactAddress)
                             <div class="text-muted">Agrega los datos de contacto de tu clínica para mostrarlos aquí.</div>
                         @endif
+                        @if(! $contactPhone && ! $contactEmail && ! $contactAddress)
+                            <div class="text-muted">Agrega los datos de contacto de tu clínica para mostrarlos aquí.</div>
+                        @endif
+                    </div>
+                </div>
+            </div>
+
+            @if($cliente && $proximasReservas->isNotEmpty())
+                <div class="card card-soft mb-4">
+                    <div class="card-body p-4">
+                        <h3 class="section-title mb-3">Tus próximas solicitudes</h3>
+                        @foreach($proximasReservas as $reserva)
+                            <div class="timeline-item">
+                                <h4 class="h6 mb-1">{{ $reserva->tipo ?? 'Reserva' }} · {{ \Carbon\Carbon::parse($reserva->fecha)->format('d/m/Y H:i') }}</h4>
+                                <p class="mb-1 text-muted">Estado: <strong>{{ $reserva->estado }}</strong> · Duración: {{ $reserva->duracion }} minutos</p>
+                                @if($reserva->nota_cliente)
+                                    <p class="mb-0 small">Nota: {{ $reserva->nota_cliente }}</p>
+                                @endif
+                            </div>
+                        @endforeach
                     </div>
                 </div>
             </div>
@@ -500,13 +407,6 @@
                 </div>
             @endif
 
-            <div class="card card-soft">
-                <div class="card-body p-4">
-                    <h3 class="section-title mb-3">Centro de documentos</h3>
-                    <p class="text-muted">Centraliza las recetas, remisiones y consentimientos informados de tus mascotas. Próximamente podrás descargar y firmar documentos desde aquí.</p>
-                    <button class="btn btn-outline-secondary w-100" type="button" disabled>Próximamente</button>
-                </div>
-            </div>
         </div>
     </div>
 </div>
