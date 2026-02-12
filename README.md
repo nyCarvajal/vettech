@@ -141,3 +141,25 @@ Menta se usa solo como acento: borde superior de KPIs, resaltado de sidebar acti
    - `config/reporting.php` permite mapear tipos/áreas de servicio y peluquería.
 5. Multitenancy:
    - Si las tablas tienen `tenant_id`, las consultas filtran por el tenant del usuario autenticado.
+
+## Mejoras demo: Pacientes e Historia clínica
+
+### Raza libre + catálogo
+- En el formulario de pacientes ahora puedes escribir una raza manualmente.
+- Si escribes una nueva, el sistema normaliza el nombre y lo guarda en el catálogo de razas por especie.
+- Se evita el duplicado con un índice único por especie + nombre normalizado.
+
+### Tutor(es) desde la ficha del paciente
+- En el paso 1 de la ficha se pueden:
+  - Buscar tutores existentes por nombre, teléfono, email o documento.
+  - Crear tutores nuevos desde el modal “Agregar tutor”.
+- Se mantiene un tutor principal y se guarda la relación many-to-many en `patient_owner`.
+
+### Examen físico ECOP (COMVEZCOL)
+- El examen físico se organiza en E (Evaluación general), C (Condición clínica), O (Observaciones por sistemas) y P (Plan).
+- Los campos nuevos (T°, TRC, mucosas, hidratación, condición corporal, etc.) se guardan en la historia clínica sin romper los campos existentes.
+- El PDF sigue el mismo orden ECOP.
+
+### Adjuntos de paraclínicos
+- Desde la historia clínica se pueden adjuntar archivos (PDF, imágenes, documentos Office, ZIP y videos).
+- El límite de tamaño es configurable vía `CLINICAL_ATTACHMENTS_MAX_KB` (por defecto 20480 KB / 20MB).

@@ -14,11 +14,12 @@ class PatientRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'owner_id' => ['required', 'exists:owners,id'],
+            'owner_id' => ['nullable', 'exists:owners,id'],
             'nombres' => ['required', 'string', 'max:255'],
             'apellidos' => ['nullable', 'string', 'max:255'],
             'species_id' => ['required', 'exists:species,id'],
-            'breed_id' => ['nullable', 'exists:breeds,id'],
+            'breed_id' => ['nullable', 'exists:breeds,id', 'required_without:breed_name'],
+            'breed_name' => ['nullable', 'string', 'max:255', 'required_without:breed_id'],
             'sexo' => ['nullable', 'in:M,F,NA'],
             'fecha_nacimiento' => ['nullable', 'date', 'before:tomorrow'],
             'color' => ['nullable', 'string', 'max:100'],
@@ -34,6 +35,32 @@ class PatientRequest extends FormRequest
             'photo' => ['nullable', 'image', 'max:2048'],
             'age_value' => ['nullable', 'integer', 'min:0', 'required_with:age_unit'],
             'age_unit' => ['nullable', 'in:years,months', 'required_with:age_value'],
+            'tutores_json' => ['nullable', 'string'],
         ];
+    }
+
+    public function withValidator($validator): void
+    {
+        $validator->after(function ($validator) {
+            $hasOwner = $this->filled('owner_id');
+            $payload = $this->tutoresPayload();
+
+            if (! $hasOwner && count($payload) === 0) {
+                $validator->errors()->add('tutores_json', 'Debes registrar al menos un tutor.');
+            }
+        });
+    }
+
+    private function tutoresPayload(): array
+    {
+        $raw = $this->input('tutores_json');
+
+        if (! $raw) {
+            return [];
+        }
+
+        $decoded = json_decode($raw, true);
+
+        return is_array($decoded) ? $decoded : [];
     }
 }

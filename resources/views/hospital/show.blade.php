@@ -136,12 +136,23 @@
                                 <h4 class="font-semibold text-emerald-700 mb-2">Aplicaciones del día</h4>
                                 <div class="space-y-2">
                                     @foreach($day->administrations as $admin)
-                                        <div class="flex items-center justify-between p-2 rounded border border-emerald-100">
-                                            <div>
+                                        @php($order = $admin->order)
+                                        @php($medicationName = $order?->source === 'manual' ? $order?->manual_name : ($order?->product?->name ?? 'Producto'))
+                                        <div class="p-2 rounded border border-emerald-100 space-y-1">
+                                            <div class="flex items-center justify-between gap-2">
                                                 <p class="text-sm font-semibold text-emerald-700">{{ optional($admin->administered_at)->format('H:i') }}</p>
-                                                <p class="text-xs text-gray-500">{{ $admin->dose_given }} • {{ $admin->status }}</p>
+                                                <p class="text-xs text-gray-500">{{ $admin->status }}</p>
                                             </div>
-                                            <p class="text-xs text-gray-500">{{ $admin->notes }}</p>
+                                            <p class="text-xs text-gray-700">
+                                                {{ $medicationName }}
+                                                @if($order?->source === 'manual')
+                                                    <span class="text-[11px] text-amber-600">(Manual)</span>
+                                                @endif
+                                            </p>
+                                            <p class="text-xs text-gray-500">Vía: {{ $order?->route ?? 'N/D' }} • Aplicado: {{ $admin->dose_given ?? 'N/D' }}</p>
+                                            @if($admin->notes)
+                                                <p class="text-xs text-gray-500">{{ $admin->notes }}</p>
+                                            @endif
                                         </div>
                                     @endforeach
                                     @if($day->administrations->isEmpty())

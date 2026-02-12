@@ -18,6 +18,7 @@ class Owner extends BaseModel
         'departamento_id',
         'municipio_id',
         'address',
+        'city',
         'notes',
         'password',
         'email_verified_at',
@@ -39,6 +40,13 @@ class Owner extends BaseModel
     public function patients()
     {
         return $this->hasMany(Patient::class, 'owner_id');
+    }
+
+    public function tutoredPatients()
+    {
+        return $this->belongsToMany(Patient::class, 'patient_owner', 'owner_id', 'patient_id')
+            ->withPivot(['relationship', 'is_primary'])
+            ->withTimestamps();
     }
 
     public function departamento()

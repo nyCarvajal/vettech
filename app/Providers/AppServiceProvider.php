@@ -17,6 +17,7 @@ use Carbon\Carbon;
 
 class AppServiceProvider extends ServiceProvider
 {
+
     public function boot()
     {
         Event::listen(RouteMatched::class, function (RouteMatched $event) {
