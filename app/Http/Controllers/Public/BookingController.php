@@ -5,21 +5,23 @@ namespace App\Http\Controllers\Public;
 use App\Http\Controllers\Controller;
 use App\Mail\ClienteVerificationMail;
 use App\Mail\NuevaReservaClinicaMail;
-use App\Models\Cliente;
 use App\Models\Clinica;
+use App\Models\Owner;
 use App\Models\Reserva;
 use App\Models\Tipocita;
 use App\Models\User;
+use App\Support\RoleLabelResolver;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
-use App\Support\RoleLabelResolver;
+use Illuminate\Support\Collection;
 
 class BookingController extends Controller
 {
@@ -36,8 +38,8 @@ class BookingController extends Controller
 
         $stylistLabels = $this->stylistLabels($clinica);
 
-        if ($cliente) {
-            $proximasReservas = Reserva::where('cliente_id', $cliente->id)
+        if ($cliente && Schema::connection('tenant')->hasColumn('reservas', 'owner_id')) {
+            $proximasReservas = Reserva::where('owner_id', $cliente->id)
                 ->orderBy('fecha')
                 ->whereDate('fecha', '>=', Carbon::today())
                 ->take(5)
@@ -89,17 +91,17 @@ class BookingController extends Controller
                 ->withInput($request->except('captcha'));
         }
 
-        if (Cliente::where('correo', $correo)->exists()) {
+        if (Owner::where('email', $correo)->exists()) {
             return back()
                 ->withErrors(['correo' => 'Este correo ya está registrado.'], 'register')
                 ->withInput();
         }
 
-        $cliente = new Cliente([
-            'nombres' => $data['nombres'],
-            'apellidos' => $data['apellidos'] ?? null,
-            'correo' => $correo,
+        $cliente = new Owner([
+            'name' => trim(($data['nombres'] ?? '') . ' ' . ($data['apellidos'] ?? '')),
+            'email' => $correo,
             'whatsapp' => $data['whatsapp'] ?? null,
+            'phone' => $data['whatsapp'] ?? null,
         ]);
 
         $cliente->password = Hash::make($data['password']);
@@ -107,10 +109,10 @@ class BookingController extends Controller
         $cliente->save();
 
         $verifyUrl = $this->verificationUrl($clinica, $cliente);
-        Mail::to($cliente->correo)->send(new ClienteVerificationMail($clinica, $cliente, $verifyUrl));
+        Mail::to($cliente->email)->send(new ClienteVerificationMail($clinica, $cliente, $verifyUrl));
 
         $request->session()->forget($this->sessionKey($clinica));
-        $request->session()->put($this->pendingKey($clinica), $cliente->correo);
+        $request->session()->put($this->pendingKey($clinica), $cliente->email);
         $request->session()->forget($this->captchaKey($clinica));
 
         return redirect()
@@ -134,7 +136,7 @@ class BookingController extends Controller
         $data = $validator->validated();
         $correo = strtolower($data['correo']);
 
-        $cliente = Cliente::where('correo', $correo)->first();
+        $cliente = Owner::where('email', $correo)->first();
 
         if (! $cliente || empty($cliente->password) || ! Hash::check($data['password'], $cliente->password)) {
             return back()
@@ -217,16 +219,23 @@ class BookingController extends Controller
 
         $data = $validator->validated();
 
-        $cliente = Cliente::where('whatsapp', $data['whatsapp'])->first();
+        $cliente = $this->currentClient($clinica);
 
         if (! $cliente) {
-            $cliente = new Cliente();
+            $cliente = Owner::query()
+                ->where('whatsapp', $data['whatsapp'])
+                ->orWhere('phone', $data['whatsapp'])
+                ->first();
+        }
+
+        if (! $cliente) {
+            $cliente = new Owner();
         }
 
         $cliente->fill([
-            'nombres' => $data['nombres'],
-            'apellidos' => $data['apellidos'] ?? null,
+            'name' => trim(($data['nombres'] ?? '') . ' ' . ($data['apellidos'] ?? '')),
             'whatsapp' => $data['whatsapp'],
+            'phone' => $data['whatsapp'],
         ]);
 
         $cliente->save();
@@ -270,15 +279,20 @@ class BookingController extends Controller
             $tipoCita = Tipocita::find($data['tipocita_id']);
         }
 
-        $reserva = Reserva::create([
+        $payload = [
             'fecha' => $inicio,
             'duracion' => $duracion,
-            'cliente_id' => $cliente->id,
             'estado' => 'Pendiente',
             'tipo' => $tipoCita?->nombre ?? 'Reserva',
             'nota_cliente' => $data['nota_cliente'] ?? null,
             'entrenador_id' => $data['entrenador_id'],
-        ]);
+        ];
+
+        if (Schema::connection('tenant')->hasColumn('reservas', 'owner_id')) {
+            $payload['owner_id'] = $cliente->id;
+        }
+
+        $reserva = Reserva::create($payload);
 
         $recipients = $this->resolveSalonNotificationEmails($clinica);
 
@@ -396,7 +410,7 @@ class BookingController extends Controller
                 ->with('error', 'El enlace de verificación no es válido o ha expirado.');
         }
 
-        $cliente = Cliente::where('correo', $correo)->first();
+        $cliente = Owner::where('email', $correo)->first();
 
         if (! $cliente) {
             return redirect()
@@ -420,7 +434,9 @@ class BookingController extends Controller
                 ->with('error', 'El enlace de verificación no es válido o ha expirado.');
         }
 
-        $cliente->markEmailAsVerified();
+        $cliente->email_verified_at = Carbon::now();
+        $cliente->verification_token = null;
+        $cliente->save();
 
         $request->session()->put($this->sessionKey($clinica), $cliente->id);
         $request->session()->forget($this->pendingKey($clinica));
@@ -507,24 +523,27 @@ class BookingController extends Controller
             $connectionStylists = User::on($connection)
                 ->where('clinica_id', $clinica->id)
                 ->whereIn('role', [11, '11', 'groomer'])
-                ->orderBy('nombre')
-                ->orderBy('apellidos')
                 ->get();
 
             if ($connectionStylists->isEmpty()) {
                 $connectionStylists = User::on($connection)
                     ->where('clinica_id', $clinica->id)
-                    ->orderBy('nombre')
-                    ->orderBy('apellidos')
                     ->get();
             }
 
             if ($connectionStylists->isNotEmpty()) {
-                $stylists = $stylists->merge($connectionStylists);
+                $stylists = $stylists->merge($this->sortStylists($connectionStylists));
             }
         }
 
         return $stylists->unique('id')->values();
+    }
+
+    private function sortStylists(Collection $stylists): Collection
+    {
+        return $stylists
+            ->sortBy(fn (User $user) => Str::lower((string) ($user->name ?? '')))
+            ->values();
     }
 
     private function normalizeStylistId($value): ?int
@@ -601,22 +620,22 @@ class BookingController extends Controller
         DB::setDefaultConnection('tenant');
     }
 
-    private function currentClient(Clinica $clinica): ?Cliente
+    private function currentClient(Clinica $clinica): ?Owner
     {
         $id = session($this->sessionKey($clinica));
         if (! $id) {
             return null;
         }
 
-        return Cliente::find($id);
+        return Owner::find($id);
     }
 
-    private function verificationUrl(Clinica $clinica, Cliente $cliente): string
+    private function verificationUrl(Clinica $clinica, Owner $cliente): string
     {
         return route('public.booking.verify', [
             'clinica' => $clinica,
             'token' => $cliente->verification_token,
-            'email' => $cliente->correo,
+            'email' => $cliente->email,
         ]);
     }
 

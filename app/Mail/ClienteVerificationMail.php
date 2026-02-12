@@ -2,8 +2,8 @@
 
 namespace App\Mail;
 
-use App\Models\Cliente;
 use App\Models\Clinica;
+use App\Models\Owner;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
@@ -14,7 +14,7 @@ class ClienteVerificationMail extends Mailable
 
     public function __construct(
         public Clinica $clinica,
-        public Cliente $cliente,
+        public Owner $cliente,
         public string $verificationUrl
     ) {
     }

@@ -4,6 +4,12 @@
 @php
     $trainerLabelSingular = $trainerLabelSingular ?? \App\Models\Clinica::defaultRoleLabel(\App\Models\Clinica::ROLE_STYLIST);
     $trainerLabelPlural = $trainerLabelPlural ?? \App\Models\Clinica::defaultRoleLabel(\App\Models\Clinica::ROLE_STYLIST, true);
+    $contactPhone = $clinica->telefono ?? $clinica->phone ?? $clinica->whatsapp ?? null;
+    $contactEmail = $clinica->correo ?? $clinica->email ?? null;
+    $contactAddress = $clinica->direccion ?? $clinica->address ?? null;
+    $ownerName = trim((string) ($cliente->name ?? ''));
+    $ownerFirstName = $ownerName !== '' ? \Illuminate\Support\Str::before($ownerName, ' ') : '';
+    $ownerLastName = $ownerName !== '' ? trim(\Illuminate\Support\Str::after($ownerName, ' ')) : '';
 @endphp
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,56 +19,95 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
+        :root {
+            --mint-100: #e0fbf7;
+            --mint-300: #8debe0;
+            --mint-500: #44d7c5;
+            --purple-100: #efeaff;
+            --purple-300: #cbb7ff;
+            --purple-500: #7b6df1;
+            --ink-900: #1b1f2a;
+            --ink-600: #5c6273;
+        }
         body {
             font-family: 'Inter', sans-serif;
-            background: #f8f9fb;
-            color: #1f2933;
+            background: radial-gradient(circle at top, #ffffff 0%, #f5f7fb 50%, #eef0f7 100%);
+            color: var(--ink-900);
+        }
+        .clinic-shell {
+            max-width: 1200px;
         }
         .hero {
-            background: linear-gradient(135deg, {{ $clinica->color ?? '#6c5ce7' }} 0%, #1f2933 100%);
-            color: #fff;
-            border-radius: 24px;
+            background: linear-gradient(135deg, var(--purple-300) 0%, var(--mint-300) 100%);
+            border-radius: 28px;
             padding: 2.5rem;
+            position: relative;
+            overflow: hidden;
         }
-        .hero-header {
-            display: flex;
-            align-items: center;
-            gap: 1.5rem;
-            flex-wrap: wrap;
+        .hero::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at top right, rgba(255, 255, 255, 0.45), transparent 60%);
+            opacity: 0.8;
+        }
+        .hero-content {
+            position: relative;
+            z-index: 1;
         }
         .hero-logo {
-            width: 96px;
-            height: 96px;
-            border-radius: 24px;
-            background: rgba(255, 255, 255, 0.12);
+            width: 110px;
+            height: 110px;
+            border-radius: 26px;
+            background: rgba(255, 255, 255, 0.45);
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 0.75rem;
+            padding: 0.85rem;
+            box-shadow: 0 10px 25px rgba(123, 109, 241, 0.25);
         }
         .hero-logo img {
             max-width: 100%;
             max-height: 100%;
             object-fit: contain;
         }
-        .card-shadow {
-            box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.15);
-            border: none;
-            border-radius: 18px;
-        }
-        .form-label {
+        .badge-soft {
+            background: rgba(255, 255, 255, 0.55);
+            color: var(--ink-600);
+            border-radius: 999px;
+            padding: 0.35rem 0.9rem;
+            font-size: 0.85rem;
             font-weight: 600;
         }
+        .card-soft {
+            background: #ffffff;
+            border-radius: 22px;
+            border: none;
+            box-shadow: 0 20px 40px rgba(15, 23, 42, 0.08);
+        }
+        .section-title {
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
         .btn-primary {
-            background-color: {{ $clinica->color ?? '#6c5ce7' }};
-            border-color: {{ $clinica->color ?? '#6c5ce7' }};
+            background: linear-gradient(135deg, var(--purple-500), var(--mint-500));
+            border: none;
+            box-shadow: 0 10px 20px rgba(123, 109, 241, 0.25);
         }
         .btn-primary:hover {
-            filter: brightness(0.92);
+            filter: brightness(0.95);
         }
-        .nav-pills .nav-link.active {
-            background-color: rgba(15, 23, 42, 0.08);
-            color: #1f2933;
+        .contact-item {
+            display: flex;
+            gap: 0.75rem;
+            align-items: flex-start;
+        }
+        .contact-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--mint-500);
+            margin-top: 0.35rem;
         }
         .timeline-item {
             position: relative;
@@ -76,7 +121,7 @@
             top: 0.2rem;
             width: 10px;
             height: 10px;
-            background: {{ $clinica->color ?? '#6c5ce7' }};
+            background: var(--purple-500);
             border-radius: 50%;
         }
         .timeline-item::after {
@@ -91,39 +136,45 @@
         .timeline-item:last-child::after {
             display: none;
         }
-        @media (max-width: 575.98px) {
+        @media (max-width: 992px) {
             .hero {
                 padding: 2rem;
             }
             .hero-logo {
-                width: 80px;
-                height: 80px;
+                width: 90px;
+                height: 90px;
             }
         }
     </style>
 </head>
 <body>
-<div class="container py-5">
+<div class="container clinic-shell py-5">
     <div class="hero mb-5">
-        <div class="hero-header">
-            <div class="hero-logo">
-                <img src="{{ $clinicaLogo }}" alt="Logo de {{ $clinica->nombre }}">
-            </div>
-            <div>
-                <h1 class="fw-bold mb-3">Reserva tu próximo servicio en {{ $clinica->nombre }}</h1>
-                <p class="lead mb-0">Completa tus datos y solicita tu cita en pocos pasos. Nosotros nos encargamos del resto.</p>
+        <div class="hero-content">
+            <div class="d-flex flex-wrap align-items-center gap-4">
+                <div class="hero-logo">
+                    <img src="{{ $clinicaLogo }}" alt="Logo de {{ $clinica->nombre }}">
+                </div>
+                <div class="flex-grow-1">
+                    <div class="d-flex flex-wrap gap-2 mb-3">
+                        <span class="badge-soft">Atención con amor y precisión</span>
+                        <span class="badge-soft">Citas en línea 24/7</span>
+                    </div>
+                    <h1 class="fw-bold mb-2">Bienvenido a {{ $clinica->nombre }}</h1>
+                    <p class="mb-0 text-dark-emphasis">Un espacio diseñado para el bienestar de tu familia multiespecie. Reserva una cita al instante y accede a las mascotas registradas desde tu cuenta.</p>
+                </div>
             </div>
         </div>
     </div>
 
     @if (session('status'))
-        <div class="alert alert-success alert-dismissible fade show card-shadow" role="alert">
+        <div class="alert alert-success alert-dismissible fade show card-soft" role="alert">
             {{ session('status') }}
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
         </div>
     @endif
     @if (session('error'))
-        <div class="alert alert-danger alert-dismissible fade show card-shadow" role="alert">
+        <div class="alert alert-danger alert-dismissible fade show card-soft" role="alert">
             {{ session('error') }}
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
         </div>
@@ -141,25 +192,30 @@
         }
     @endphp
 
-    <div class="row justify-content-center">
-        <div class="col-lg-8 col-xl-6">
-            <div class="card card-shadow">
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="card card-soft mb-4">
                 <div class="card-body p-4">
-                    <h2 class="h4 fw-bold mb-4">Agenda tu cita</h2>
-                    <p class="text-muted mb-4">Déjanos tus datos básicos y elige el horario que mejor te funcione. Te contactaremos para confirmar tu reserva.</p>
+                    <div class="d-flex justify-content-between flex-wrap gap-3 align-items-center mb-3">
+                        <div>
+                            <h2 class="section-title mb-1">Solicita tu cita</h2>
+                            <p class="text-muted mb-0">Selecciona fecha, hora y el profesional que acompañará a tu mascota.</p>
+                        </div>
+                        <div class="badge-soft">Agenda rápida</div>
+                    </div>
                     <form method="POST" action="{{ route('public.booking.appointment', $clinica) }}">
                         @csrf
                         <div class="row g-3">
                             <div class="col-md-6">
                                 <label class="form-label" for="appointment-first-name">Nombre</label>
-                                <input type="text" class="form-control @if($appointmentErrors?->has('nombres')) is-invalid @endif" id="appointment-first-name" name="nombres" value="{{ old('nombres', $cliente->nombres ?? '') }}" required>
+                                <input type="text" class="form-control @if($appointmentErrors?->has('nombres')) is-invalid @endif" id="appointment-first-name" name="nombres" value="{{ old('nombres', $ownerFirstName) }}" required>
                                 @if($appointmentErrors?->has('nombres'))
                                     <div class="invalid-feedback">{{ $appointmentErrors->first('nombres') }}</div>
                                 @endif
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label" for="appointment-last-name">Apellidos</label>
-                                <input type="text" class="form-control @if($appointmentErrors?->has('apellidos')) is-invalid @endif" id="appointment-last-name" name="apellidos" value="{{ old('apellidos', $cliente->apellidos ?? '') }}">
+                                <input type="text" class="form-control @if($appointmentErrors?->has('apellidos')) is-invalid @endif" id="appointment-last-name" name="apellidos" value="{{ old('apellidos', $ownerLastName) }}">
                                 @if($appointmentErrors?->has('apellidos'))
                                     <div class="invalid-feedback">{{ $appointmentErrors->first('apellidos') }}</div>
                                 @endif
@@ -237,25 +293,105 @@
                     </form>
                 </div>
             </div>
-        </div>
-    </div>
 
-    @if($cliente && $proximasReservas->isNotEmpty())
-        <div class="card card-shadow mt-4">
-            <div class="card-body p-4">
-                <h2 class="h5 fw-bold mb-4">Tus próximas solicitudes</h2>
-                @foreach($proximasReservas as $reserva)
-                    <div class="timeline-item">
-                        <h3 class="h6 mb-1">{{ $reserva->tipo ?? 'Reserva' }} · {{ \Carbon\Carbon::parse($reserva->fecha)->format('d/m/Y H:i') }}</h3>
-                        <p class="mb-1 text-muted">Estado: <strong>{{ $reserva->estado }}</strong> · Duración: {{ $reserva->duracion }} minutos</p>
-                        @if($reserva->nota_cliente)
-                            <p class="mb-0 small">Nota: {{ $reserva->nota_cliente }}</p>
+
+        <div class="col-lg-4">
+            @if(! $cliente)
+                <div class="card card-soft mb-4">
+                    <div class="card-body p-4">
+                        <h3 class="section-title mb-2">Inicia sesión</h3>
+                        <p class="text-muted mb-3">Usa el correo y la contraseña creada por la clínica para ver tus mascotas y documentos.</p>
+                        <form method="POST" action="{{ route('public.booking.login', $clinica) }}">
+                            @csrf
+                            <div class="mb-3">
+                                <label class="form-label" for="login-email">Correo</label>
+                                <input type="email" class="form-control @if(($errors->login ?? null)?->has('correo')) is-invalid @endif" id="login-email" name="correo" value="{{ old('correo') }}" required>
+                                @if(($errors->login ?? null)?->has('correo'))
+                                    <div class="invalid-feedback">{{ $errors->login->first('correo') }}</div>
+                                @endif
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label" for="login-password">Contraseña</label>
+                                <input type="password" class="form-control @if(($errors->login ?? null)?->has('password')) is-invalid @endif" id="login-password" name="password" required>
+                                @if(($errors->login ?? null)?->has('password'))
+                                    <div class="invalid-feedback">{{ $errors->login->first('password') }}</div>
+                                @endif
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100">Entrar</button>
+                        </form>
+                    </div>
+                </div>
+            @endif
+            @if($cliente)
+                <div class="card card-soft mb-4">
+                    <div class="card-body p-4">
+                        <h3 class="section-title mb-2">Tu cuenta</h3>
+                        <p class="text-muted mb-3">Sesión activa para {{ $cliente->email ?? 'tu cuenta' }}.</p>
+                        <form method="POST" action="{{ route('public.booking.logout', $clinica) }}">
+                            @csrf
+                            <button type="submit" class="btn btn-outline-secondary w-100">Cerrar sesión</button>
+                        </form>
+                    </div>
+                </div>
+            @endif
+
+            <div class="card card-soft mb-4">
+                <div class="card-body p-4">
+                    <h3 class="section-title mb-3">Información de contacto</h3>
+                    <div class="d-grid gap-3">
+                        @if($contactPhone)
+                            <div class="contact-item">
+                                <span class="contact-dot"></span>
+                                <div>
+                                    <div class="fw-semibold">Teléfono / WhatsApp</div>
+                                    <div class="text-muted">{{ $contactPhone }}</div>
+                                </div>
+                            </div>
+                        @endif
+                        @if($contactEmail)
+                            <div class="contact-item">
+                                <span class="contact-dot"></span>
+                                <div>
+                                    <div class="fw-semibold">Correo</div>
+                                    <div class="text-muted">{{ $contactEmail }}</div>
+                                </div>
+                            </div>
+                        @endif
+                        @if($contactAddress)
+                            <div class="contact-item">
+                                <span class="contact-dot"></span>
+                                <div>
+                                    <div class="fw-semibold">Dirección</div>
+                                    <div class="text-muted">{{ $contactAddress }}</div>
+                                </div>
+                            </div>
+                        @endif
+                        @if(! $contactPhone && ! $contactEmail && ! $contactAddress)
+                            <div class="text-muted">Agrega los datos de contacto de tu clínica para mostrarlos aquí.</div>
                         @endif
                     </div>
-                @endforeach
+                </div>
             </div>
+
+            @if($cliente && $proximasReservas->isNotEmpty())
+                <div class="card card-soft mb-4">
+                    <div class="card-body p-4">
+                        <h3 class="section-title mb-3">Tus próximas solicitudes</h3>
+                        @foreach($proximasReservas as $reserva)
+                            <div class="timeline-item">
+                                <h4 class="h6 mb-1">{{ $reserva->tipo ?? 'Reserva' }} · {{ \Carbon\Carbon::parse($reserva->fecha)->format('d/m/Y H:i') }}</h4>
+                                <p class="mb-1 text-muted">Estado: <strong>{{ $reserva->estado }}</strong> · Duración: {{ $reserva->duracion }} minutos</p>
+                                @if($reserva->nota_cliente)
+                                    <p class="mb-0 small">Nota: {{ $reserva->nota_cliente }}</p>
+                                @endif
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+            @endif
+
         </div>
-    @endif
+    </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
