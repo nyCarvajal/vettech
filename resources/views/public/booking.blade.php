@@ -199,7 +199,7 @@
                         <span class="badge-soft">Citas en línea 24/7</span>
                     </div>
                     <h1 class="fw-bold mb-2">Bienvenido a {{ $clinica->nombre }}</h1>
-                    <p class="mb-0 text-dark-emphasis">Un espacio diseñado para el bienestar de tu familia multiespecie. Gestiona tus citas, mascotas y documentos clínicos en un solo lugar.</p>
+                    <p class="mb-0 text-dark-emphasis">Un espacio diseñado para el bienestar de tu familia multiespecie. Reserva una cita al instante y accede a las mascotas registradas desde tu cuenta.</p>
                 </div>
             </div>
         </div>
@@ -342,7 +342,11 @@
                         <div class="badge-soft">{{ $pets->count() }} mascotas</div>
                     </div>
 
-                    @if($pets->isEmpty())
+                    @if(! $cliente)
+                        <div class="text-muted">
+                            Inicia sesión para ver tus mascotas, el carnet de vacunas, desparasitaciones y los documentos enviados por la clínica.
+                        </div>
+                    @elseif($pets->isEmpty())
                         <div class="text-muted">
                             Aún no hay mascotas vinculadas. Aquí aparecerán los pacientes registrados junto a su carnet de vacunas, desparasitaciones y documentos clínicos.
                         </div>
@@ -386,8 +390,8 @@
                                                 </div>
                                                 <div class="col-md-4">
                                                     <div class="mini-card">
-                                                        <h6 class="mb-2">Consentimientos</h6>
-                                                        <p class="text-muted mb-0">Control de consentimientos informados.</p>
+                                                        <h6 class="mb-2">Documentos enviados</h6>
+                                                        <p class="text-muted mb-0">Recetas, remisiones y consentimientos informados.</p>
                                                     </div>
                                                 </div>
                                             </div>
@@ -402,6 +406,45 @@
         </div>
 
         <div class="col-lg-4">
+            @if(! $cliente)
+                <div class="card card-soft mb-4">
+                    <div class="card-body p-4">
+                        <h3 class="section-title mb-2">Inicia sesión</h3>
+                        <p class="text-muted mb-3">Usa el correo y la contraseña creada por la clínica para ver tus mascotas y documentos.</p>
+                        <form method="POST" action="{{ route('public.booking.login', $clinica) }}">
+                            @csrf
+                            <div class="mb-3">
+                                <label class="form-label" for="login-email">Correo</label>
+                                <input type="email" class="form-control @if(($errors->login ?? null)?->has('correo')) is-invalid @endif" id="login-email" name="correo" value="{{ old('correo') }}" required>
+                                @if(($errors->login ?? null)?->has('correo'))
+                                    <div class="invalid-feedback">{{ $errors->login->first('correo') }}</div>
+                                @endif
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label" for="login-password">Contraseña</label>
+                                <input type="password" class="form-control @if(($errors->login ?? null)?->has('password')) is-invalid @endif" id="login-password" name="password" required>
+                                @if(($errors->login ?? null)?->has('password'))
+                                    <div class="invalid-feedback">{{ $errors->login->first('password') }}</div>
+                                @endif
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100">Entrar</button>
+                        </form>
+                    </div>
+                </div>
+            @endif
+            @if($cliente)
+                <div class="card card-soft mb-4">
+                    <div class="card-body p-4">
+                        <h3 class="section-title mb-2">Tu cuenta</h3>
+                        <p class="text-muted mb-3">Sesión activa para {{ $cliente->correo ?? 'tu cuenta' }}.</p>
+                        <form method="POST" action="{{ route('public.booking.logout', $clinica) }}">
+                            @csrf
+                            <button type="submit" class="btn btn-outline-secondary w-100">Cerrar sesión</button>
+                        </form>
+                    </div>
+                </div>
+            @endif
+
             <div class="card card-soft mb-4">
                 <div class="card-body p-4">
                     <h3 class="section-title mb-3">Información de contacto</h3>
