@@ -294,6 +294,7 @@
                 </div>
             </div>
 
+        </div>
 
         <div class="col-lg-4">
             @if(! $cliente)
@@ -369,47 +370,6 @@
                         @if(! $contactPhone && ! $contactEmail && ! $contactAddress)
                             <div class="text-muted">Agrega los datos de contacto de tu clínica para mostrarlos aquí.</div>
                         @endif
-                        @if($contactEmail)
-                            <div class="contact-item">
-                                <span class="contact-dot"></span>
-                                <div>
-                                    <div class="fw-semibold">Correo</div>
-                                    <div class="text-muted">{{ $contactEmail }}</div>
-                                </div>
-                            </div>
-                        @endif
-                        @if($contactAddress)
-                            <div class="contact-item">
-                                <span class="contact-dot"></span>
-                                <div>
-                                    <div class="fw-semibold">Dirección</div>
-                                    <div class="text-muted">{{ $contactAddress }}</div>
-                                </div>
-                            </div>
-                        @endif
-                        @if(! $contactPhone && ! $contactEmail && ! $contactAddress)
-                            <div class="text-muted">Agrega los datos de contacto de tu clínica para mostrarlos aquí.</div>
-                        @endif
-                        @if(! $contactPhone && ! $contactEmail && ! $contactAddress)
-                            <div class="text-muted">Agrega los datos de contacto de tu clínica para mostrarlos aquí.</div>
-                        @endif
-                    </div>
-                </div>
-            </div>
-
-            @if($cliente && $proximasReservas->isNotEmpty())
-                <div class="card card-soft mb-4">
-                    <div class="card-body p-4">
-                        <h3 class="section-title mb-3">Tus próximas solicitudes</h3>
-                        @foreach($proximasReservas as $reserva)
-                            <div class="timeline-item">
-                                <h4 class="h6 mb-1">{{ $reserva->tipo ?? 'Reserva' }} · {{ \Carbon\Carbon::parse($reserva->fecha)->format('d/m/Y H:i') }}</h4>
-                                <p class="mb-1 text-muted">Estado: <strong>{{ $reserva->estado }}</strong> · Duración: {{ $reserva->duracion }} minutos</p>
-                                @if($reserva->nota_cliente)
-                                    <p class="mb-0 small">Nota: {{ $reserva->nota_cliente }}</p>
-                                @endif
-                            </div>
-                        @endforeach
                     </div>
                 </div>
             </div>
