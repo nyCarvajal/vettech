@@ -5,8 +5,8 @@ Hola {{ $clinica->nombre }},
 
 Se ha registrado una nueva solicitud de cita desde la página pública.
 
-- **Cliente:** {{ trim($cliente->nombres . ' ' . ($cliente->apellidos ?? '')) }}
-- **Correo:** {{ $cliente->correo }}
+- **Tutor:** {{ $cliente->name }}
+- **Correo:** {{ $cliente->email }}
 - **Fecha y hora:** {{ \Carbon\Carbon::parse($reserva->fecha)->format('d/m/Y H:i') }}
 - **Duración:** {{ $reserva->duracion }} minutos
 - **Tipo:** {{ $reserva->tipo ?? 'Reserva' }}
