@@ -151,6 +151,29 @@
             color: #5b4bc4;
             font-weight: 600;
         }
+        .pets-spotlight {
+            border: 2px solid rgba(91, 75, 196, 0.22);
+            box-shadow: 0 24px 50px rgba(91, 75, 196, 0.12);
+        }
+        .pets-spotlight .card-body {
+            padding: 1.75rem;
+        }
+        .booking-form-compact {
+            max-width: 92%;
+            margin-left: auto;
+        }
+        .booking-form-compact .card-body {
+            padding: 1rem 1.1rem;
+        }
+        .booking-form-compact .form-label {
+            font-size: 0.82rem;
+            margin-bottom: 0.25rem;
+        }
+        .booking-form-compact .form-control,
+        .booking-form-compact .form-select {
+            padding: 0.4rem 0.55rem;
+            font-size: 0.9rem;
+        }
         @media (max-width: 992px) {
             .hero {
                 padding: 2rem;
@@ -158,6 +181,9 @@
             .hero-logo {
                 width: 90px;
                 height: 90px;
+            }
+            .booking-form-compact {
+                max-width: 100%;
             }
         }
     </style>
@@ -208,15 +234,15 @@
     @endphp
 
     <div class="row g-4">
-        <div class="col-lg-8">
-            <div class="card card-soft mb-4">
+        <div class="col-lg-8 d-flex flex-column">
+            <div class="card card-soft mb-4 booking-form-compact order-2">
                 <div class="card-body p-4">
                     <div class="d-flex justify-content-between flex-wrap gap-3 align-items-center mb-3">
                         <div>
-                            <h2 class="section-title mb-1">Solicita tu cita</h2>
-                            <p class="text-muted mb-0">Selecciona fecha, hora y el profesional que acompañará a tu mascota.</p>
+                            <h2 class="section-title mb-1">Reserva rápida</h2>
+                            <p class="text-muted mb-0 small">Selecciona mascota, fecha y hora.</p>
                         </div>
-                        <div class="badge-soft">Agenda rápida</div>
+                        <div class="badge-soft">Express</div>
                     </div>
                     <form method="POST" action="{{ route('public.booking.appointment', $clinica) }}">
                         @csrf
@@ -324,9 +350,12 @@
             </div>
 
             @if($cliente)
-                <div class="card card-soft mb-4">
+                <div class="card card-soft mb-4 pets-spotlight order-1">
                     <div class="card-body p-4">
-                        <h3 class="section-title mb-3">Mis mascotas</h3>
+                        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+                            <h3 class="section-title mb-0">Mis mascotas</h3>
+                            <span class="pet-chip">{{ $patientProfiles->count() }} registradas</span>
+                        </div>
 
                         @if($patientProfiles->isEmpty())
                             <p class="text-muted mb-0">No hay mascotas asociadas a tu cuenta.</p>
