@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     @php
-        $primaryColor = $clinica->color ?? '#5e4cfa';
+        $primaryColor = $clinica->primary_color ?? $clinica->color ?? '#5e4cfa';
         $primaryHex = ltrim($primaryColor, '#');
         if (strlen($primaryHex) === 3) {
             $primaryHex = sprintf('%s%s%s%s%s%s', $primaryHex[0], $primaryHex[0], $primaryHex[1], $primaryHex[1], $primaryHex[2], $primaryHex[2]);
@@ -25,7 +25,7 @@
         $signatureText = $professional?->firma_medica_texto;
     @endphp
     <style>
-        @page { margin: 20px 24px; }
+        @page { size: letter; margin: 8mm 8mm; }
         :root {
             --primary: {{ $primaryColor }};
             --primary-rgb: {{ $primaryRgb }};
@@ -39,8 +39,8 @@
         body {
             font-family: 'DejaVu Sans', sans-serif;
             color: var(--ink);
-            font-size: 12px;
-            line-height: 1.45;
+            font-size: 11.5px;
+            line-height: 1.4;
             background: #fff;
         }
         .card {
@@ -52,26 +52,26 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: 16px;
-            padding: 16px 18px;
+            gap: 10px;
+            padding: 8px 10px;
             background: var(--primary);
             color: #fff;
         }
         .header-main {
             display: flex;
             align-items: center;
-            gap: 14px;
+            gap: 12px;
             min-width: 0;
             flex: 1 1 auto;
         }
         .brand-mark {
-            width: 52px;
-            height: 52px;
+            width: 80px;
+            height: 80px;
             border-radius: 12px;
             background: #fff;
             display: grid;
             place-items: center;
-            margin-right: 14px;
+            margin-right: 8px;
             overflow: hidden;
         }
         .brand-mark img {
@@ -87,8 +87,8 @@
             text-align: right;
             display: flex;
             flex-direction: column;
-            gap: 4px;
-            min-width: 180px;
+            gap: 3px;
+            min-width: 130px;
             flex: 0 1 40%;
         }
         .clinic-details strong {
@@ -101,8 +101,8 @@
             line-height: 1.3;
             word-break: break-word;
         }
-        .header h1 { margin: 0; font-size: 18px; letter-spacing: 0.2px; }
-        .header p { margin: 2px 0 0; color: rgba(255,255,255,0.82); font-size: 11px; }
+        .header h1 { margin: 0; font-size: 17px; letter-spacing: 0.2px; }
+        .header p { margin: 2px 0 0; color: rgba(255,255,255,0.82); font-size: 10.5px; }
         .meta-row {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -114,13 +114,13 @@
         .meta-card {
             border: 1px solid var(--line);
             border-radius: 10px;
-            padding: 10px 12px;
+            padding: 8px 10px;
             background: #fff;
         }
         .meta-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.6px; color: var(--muted); margin-bottom: 4px; }
         .meta-value { font-weight: 600; font-size: 12px; color: var(--ink); }
         .section {
-            padding: 14px 18px 6px;
+            padding: 10px 12px 6px;
         }
         .section-title {
             font-size: 12px;
@@ -147,55 +147,89 @@
         .grid-two {
             display: grid;
             grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 10px;
+            gap: 6px;
         }
         .info-card {
             border: 1px solid var(--line);
             border-radius: 10px;
-            padding: 10px 12px;
+            padding: 8px 10px;
             background: #fff;
         }
         .info-card h3 { margin: 0 0 6px; font-size: 13px; color: var(--primary); }
         .info-table {
             width: 100%;
             border-collapse: collapse;
+            table-layout: fixed;
         }
-        .info-table td { padding: 4px 0; vertical-align: top; font-size: 12px; }
-        .info-table .label { color: var(--muted); width: 38%; }
+        .info-table td { padding: 2px 4px 2px 0; vertical-align: top; font-size: 11px; }
+        .info-table .label { color: var(--muted); width: 24%; white-space: nowrap; }
         .info-table .value { font-weight: 600; color: var(--ink); }
         .rx-block {
-            margin-top: 8px;
+            margin-top: 6px;
             border: 1px solid var(--line);
             border-radius: 10px;
             overflow: hidden;
         }
         .rx-head {
             background: linear-gradient(90deg, rgba(var(--primary-rgb), 0.12), rgba(68, 212, 183, 0.16));
-            padding: 10px 12px;
+            padding: 8px 12px;
             display: flex;
             align-items: center;
             gap: 8px;
             font-weight: 700;
             color: var(--ink);
         }
-        .rx-head span { color: var(--primary); font-size: 15px; }
-        .rx-table { width: 100%; border-collapse: collapse; }
-        .rx-table th { text-align: left; font-size: 11px; letter-spacing: 0.4px; text-transform: uppercase; color: var(--muted); padding: 8px 10px; background: #f9fafc; }
-        .rx-table td { padding: 8px 10px; border-top: 1px solid var(--line); font-size: 12px; vertical-align: top; }
+        .rx-head span { color: var(--primary); font-size: 14px; }
+        .rx-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+        .rx-table th { text-align: left; font-size: 10.5px; letter-spacing: 0.4px; text-transform: uppercase; color: var(--muted); padding: 7px 8px; background: #f9fafc; }
+        .rx-table td { padding: 7px 8px; border-top: 1px solid var(--line); font-size: 11.5px; vertical-align: top; }
+        .rx-table th,
+        .rx-table td {
+            overflow-wrap: anywhere;
+            word-break: break-word;
+        }
         .rx-table .name { font-weight: 700; color: var(--ink); }
         .rx-table .muted { color: var(--muted); font-weight: 500; }
+        .observations-block {
+            margin-top: 8px;
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            padding: 8px 10px;
+            background: #fff;
+        }
+        .observations-block .title {
+            margin: 0 0 4px;
+            font-size: 10.5px;
+            letter-spacing: 0.4px;
+            text-transform: uppercase;
+            color: var(--muted);
+            font-weight: 700;
+        }
+        .observations-block .content {
+            margin: 0;
+            white-space: pre-line;
+            color: var(--ink);
+            font-size: 11.5px;
+        }
         .footer {
-            margin-top: 12px;
-            padding: 12px 18px 16px;
+            margin-top: 10px;
+            padding: 10px 16px 14px;
             display: flex;
             align-items: center;
             justify-content: space-between;
             background: linear-gradient(110deg, rgba(var(--primary-rgb), 0.08), rgba(68, 212, 183, 0.08));
             border-top: 1px solid var(--line);
         }
-        .signature { margin-top: 28px; text-align: center; }
-        .signature img { max-height: 70px; object-fit: contain; display: block; margin: 0 auto 10px; }
-        .signature-line { height: 1px; background: var(--line); margin: 18px 0 8px; }
+        .signature { margin-top: 22px; text-align: center; }
+        .signature img { max-height: 64px; object-fit: contain; display: block; margin: 0 auto 8px; }
+        .signature-line { height: 1px; background: var(--line); margin: 14px 0 8px; }
+        .signature-text {
+            font-family: 'DejaVu Serif', 'Times New Roman', serif;
+            font-size: 18px;
+            color: var(--ink);
+            letter-spacing: 0.3px;
+            margin-bottom: 6px;
+        }
         .tiny { font-size: 10px; color: var(--muted); }
     </style>
 </head>
@@ -284,7 +318,10 @@
                             <td class="label">Nombre</td>
                             <td class="value">{{ trim(optional($prescription->historiaClinica?->paciente)->nombres . ' ' . optional($prescription->historiaClinica?->paciente)->apellidos) ?: 'N/D' }}</td>
                             <td class="label">Edad</td>
-                            <td class="value">{{ optional($prescription->historiaClinica?->paciente)->edad ?? 'N/D' }}</td>
+                            @php($patientAge = optional($prescription->historiaClinica?->paciente))
+                            <td class="value">
+                                {{ $patientAge?->age_value ? trim($patientAge->age_value . ' ' . ($patientAge->age_unit ?? '')) : ($patientAge?->edad ?? 'N/D') }}
+                            </td>
                         </tr>
                         <tr>
                             <td class="label">Especie</td>
@@ -344,17 +381,23 @@
                 </table>
             </div>
 
+            @if($prescription->observations)
+                <div class="observations-block">
+                    <p class="title">Observaciones generales</p>
+                    <p class="content">{{ $prescription->observations }}</p>
+                </div>
+            @endif
+
             <div class="signature">
                 @if ($signatureUrl)
                     <img src="{{ $signatureUrl }}" alt="Firma médica">
                 @endif
-                <div class="signature-line"></div>
-                <div style="font-weight:700;">{{ optional($prescription->professional)->name ?? 'Profesional N/D' }}</div>
                 @if ($signatureText)
-                    <div class="tiny">{{ $signatureText }}</div>
-                @else
-                    <div class="tiny">Firma y sello</div>
+                    <div class="signature-text">{{ $signatureText }}</div>
                 @endif
+                <div class="signature-line"></div>
+               
+                <div class="tiny">{{ $signatureText ? 'Firma' : 'Firma y sello' }}</div>
             </div>
         </div>
 
