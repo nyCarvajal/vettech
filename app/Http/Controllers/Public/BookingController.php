@@ -6,7 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Mail\ClienteVerificationMail;
 use App\Mail\NuevaReservaClinicaMail;
 use App\Models\Clinica;
+use App\Models\ClinicalAttachment;
 use App\Models\Owner;
+use App\Models\Patient;
 use App\Models\Reserva;
 use App\Models\Tipocita;
 use App\Models\User;
@@ -35,13 +37,19 @@ class BookingController extends Controller
         $tipocitas = Tipocita::orderBy('nombre')->get();
         $estilistas = $this->availableStylists($clinica);
         $proximasReservas = collect();
+        $patientProfiles = collect();
 
         $stylistLabels = $this->stylistLabels($clinica);
+
+        if ($cliente) {
+            $patientProfiles = $this->ownerPatients($cliente);
+        }
 
         if ($cliente && Schema::connection('tenant')->hasColumn('reservas', 'owner_id')) {
             $proximasReservas = Reserva::where('owner_id', $cliente->id)
                 ->orderBy('fecha')
                 ->whereDate('fecha', '>=', Carbon::today())
+                ->with('paciente')
                 ->take(5)
                 ->get();
         }
@@ -54,6 +62,7 @@ class BookingController extends Controller
             'defaultDuration' => self::DEFAULT_DURATION,
             'clinicaLogo' => $this->resolveLogoUrl($clinica),
             'estilistas' => $estilistas,
+            'patientProfiles' => $patientProfiles,
             'trainerLabelSingular' => $stylistLabels['singular'],
             'trainerLabelPlural' => $stylistLabels['plural'],
         ]);
@@ -188,6 +197,7 @@ class BookingController extends Controller
             'fecha' => ['required', 'date_format:Y-m-d'],
             'hora' => ['required', 'date_format:H:i'],
             'tipocita_id' => ['nullable', 'integer', 'exists:tipocita,id'],
+            'paciente_id' => ['nullable', 'integer'],
             'nota_cliente' => ['nullable', 'string', 'max:1000'],
             'entrenador_id' => [
                 'required',
@@ -240,6 +250,24 @@ class BookingController extends Controller
 
         $cliente->save();
 
+        $patientId = $data['paciente_id'] ?? null;
+        $ownerPatients = $this->ownerPatients($cliente);
+        if ($ownerPatients->isNotEmpty()) {
+            if (! $patientId) {
+                return redirect()
+                    ->route('public.booking.show', $clinica)
+                    ->withErrors(['paciente_id' => 'Selecciona la mascota para la reserva.'], 'appointment')
+                    ->withInput();
+            }
+
+            if (! $ownerPatients->firstWhere('id', (int) $patientId)) {
+                return redirect()
+                    ->route('public.booking.show', $clinica)
+                    ->withErrors(['paciente_id' => 'La mascota seleccionada no corresponde a tu cuenta.'], 'appointment')
+                    ->withInput();
+            }
+        }
+
         $inicio = Carbon::createFromFormat('Y-m-d H:i', $data['fecha'] . ' ' . $data['hora']);
         if ($inicio->isPast()) {
             return redirect()
@@ -282,6 +310,7 @@ class BookingController extends Controller
         $payload = [
             'fecha' => $inicio,
             'duracion' => $duracion,
+            'paciente_id' => $patientId,
             'estado' => 'Pendiente',
             'tipo' => $tipoCita?->nombre ?? 'Reserva',
             'nota_cliente' => $data['nota_cliente'] ?? null,
@@ -684,5 +713,41 @@ class BookingController extends Controller
     private function resolveLogoUrl(Clinica $clinica): string
     {
         return $clinica->resolvedLogoUrl();
+    }
+
+    private function ownerPatients(Owner $owner): Collection
+    {
+        if (! Schema::connection('tenant')->hasTable('pacientes') || ! Schema::connection('tenant')->hasColumn('pacientes', 'owner_id')) {
+            return collect();
+        }
+
+        $query = Patient::query()
+            ->where('owner_id', $owner->id)
+            ->with(['species', 'breed'])
+            ->orderBy('nombres');
+
+        if (Schema::connection('tenant')->hasTable('patient_immunizations')) {
+            $query->with(['immunizations' => fn ($q) => $q->latest('applied_at')->take(5)]);
+        }
+
+        if (Schema::connection('tenant')->hasTable('patient_dewormings')) {
+            $query->with(['dewormings' => fn ($q) => $q->latest('applied_at')->take(5)]);
+        }
+
+        $patients = $query->get();
+
+        if (Schema::connection('tenant')->hasTable('clinical_attachments') && $patients->isNotEmpty()) {
+            $attachments = ClinicalAttachment::query()
+                ->whereIn('paciente_id', $patients->pluck('id'))
+                ->latest('created_at')
+                ->get()
+                ->groupBy('paciente_id');
+
+            $patients->each(function (Patient $patient) use ($attachments) {
+                $patient->setRelation('publicAttachments', $attachments->get($patient->id, collect())->take(5));
+            });
+        }
+
+        return $patients;
     }
 }

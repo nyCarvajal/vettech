@@ -10,6 +10,7 @@
     $ownerName = trim((string) ($cliente->name ?? ''));
     $ownerFirstName = $ownerName !== '' ? \Illuminate\Support\Str::before($ownerName, ' ') : '';
     $ownerLastName = $ownerName !== '' ? trim(\Illuminate\Support\Str::after($ownerName, ' ')) : '';
+    $patientProfiles = $patientProfiles ?? collect();
 @endphp
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -135,6 +136,20 @@
         }
         .timeline-item:last-child::after {
             display: none;
+        }
+        .pet-card {
+            border: 1px solid rgba(123, 109, 241, 0.2);
+            border-radius: 18px;
+            padding: 1rem;
+            background: #fff;
+        }
+        .pet-chip {
+            background: #f2edff;
+            border-radius: 999px;
+            padding: 0.25rem 0.7rem;
+            font-size: 0.78rem;
+            color: #5b4bc4;
+            font-weight: 600;
         }
         @media (max-width: 992px) {
             .hero {
@@ -281,6 +296,20 @@
                                     <div class="invalid-feedback">{{ $appointmentErrors->first('tipocita_id') }}</div>
                                 @endif
                             </div>
+                            <div class="col-md-6">
+                                <label class="form-label" for="appointment-patient">Mascota</label>
+                                <select class="form-select @if($appointmentErrors?->has('paciente_id')) is-invalid @endif" id="appointment-patient" name="paciente_id" @if($cliente && $patientProfiles->isNotEmpty()) required @endif>
+                                    <option value="">{{ $cliente ? 'Selecciona tu mascota' : 'Inicia sesión para seleccionar mascota' }}</option>
+                                    @foreach($patientProfiles as $pet)
+                                        <option value="{{ $pet->id }}" @selected((string) old('paciente_id') === (string) $pet->id)>
+                                            {{ $pet->display_name ?: ($pet->nombres ?? 'Mascota') }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @if($appointmentErrors?->has('paciente_id'))
+                                    <div class="invalid-feedback">{{ $appointmentErrors->first('paciente_id') }}</div>
+                                @endif
+                            </div>
                             <div class="col-12">
                                 <label class="form-label" for="appointment-note">Notas adicionales</label>
                                 <textarea class="form-control @if($appointmentErrors?->has('nota_cliente')) is-invalid @endif" id="appointment-note" name="nota_cliente" rows="3" placeholder="Cuéntanos detalles que debamos saber">{{ old('nota_cliente') }}</textarea>
@@ -293,6 +322,61 @@
                     </form>
                 </div>
             </div>
+
+            @if($cliente)
+                <div class="card card-soft mb-4">
+                    <div class="card-body p-4">
+                        <h3 class="section-title mb-3">Mis mascotas</h3>
+
+                        @if($patientProfiles->isEmpty())
+                            <p class="text-muted mb-0">No hay mascotas asociadas a tu cuenta.</p>
+                        @else
+                            <div class="d-grid gap-3">
+                                @foreach($patientProfiles as $pet)
+                                    <div class="pet-card">
+                                        <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-2">
+                                            <div>
+                                                <h5 class="mb-1">{{ $pet->display_name ?: ($pet->nombres ?? 'Mascota') }}</h5>
+                                                <div class="text-muted small">
+                                                    {{ $pet->species?->name ?? 'Especie' }} · {{ $pet->breed?->name ?? 'Raza' }} · {{ $pet->edad ?? 'Edad sin registro' }}
+                                                </div>
+                                            </div>
+                                            <span class="pet-chip">ID {{ $pet->id }}</span>
+                                        </div>
+
+                                        <div class="row g-2">
+                                            <div class="col-md-4">
+                                                <div class="small fw-semibold">Carnet de vacunación</div>
+                                                @forelse(($pet->immunizations ?? collect()) as $vaccine)
+                                                    <div class="small text-muted">• {{ $vaccine->vaccine_name ?? $vaccine->item_manual ?? 'Vacuna' }} ({{ optional($vaccine->applied_at)->format('d/m/Y') ?? 's/f' }})</div>
+                                                @empty
+                                                    <div class="small text-muted">Sin vacunas registradas.</div>
+                                                @endforelse
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="small fw-semibold">Desparasitación</div>
+                                                @forelse(($pet->dewormings ?? collect()) as $deworm)
+                                                    <div class="small text-muted">• {{ $deworm->item_manual ?? $deworm->type ?? 'Desparasitación' }} ({{ optional($deworm->applied_at)->format('d/m/Y') ?? 's/f' }})</div>
+                                                @empty
+                                                    <div class="small text-muted">Sin desparasitaciones registradas.</div>
+                                                @endforelse
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="small fw-semibold">Documentos enviados</div>
+                                                @forelse(($pet->publicAttachments ?? collect()) as $doc)
+                                                    <div class="small text-muted">• {{ $doc->titulo ?: 'Documento clínico' }}</div>
+                                                @empty
+                                                    <div class="small text-muted">Sin documentos disponibles.</div>
+                                                @endforelse
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                        @endif
+                    </div>
+                </div>
+            @endif
 
         </div>
 
