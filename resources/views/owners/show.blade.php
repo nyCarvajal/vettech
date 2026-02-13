@@ -59,7 +59,7 @@
                 <h5 class="mb-0">Mascotas</h5>
             </div>
             <div class="row g-3">
-                @forelse($owner->patients as $patient)
+                @forelse($patients as $patient)
                 <div class="col-md-6">
                     <div class="card h-100 shadow-sm border-0">
                         <div class="card-body d-flex gap-3">
@@ -74,10 +74,13 @@
                                     <span class="badge bg-light text-dark">{{ $patient->sexo }}</span>
                                     @endif
                                 </div>
-                                <div class="mt-2">
+                                <div class="mt-2 d-flex flex-wrap gap-2">
                                     <span class="badge bg-soft-primary text-primary">{{ $patient->edad ?? 'Edad N/D' }}</span>
                                     @if($patient->peso_formateado)
                                         <span class="badge bg-soft-secondary text-secondary">{{ $patient->peso_formateado }}</span>
+                                    @endif
+                                    @if($patient->owner_id !== $owner->id)
+                                        <span class="badge bg-soft-warning text-warning">Tutor secundario</span>
                                     @endif
                                 </div>
                                 <a href="{{ route('patients.show', $patient) }}" class="btn btn-sm btn-outline-primary mt-3">Abrir perfil</a>

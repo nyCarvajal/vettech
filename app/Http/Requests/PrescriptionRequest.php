@@ -17,6 +17,7 @@ class PrescriptionRequest extends FormRequest
             'patient_id' => 'required|integer',
             'professional_id' => 'required|exists:users,id',
             'status' => 'required|in:draft,signed,partial,done',
+            'observations' => 'nullable|string',
             'items' => 'required|array|min:1',
             'items.*.product_id' => 'required|exists:products,id',
             'items.*.dose' => 'required|string',
