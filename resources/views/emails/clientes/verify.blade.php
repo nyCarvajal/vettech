@@ -1,5 +1,5 @@
 @component('mail::message')
-# ¡Hola {{ $cliente->nombres }}!
+# ¡Hola {{ $cliente->name }}!
 
 Gracias por registrarte en **{{ $clinica->nombre }}**.
 

@@ -2,8 +2,8 @@
 
 namespace App\Mail;
 
-use App\Models\Cliente;
 use App\Models\Clinica;
+use App\Models\Owner;
 use App\Models\Reserva;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
@@ -15,7 +15,7 @@ class NuevaReservaClinicaMail extends Mailable
 
     public function __construct(
         public Clinica $clinica,
-        public Cliente $cliente,
+        public Owner $cliente,
         public Reserva $reserva
     ) {
     }
