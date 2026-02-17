@@ -134,6 +134,7 @@ class PatientsController extends Controller
             'type' => $request->string('tipo')->toString(),
             'from' => $request->date('desde'),
             'to' => $request->date('hasta'),
+            'perPage' => 10,
         ];
 
         $timeline = $this->timelineService->forPatient($patient, $filters);

@@ -664,6 +664,21 @@
             </form>
 
             <div class="history-list">
+                @php
+                    $historiaCampos = [
+                        'motivo_consulta' => 'Motivo',
+                        'enfermedad_actual' => 'Enfermedad actual',
+                        'analisis' => 'Análisis',
+                        'plan_procedimientos' => 'Plan de procedimientos',
+                        'plan_medicamentos' => 'Plan de medicamentos',
+                        'temperatura' => 'Temperatura',
+                        'peso' => 'Peso',
+                        'frecuencia_cardiaca' => 'Frec. cardiaca',
+                        'frecuencia_respiratoria' => 'Frec. respiratoria',
+                        'estado_mental' => 'Estado mental',
+                        'dolor' => 'Dolor',
+                    ];
+                @endphp
                 @forelse($timeline as $event)
                     <div class="history-item">
                         <div class="history-date">
@@ -676,12 +691,39 @@
                                 <h5 class="history-title mb-0">{{ $event['title'] }}</h5>
                             </div>
                             <p class="history-meta mb-0">{{ $event['summary'] }}</p>
-                            @if(!empty($event['meta']))
+                            @if($event['type'] === 'historia' && isset($event['record']) && $event['record'])
+                                @php
+                                    $historiaDetalle = collect($historiaCampos)
+                                        ->map(function ($label, $campo) use ($event) {
+                                            $valor = data_get($event['record'], $campo);
+
+                                            if (is_string($valor)) {
+                                                $valor = trim($valor);
+                                            }
+
+                                            if ($valor === null || $valor === '') {
+                                                return null;
+                                            }
+
+                                            return $label.': '.$valor;
+                                        })
+                                        ->filter()
+                                        ->values()
+                                        ->take(6)
+                                        ->join(' · ');
+                                @endphp
+                                @if($historiaDetalle !== '')
+                                    <p class="history-meta mb-0">{{ $historiaDetalle }}</p>
+                                @endif
+                            @elseif(!empty($event['meta']))
                                 <p class="history-meta mb-0">{{ collect($event['meta'])->filter()->map(fn($v, $k) => ucfirst($k).': '.$v)->join(' · ') }}</p>
                             @endif
                         </div>
-                        <div class="history-actions">
-                            @if($event['url'])
+                        <div class="history-actions d-flex flex-column align-items-end gap-2">
+                            @if($event['type'] === 'historia' && isset($event['record']) && $event['record'])
+                                <a href="{{ route('historias-clinicas.recetarios.create', $event['record']) }}">Añadir receta</a>
+                                <a href="{{ route('historias-clinicas.remisiones.create', $event['record']) }}">Añadir remisión</a>
+                            @elseif($event['url'])
                                 <a href="{{ $event['url'] }}">Ver detalle</a>
                             @endif
                         </div>
@@ -692,7 +734,11 @@
             </div>
         </div>
         @if($timeline instanceof \Illuminate\Pagination\LengthAwarePaginator)
-            <div class="card-footer bg-white">{{ $timeline->withQueryString()->links() }}</div>
+            <div class="card-footer bg-white d-flex justify-content-end">
+                @if($timeline->hasMorePages())
+                    <a href="{{ $timeline->nextPageUrl() }}" class="pill-action">Ver más</a>
+                @endif
+            </div>
         @endif
     </div>
 </div>
