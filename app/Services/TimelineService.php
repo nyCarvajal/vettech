@@ -93,6 +93,7 @@ class TimelineService
                     'title' => 'Historia clínica',
                     'summary' => $historia->motivo_consulta ?: 'Consulta clínica',
                     'url' => route('historias-clinicas.show', $historia),
+                    'record' => $historia,
                     'meta' => [
                         'antecedentes' => $historia->enfermedad_actual,
                         'plan' => $historia->plan_medicamentos,
