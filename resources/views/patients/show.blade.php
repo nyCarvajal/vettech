@@ -338,6 +338,65 @@
         font-size: 0.75rem;
     }
 
+
+    .history-clinical-details {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 0.4rem;
+        margin-top: 0.6rem;
+    }
+
+    .history-clinical-chip {
+        display: flex;
+        flex-direction: column;
+        gap: 0.1rem;
+        padding: 0.4rem 0.55rem;
+        border-radius: 10px;
+        border: 1px solid #edf0f7;
+        background: #fafbff;
+    }
+
+    .history-clinical-chip small {
+        color: #64748b;
+        font-size: 0.72rem;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+        line-height: 1.1;
+    }
+
+    .history-clinical-chip span {
+        color: var(--ink-900);
+        font-weight: 600;
+        font-size: 0.86rem;
+        line-height: 1.25;
+        word-break: break-word;
+    }
+
+    .history-actions {
+        min-width: 170px;
+    }
+
+    .history-action-link {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.35rem 0.75rem;
+        border-radius: 9999px;
+        border: 1px solid rgba(124, 111, 242, 0.3);
+        background: #f8f7ff;
+        color: var(--lavender-600);
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.82rem;
+        line-height: 1.2;
+        transition: all 0.2s ease;
+    }
+
+    .history-action-link:hover {
+        background: #f1edff;
+        border-color: rgba(124, 111, 242, 0.45);
+    }
+
     @media (max-width: 1100px) {
         .grid-panels {
             grid-template-columns: 1fr;
@@ -705,15 +764,24 @@
                                                 return null;
                                             }
 
-                                            return $label.': '.$valor;
+                                            return [
+                                                'label' => $label,
+                                                'value' => $valor,
+                                            ];
                                         })
                                         ->filter()
                                         ->values()
-                                        ->take(6)
-                                        ->join(' · ');
+                                        ->take(6);
                                 @endphp
-                                @if($historiaDetalle !== '')
-                                    <p class="history-meta mb-0">{{ $historiaDetalle }}</p>
+                                @if($historiaDetalle->isNotEmpty())
+                                    <div class="history-clinical-details">
+                                        @foreach($historiaDetalle as $detalle)
+                                            <div class="history-clinical-chip">
+                                                <small>{{ $detalle['label'] }}</small>
+                                                <span>{{ $detalle['value'] }}</span>
+                                            </div>
+                                        @endforeach
+                                    </div>
                                 @endif
                             @elseif(!empty($event['meta']))
                                 <p class="history-meta mb-0">{{ collect($event['meta'])->filter()->map(fn($v, $k) => ucfirst($k).': '.$v)->join(' · ') }}</p>
@@ -721,10 +789,10 @@
                         </div>
                         <div class="history-actions d-flex flex-column align-items-end gap-2">
                             @if($event['type'] === 'historia' && isset($event['record']) && $event['record'])
-                                <a href="{{ route('historias-clinicas.recetarios.create', $event['record']) }}">Añadir receta</a>
-                                <a href="{{ route('historias-clinicas.remisiones.create', $event['record']) }}">Añadir remisión</a>
+                                <a href="{{ route('historias-clinicas.recetarios.create', $event['record']) }}" class="history-action-link">Añadir receta</a>
+                                <a href="{{ route('historias-clinicas.remisiones.create', $event['record']) }}" class="history-action-link">Añadir remisión</a>
                             @elseif($event['url'])
-                                <a href="{{ $event['url'] }}">Ver detalle</a>
+                                <a href="{{ $event['url'] }}" class="history-action-link">Ver detalle</a>
                             @endif
                         </div>
                     </div>
