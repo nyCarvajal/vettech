@@ -143,6 +143,39 @@
                         <input type="text" name="address" value="{{ old('address', $owner->address) }}" class="form-control" placeholder="Calle, número y ciudad">
                     </div>
 
+                    <div class="col-md-6">
+                        <div class="p-3 rounded-3 border mint-border h-100">
+                            <div class="d-flex align-items-center gap-2 mb-2">
+                                <span class="badge accent-badge">Acceso del tutor</span>
+                                <span class="text-muted small">Contraseña del portal público</span>
+                            </div>
+                            <div class="row g-2">
+                                <div class="col-md-6">
+                                    <label class="form-label mb-1">Password</label>
+                                    <input type="password" name="password" class="form-control" minlength="8" placeholder="Mínimo 8 caracteres">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label mb-1">Confirmar password</label>
+                                    <input type="password" name="password_confirmation" class="form-control" minlength="8" placeholder="Repite la contraseña">
+                                </div>
+                                <div class="col-12">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" value="1" id="generate_random_password" name="generate_random_password" checked>
+                                        <label class="form-check-label" for="generate_random_password">
+                                            Generar contraseña aleatoria automáticamente
+                                        </label>
+                                    </div>
+                                    <div class="form-check mt-1">
+                                        <input class="form-check-input" type="checkbox" value="1" id="send_credentials" name="send_credentials" checked>
+                                        <label class="form-check-label" for="send_credentials">
+                                            Enviar usuario y contraseña al correo del tutor
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="col-md-3">
                         <label class="form-label">Departamento</label>
                         <select name="departamento_id" id="departamento_id" class="form-select">
@@ -183,6 +216,9 @@
 
         const departamentoSelect = document.getElementById('departamento_id');
         const municipioSelect = document.getElementById('municipio_id');
+        const generatePasswordToggle = document.getElementById('generate_random_password');
+        const passwordInput = document.querySelector('input[name="password"]');
+        const passwordConfirmationInput = document.querySelector('input[name="password_confirmation"]');
         let selectedMunicipioId = '{{ $selectedMunicipioId }}';
 
         function renderMunicipios() {
@@ -219,6 +255,22 @@
         municipioSelect.addEventListener('change', () => {
             selectedMunicipioId = municipioSelect.value;
         });
+
+        if (generatePasswordToggle && passwordInput && passwordConfirmationInput) {
+            const syncPasswordFields = () => {
+                const disabled = generatePasswordToggle.checked;
+                passwordInput.disabled = disabled;
+                passwordConfirmationInput.disabled = disabled;
+
+                if (disabled) {
+                    passwordInput.value = '';
+                    passwordConfirmationInput.value = '';
+                }
+            };
+
+            generatePasswordToggle.addEventListener('change', syncPasswordFields);
+            syncPasswordFields();
+        }
 
         renderMunicipios();
     });
