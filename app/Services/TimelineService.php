@@ -80,7 +80,8 @@ class TimelineService
         }
 
         if (! $typeFilter || $typeFilter === 'historia') {
-            $historias = HistoriaClinica::where('paciente_id', $patient->id)
+            $historias = HistoriaClinica::with('prescriptions:id,historia_clinica_id,created_at,status')
+                ->where('paciente_id', $patient->id)
                 ->when($from, fn ($q) => $q->whereDate('created_at', '>=', $from))
                 ->when($to, fn ($q) => $q->whereDate('created_at', '<=', $to))
                 ->orderByDesc('created_at')
@@ -93,6 +94,8 @@ class TimelineService
                     'title' => 'Historia clínica',
                     'summary' => $historia->motivo_consulta ?: 'Consulta clínica',
                     'url' => route('historias-clinicas.show', $historia),
+                    'record' => $historia,
+                    'prescription' => $historia->prescriptions->first(),
                     'meta' => [
                         'antecedentes' => $historia->enfermedad_actual,
                         'plan' => $historia->plan_medicamentos,
