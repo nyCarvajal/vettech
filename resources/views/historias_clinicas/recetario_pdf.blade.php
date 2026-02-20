@@ -396,7 +396,7 @@
                 @endif
                 <div class="signature-line"></div>
                
-                <div class="tiny">{{ $signatureText ? 'Firma' : 'Firma y sello' }}</div>
+                <div class="tiny">{{ $signatureText ? 'Firma Medico Veterinario' : 'Firma y sello' }}</div>
             </div>
         </div>
 
