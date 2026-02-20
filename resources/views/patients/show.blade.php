@@ -372,6 +372,11 @@
         word-break: break-word;
     }
 
+    .history-clinical-chip--recipe {
+        background: #eefcf5;
+        border-color: #c9f2dd;
+    }
+
     .history-actions {
         min-width: 170px;
     }
@@ -773,7 +778,7 @@
                                         ->values()
                                         ->take(6);
                                 @endphp
-                                @if($historiaDetalle->isNotEmpty())
+                                @if($historiaDetalle->isNotEmpty() || !empty($event['prescription']))
                                     <div class="history-clinical-details">
                                         @foreach($historiaDetalle as $detalle)
                                             <div class="history-clinical-chip">
@@ -781,6 +786,13 @@
                                                 <span>{{ $detalle['value'] }}</span>
                                             </div>
                                         @endforeach
+
+                                        @if(!empty($event['prescription']))
+                                            <div class="history-clinical-chip history-clinical-chip--recipe">
+                                                <small>Receta</small>
+                                                <span>Recetario #{{ $event['prescription']->id }}</span>
+                                            </div>
+                                        @endif
                                     </div>
                                 @endif
                             @elseif(!empty($event['meta']))
@@ -789,9 +801,13 @@
                         </div>
                         <div class="history-actions d-flex flex-column align-items-end gap-2">
                             @if($event['type'] === 'historia' && isset($event['record']) && $event['record'])
+                                @if(!empty($event['prescription']))
+                                    <a href="{{ route('historias-clinicas.recetarios.print', $event['prescription']) }}" class="history-action-link">Ver receta</a>
+                                @endif
                                 <a href="{{ route('historias-clinicas.recetarios.create', $event['record']) }}" class="history-action-link">Añadir receta</a>
                                 <a href="{{ route('historias-clinicas.remisiones.create', $event['record']) }}" class="history-action-link">Añadir remisión</a>
-                            @elseif($event['url'])
+                            @endif
+                            @if($event['url'])
                                 <a href="{{ $event['url'] }}" class="history-action-link">Ver detalle</a>
                             @endif
                         </div>
