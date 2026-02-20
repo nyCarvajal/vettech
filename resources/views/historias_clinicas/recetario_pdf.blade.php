@@ -294,8 +294,7 @@
                     <table class="info-table">
                         <tr>
                             <td class="label">Documento</td>
-                            <td class="value">{{ optional(optional($prescription->historiaClinica?->paciente)->owner)->document_type ?? 'N/D' }}</td>
-                            <td class="value">{{ optional(optional($prescription->historiaClinica?->paciente)->owner)->document ?? 'N/D' }}</td>
+                            <td class="value">{{ optional(optional($prescription->historiaClinica?->paciente)->owner)->document_type ?? 'N/D' }} {{ optional(optional($prescription->historiaClinica?->paciente)->owner)->document ?? 'N/D' }}</td>
                         </tr>
                         <tr>
                             <td class="label">Nombre</td>
@@ -397,7 +396,7 @@
                 @endif
                 <div class="signature-line"></div>
                
-                <div class="tiny">{{ $signatureText ? 'Firma' : 'Firma y sello' }}</div>
+                <div class="tiny">{{ $signatureText ? 'Firma Medico Veterinario' : 'Firma y sello' }}</div>
             </div>
         </div>
 
