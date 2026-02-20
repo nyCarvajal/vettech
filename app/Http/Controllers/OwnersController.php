@@ -120,7 +120,7 @@ class OwnersController extends Controller
 
         $plainPassword = null;
         if ($request->boolean('generate_random_password')) {
-            $plainPassword = Str::password(10);
+            $plainPassword = Str::password(10)->toString();
             $data['password'] = $plainPassword;
             $data['email_verified_at'] = now();
         } elseif ($request->filled('password')) {
@@ -150,7 +150,7 @@ class OwnersController extends Controller
     private function resolveOwnerPassword(OwnerRequest $request): string
     {
         if ($request->boolean('generate_random_password') || ! $request->filled('password')) {
-            return Str::password(10);
+            return Str::password(10)->toString();
         }
 
         return $request->string('password')->toString();

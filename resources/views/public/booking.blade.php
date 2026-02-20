@@ -280,7 +280,7 @@
                                                 $estilistaId = end($idParts) ?: reset($idParts);
                                             }
                                         @endphp
-                                        <option value="{{ $estilistaId }}" @selected((string) $defaultStylistId === (string) $estilistaId)>{{ trim($estilista->nombre . ' ' . ($estilista->apellidos ?? '')) }}</option>
+                                        <option value="{{ $estilistaId }}" @selected((string) $defaultStylistId === (string) $estilistaId)>{{ $estilista->name ?? trim(($estilista->nombres ?? $estilista->nombre ?? '') . ' ' . ($estilista->apellidos ?? '')) }}</option>
                                     @endforeach
                                 </select>
                                 @if(($estilistas ?? collect())->isEmpty())
