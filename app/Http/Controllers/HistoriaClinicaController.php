@@ -5,12 +5,15 @@ namespace App\Http\Controllers;
 use App\Models\ExamReferral;
 use App\Models\HistoriaClinica;
 use App\Models\Paciente;
+use App\Models\User;
 use App\Models\Prescription;
 use App\Models\PrescriptionItem;
 use App\Models\Product;
 use App\Services\BillingService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Barryvdh\DomPDF\Facade\Pdf;
 
 class HistoriaClinicaController extends Controller
@@ -57,7 +60,7 @@ class HistoriaClinicaController extends Controller
     {
         $historiaClinica->load(['paraclinicos', 'diagnosticos', 'paciente.owner']);
 
-        $prescriptions = Prescription::with(['items.product', 'professional'])
+        $prescriptions = Prescription::with(['items.product'])
             ->where('historia_clinica_id', $historiaClinica->id)
             ->latest()
             ->get();
@@ -173,9 +176,10 @@ class HistoriaClinicaController extends Controller
             'items.*.duration_days' => ['nullable', 'integer', 'min:1'],
             'items.*.instructions' => ['nullable', 'string'],
             'items.*.qty_requested' => ['required', 'numeric', 'min:1'],
+            'observations' => ['nullable', 'string'],
         ]);
 
-        $this->persistRecetario($historiaClinica, $data['items']);
+        $this->persistRecetario($historiaClinica, $data['items'], $data['observations'] ?? null);
 
         return redirect()->route('historias-clinicas.show', $historiaClinica)
             ->with('success', 'Recetario creado correctamente.');
@@ -194,6 +198,7 @@ class HistoriaClinicaController extends Controller
             'items.*.duration_days' => ['nullable', 'integer', 'min:1'],
             'items.*.instructions' => ['nullable', 'string'],
             'items.*.qty_requested' => ['required', 'numeric', 'min:1'],
+            'observations' => ['nullable', 'string'],
         ]);
 
         $historiaClinica = HistoriaClinica::where('paciente_id', $data['patient_id'])
@@ -207,7 +212,7 @@ class HistoriaClinicaController extends Controller
             ]);
         }
 
-        $this->persistRecetario($historiaClinica, $data['items']);
+        $this->persistRecetario($historiaClinica, $data['items'], $data['observations'] ?? null);
 
         return redirect()->route('historias-clinicas.show', $historiaClinica)
             ->with('success', 'Recetario creado correctamente.');
@@ -223,18 +228,65 @@ class HistoriaClinicaController extends Controller
 
     public function imprimirRecetario(Prescription $prescription)
     {
-        $prescription->load([
-            'items.product',
-            'historiaClinica.paciente.owner',
-            'historiaClinica.paciente.species',
-            'historiaClinica.paciente.breed',
-            'professional',
-        ]);
+        try {
+            $prescription->load([
+                'items.product',
+                'historiaClinica.paciente.owner',
+                'historiaClinica.paciente.species',
+                'historiaClinica.paciente.breed',
+            ]);
 
-        $pdf = Pdf::loadView('historias_clinicas.recetario_pdf', compact('prescription'))
-            ->setPaper([0, 0, 396, 612]);
+            $professional = $this->fetchProfessionalById($prescription->professional_id);
+            $prescription->setRelation('professional', $professional);
 
-        return $pdf->stream('recetario-' . $prescription->id . '.pdf');
+            $clinica = optional(Auth::user())->clinica;
+
+            $pdf = Pdf::loadView('historias_clinicas.recetario_pdf', compact('prescription', 'clinica'))
+                ->setPaper('letter');
+
+            return $pdf->stream('recetario-' . $prescription->id . '.pdf');
+        } catch (\Throwable $exception) {
+            $context = [
+                'prescription_id' => $prescription->id,
+                'user_id' => Auth::id(),
+                'message' => $exception->getMessage(),
+                'file' => $exception->getFile(),
+                'line' => $exception->getLine(),
+                'trace' => $exception->getTraceAsString(),
+            ];
+
+            Log::channel('single')->error('Error generando recetario PDF', $context);
+
+            @file_put_contents(
+                storage_path('logs/laravel.log'),
+                '[' . now()->toDateTimeString() . "] recetario_pdf_error " . json_encode($context) . PHP_EOL,
+                FILE_APPEND
+            );
+
+            throw $exception;
+        }
+    }
+
+    private function fetchProfessionalById(?int $professionalId): ?User
+    {
+        if (! $professionalId) {
+            return null;
+        }
+
+        $record = DB::connection('mysql')
+            ->table('users')
+            ->where('id', $professionalId)
+            ->first();
+
+        if (! $record) {
+            return null;
+        }
+
+        $user = new User();
+        $user->forceFill((array) $record);
+        $user->exists = true;
+
+        return $user;
     }
 
     public function createRemision(HistoriaClinica $historiaClinica)
@@ -252,7 +304,8 @@ class HistoriaClinicaController extends Controller
             'notes' => ['nullable', 'string'],
         ]);
 
-        $data['doctor_name'] = optional(Auth::user())->name ?: ($data['doctor_name'] ?? null);
+        $doctor = $this->fetchProfessionalById(Auth::id());
+        $data['doctor_name'] = $doctor?->name ?: ($data['doctor_name'] ?? null);
 
         ExamReferral::create($data + [
             'historia_clinica_id' => $historiaClinica->id,
@@ -269,7 +322,7 @@ class HistoriaClinicaController extends Controller
         $examReferral->load(['historiaClinica.paciente', 'author']);
 
         $pdf = Pdf::loadView('historias_clinicas.remision_pdf', compact('examReferral'))
-            ->setPaper([0, 0, 396, 612]);
+            ->setPaper('letter');
 
         return $pdf->stream('remision-' . $examReferral->id . '.pdf');
     }
@@ -286,13 +339,14 @@ class HistoriaClinicaController extends Controller
         ];
     }
 
-    private function persistRecetario(HistoriaClinica $historiaClinica, array $items): void
+    private function persistRecetario(HistoriaClinica $historiaClinica, array $items, ?string $observations = null): void
     {
         $prescription = Prescription::create([
             'historia_clinica_id' => $historiaClinica->id,
             'patient_id' => $historiaClinica->paciente_id,
             'professional_id' => Auth::id(),
             'status' => 'draft',
+            'observations' => $observations,
         ]);
 
         foreach ($items as $item) {
@@ -329,11 +383,25 @@ class HistoriaClinicaController extends Controller
             'antecedentes_ginecologicos' => ['nullable', 'string'],
             'antecedentes_familiares' => ['nullable', 'string'],
             'revision_sistemas' => ['nullable', 'string'],
+            'temperatura' => ['nullable', 'numeric', 'between:20,50'],
+            'peso' => ['nullable', 'numeric', 'between:0,200000'],
+            'trc' => ['nullable', 'string', 'max:20'],
+            'mucosas' => ['nullable', 'string', 'max:100'],
+            'hidratacion' => ['nullable', 'string', 'max:100'],
+            'condicion_corporal' => ['nullable', 'string', 'max:100'],
             'frecuencia_cardiaca' => ['nullable', 'integer', 'min:0'],
             'tension_arterial' => ['nullable', 'string', 'max:50'],
             'saturacion_oxigeno' => ['nullable', 'numeric', 'between:0,100'],
             'frecuencia_respiratoria' => ['nullable', 'integer', 'min:0'],
+            'estado_mental' => ['nullable', 'string'],
+            'postura' => ['nullable', 'string'],
+            'marcha' => ['nullable', 'string'],
+            'dolor' => ['nullable', 'string'],
             'examen_cabeza_cuello' => ['nullable', 'string'],
+            'examen_ojos' => ['nullable', 'string'],
+            'examen_oidos' => ['nullable', 'string'],
+            'examen_boca' => ['nullable', 'string'],
+            'examen_ganglios' => ['nullable', 'string'],
             'examen_torax' => ['nullable', 'string'],
             'examen_corazon' => ['nullable', 'string'],
             'examen_mama' => ['nullable', 'string'],

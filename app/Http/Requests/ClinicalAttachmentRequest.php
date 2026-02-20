@@ -15,15 +15,17 @@ class ClinicalAttachmentRequest extends FormRequest
 
     public function rules(): array
     {
+        $maxSize = config('clinical_attachments.max_size_kb', 20480);
+
         return [
             'titulo' => ['required', 'string', 'min:3', 'max:60'],
             'files' => ['required', 'array', 'min:1'],
             'files.*' => [
                 'required',
                 'file',
-                'max:10240',
-                'mimetypes:image/jpeg,image/png,image/webp,application/pdf,video/mp4,video/webm,video/quicktime',
-                'mimes:jpg,jpeg,png,webp,pdf,mp4,webm,mov',
+                'max:' . $maxSize,
+                'mimetypes:image/jpeg,image/png,image/webp,image/heic,image/heif,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/zip,application/x-zip-compressed,video/mp4,video/webm,video/quicktime',
+                'mimes:jpg,jpeg,png,webp,heic,heif,pdf,doc,docx,xls,xlsx,zip,mp4,webm,mov',
             ],
         ];
     }
@@ -31,7 +33,7 @@ class ClinicalAttachmentRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'files.*.max' => 'Cada archivo debe pesar máximo 10MB.',
+            'files.*.max' => 'Cada archivo supera el tamaño máximo permitido.',
             'files.*.mimetypes' => 'Tipo de archivo no permitido.',
             'files.*.mimes' => 'Extensión de archivo no permitida.',
         ];
@@ -63,7 +65,7 @@ class ClinicalAttachmentRequest extends FormRequest
             str_starts_with($mime, 'image/') => 'image',
             $mime === 'application/pdf' => 'pdf',
             str_starts_with($mime, 'video/') => 'video',
-            default => 'pdf',
+            default => 'document',
         };
     }
 }

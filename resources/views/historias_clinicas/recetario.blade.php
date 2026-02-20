@@ -94,6 +94,14 @@
             </div>
         </div>
 
+
+        <div class="card shadow-sm mb-3">
+            <div class="card-body">
+                <label class="form-label" for="observations">Observaciones generales</label>
+                <textarea id="observations" name="observations" class="form-control" rows="3" placeholder="Ej: recomendaciones generales para el tratamiento">{{ old('observations') }}</textarea>
+            </div>
+        </div>
+
         <div class="d-flex justify-content-between align-items-center">
             <button type="button" class="btn btn-outline-secondary" id="add-row"><i class="bi bi-plus-lg me-1"></i>Agregar otro medicamento</button>
             <div class="d-flex gap-2">
