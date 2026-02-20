@@ -19,6 +19,21 @@ class Owner extends BaseModel
         'municipio_id',
         'address',
         'notes',
+        'password',
+        'email_verified_at',
+        'verification_token',
+        'remember_token',
+    ];
+
+    protected $hidden = [
+        'password',
+        'remember_token',
+        'verification_token',
+    ];
+
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+        'password' => 'hashed',
     ];
 
     public function patients()
