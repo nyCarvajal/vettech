@@ -82,7 +82,7 @@ class TimelineService
         if (! $typeFilter || $typeFilter === 'historia') {
             $historias = HistoriaClinica::with([
                 'prescriptions' => fn ($query) => $query
-                    ->select(['id', 'historia_clinica_id', 'created_at', 'status'])
+                    ->select(['id', 'historia_clinica_id', 'professional_id', 'created_at', 'status'])
                     ->latest()
                     ->with([
                         'items' => fn ($itemsQuery) => $itemsQuery
@@ -95,6 +95,7 @@ class TimelineService
                                 'dose',
                                 'frequency',
                                 'duration_days',
+                                'qty_requested',
                             ])
                             ->with('product:id,name'),
                     ]),

@@ -392,6 +392,41 @@
         line-height: 1.3;
     }
 
+    .history-prescription-meta {
+        margin-top: 0.2rem;
+        display: block;
+        font-size: 0.78rem;
+        color: #166534;
+        opacity: 0.95;
+    }
+
+    .history-prescription-toolbar {
+        margin-top: 0.4rem;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.35rem;
+    }
+
+    .history-prescription-toolbar form {
+        margin: 0;
+    }
+
+    .history-prescription-action {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.2rem 0.55rem;
+        border-radius: 9999px;
+        border: 1px solid #86efac;
+        background: #ffffff;
+        color: #166534;
+        text-decoration: none;
+        font-size: 0.74rem;
+        font-weight: 600;
+        line-height: 1.2;
+        cursor: pointer;
+    }
+
     .history-actions {
         min-width: 170px;
     }
@@ -804,26 +839,34 @@
 
                                         @if(!empty($event['prescription']))
                                             @php
-                                                $prescriptionItems = $event['prescription']->items->take(2);
+                                                $prescription = $event['prescription'];
+                                                $prescriptionItems = $prescription->items->take(2);
                                             @endphp
                                             <div class="history-clinical-chip history-clinical-chip--recipe">
                                                 <small>Receta</small>
-                                                <span>Recetario #{{ $event['prescription']->id }}</span>
+                                                <span>Recetario #{{ $prescription->id }}</span>
+                                                <span class="history-prescription-meta">Profesional ID: {{ $prescription->professional_id ?? 'N/D' }}</span>
+
+                                                <div class="history-prescription-toolbar">
+                                                    <a href="{{ route('historias-clinicas.recetarios.print', $prescription) }}" class="history-prescription-action">Imprimir</a>
+                                                    <form method="post" action="{{ route('historias-clinicas.recetarios.whatsapp', $prescription) }}">
+                                                        @csrf
+                                                        <button type="submit" class="history-prescription-action">WhatsApp</button>
+                                                    </form>
+                                                    <form method="post" action="{{ route('historias-clinicas.recetarios.facturar', $prescription) }}">
+                                                        @csrf
+                                                        <button type="submit" class="history-prescription-action">Facturar</button>
+                                                    </form>
+                                                </div>
 
                                                 @if($prescriptionItems->isNotEmpty())
                                                     <div class="history-prescription-details">
                                                         @foreach($prescriptionItems as $item)
                                                             @php
                                                                 $medicationName = $item->manual_name ?: optional($item->product)->name ?: 'Medicamento';
-                                                                $medicationSpecs = collect([
-                                                                    $item->dose,
-                                                                    $item->frequency,
-                                                                    $item->duration_days ? $item->duration_days.' días' : null,
-                                                                ])->filter()->join(' · ');
+                                                                $qty = $item->qty_requested ? ' (' . $item->qty_requested . ')' : '';
                                                             @endphp
-                                                            <span class="history-prescription-item">
-                                                                {{ $medicationName }}@if($medicationSpecs !== '') — {{ $medicationSpecs }}@endif
-                                                            </span>
+                                                            <span class="history-prescription-item">{{ $medicationName }}{{ $qty }}</span>
                                                         @endforeach
                                                     </div>
                                                 @endif
@@ -837,9 +880,6 @@
                         </div>
                         <div class="history-actions d-flex flex-column align-items-end gap-2">
                             @if($event['type'] === 'historia' && isset($event['record']) && $event['record'])
-                                @if(!empty($event['prescription']))
-                                    <a href="{{ route('historias-clinicas.recetarios.print', $event['prescription']) }}" class="history-action-link">Ver receta</a>
-                                @endif
                                 <a href="{{ route('historias-clinicas.recetarios.create', $event['record']) }}" class="history-action-link">Añadir receta</a>
                                 <a href="{{ route('historias-clinicas.remisiones.create', $event['record']) }}" class="history-action-link">Añadir remisión</a>
                             @endif
