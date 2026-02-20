@@ -294,8 +294,7 @@
                     <table class="info-table">
                         <tr>
                             <td class="label">Documento</td>
-                            <td class="value">{{ optional(optional($prescription->historiaClinica?->paciente)->owner)->document_type ?? 'N/D' }}</td>
-                            <td class="value">{{ optional(optional($prescription->historiaClinica?->paciente)->owner)->document ?? 'N/D' }}</td>
+                            <td class="value">{{ optional(optional($prescription->historiaClinica?->paciente)->owner)->document_type ?? 'N/D' }} {{ optional(optional($prescription->historiaClinica?->paciente)->owner)->document ?? 'N/D' }}</td>
                         </tr>
                         <tr>
                             <td class="label">Nombre</td>
