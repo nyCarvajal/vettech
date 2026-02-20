@@ -338,6 +338,120 @@
         font-size: 0.75rem;
     }
 
+
+    .history-clinical-details {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 0.4rem;
+        margin-top: 0.6rem;
+    }
+
+    .history-clinical-chip {
+        display: flex;
+        flex-direction: column;
+        gap: 0.1rem;
+        padding: 0.4rem 0.55rem;
+        border-radius: 10px;
+        border: 1px solid #edf0f7;
+        background: #fafbff;
+    }
+
+    .history-clinical-chip small {
+        color: #64748b;
+        font-size: 0.72rem;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+        line-height: 1.1;
+    }
+
+    .history-clinical-chip span {
+        color: var(--ink-900);
+        font-weight: 600;
+        font-size: 0.86rem;
+        line-height: 1.25;
+        word-break: break-word;
+    }
+
+    .history-clinical-chip--recipe {
+        background: #eefcf5;
+        border-color: #c9f2dd;
+    }
+
+
+    .history-prescription-details {
+        margin-top: 0.4rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+
+    .history-prescription-item {
+        display: block;
+        font-size: 0.8rem;
+        color: #166534;
+        line-height: 1.3;
+    }
+
+    .history-prescription-meta {
+        margin-top: 0.2rem;
+        display: block;
+        font-size: 0.78rem;
+        color: #166534;
+        opacity: 0.95;
+    }
+
+    .history-prescription-toolbar {
+        margin-top: 0.4rem;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.35rem;
+    }
+
+    .history-prescription-toolbar form {
+        margin: 0;
+    }
+
+    .history-prescription-action {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.2rem 0.55rem;
+        border-radius: 9999px;
+        border: 1px solid #86efac;
+        background: #ffffff;
+        color: #166534;
+        text-decoration: none;
+        font-size: 0.74rem;
+        font-weight: 600;
+        line-height: 1.2;
+        cursor: pointer;
+    }
+
+    .history-actions {
+        min-width: 170px;
+    }
+
+    .history-action-link {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.35rem 0.75rem;
+        border-radius: 9999px;
+        border: 1px solid rgba(124, 111, 242, 0.3);
+        background: #f8f7ff;
+        color: var(--lavender-600);
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.82rem;
+        line-height: 1.2;
+        transition: all 0.2s ease;
+    }
+
+    .history-action-link:hover {
+        background: #f1edff;
+        border-color: rgba(124, 111, 242, 0.45);
+    }
+
     @media (max-width: 1100px) {
         .grid-panels {
             grid-template-columns: 1fr;
@@ -664,6 +778,21 @@
             </form>
 
             <div class="history-list">
+                @php
+                    $historiaCampos = [
+                        'motivo_consulta' => 'Motivo',
+                        'enfermedad_actual' => 'Enfermedad actual',
+                        'analisis' => 'Análisis',
+                        'plan_procedimientos' => 'Plan de procedimientos',
+                        'plan_medicamentos' => 'Plan de medicamentos',
+                        'temperatura' => 'Temperatura',
+                        'peso' => 'Peso',
+                        'frecuencia_cardiaca' => 'Frec. cardiaca',
+                        'frecuencia_respiratoria' => 'Frec. respiratoria',
+                        'estado_mental' => 'Estado mental',
+                        'dolor' => 'Dolor',
+                    ];
+                @endphp
                 @forelse($timeline as $event)
                     <div class="history-item">
                         <div class="history-date">
@@ -676,13 +805,86 @@
                                 <h5 class="history-title mb-0">{{ $event['title'] }}</h5>
                             </div>
                             <p class="history-meta mb-0">{{ $event['summary'] }}</p>
-                            @if(!empty($event['meta']))
+                            @if($event['type'] === 'historia' && isset($event['record']) && $event['record'])
+                                @php
+                                    $historiaDetalle = collect($historiaCampos)
+                                        ->map(function ($label, $campo) use ($event) {
+                                            $valor = data_get($event['record'], $campo);
+
+                                            if (is_string($valor)) {
+                                                $valor = trim($valor);
+                                            }
+
+                                            if ($valor === null || $valor === '') {
+                                                return null;
+                                            }
+
+                                            return [
+                                                'label' => $label,
+                                                'value' => $valor,
+                                            ];
+                                        })
+                                        ->filter()
+                                        ->values()
+                                        ->take(6);
+                                @endphp
+                                @if($historiaDetalle->isNotEmpty() || !empty($event['prescription']))
+                                    <div class="history-clinical-details">
+                                        @foreach($historiaDetalle as $detalle)
+                                            <div class="history-clinical-chip">
+                                                <small>{{ $detalle['label'] }}</small>
+                                                <span>{{ $detalle['value'] }}</span>
+                                            </div>
+                                        @endforeach
+
+                                        @if(!empty($event['prescription']))
+                                            @php
+                                                $prescription = $event['prescription'];
+                                                $prescriptionItems = $prescription->items->take(2);
+                                            @endphp
+                                            <div class="history-clinical-chip history-clinical-chip--recipe">
+                                                <small>Receta</small>
+                                                <span>Recetario #{{ $prescription->id }}</span>
+                                                <span class="history-prescription-meta">Profesional ID: {{ $prescription->professional_id ?? 'N/D' }}</span>
+
+                                                <div class="history-prescription-toolbar">
+                                                    <a href="{{ route('historias-clinicas.recetarios.print', $prescription) }}" class="history-prescription-action">Imprimir</a>
+                                                    <form method="post" action="{{ route('historias-clinicas.recetarios.whatsapp', $prescription) }}">
+                                                        @csrf
+                                                        <button type="submit" class="history-prescription-action">WhatsApp</button>
+                                                    </form>
+                                                    <form method="post" action="{{ route('historias-clinicas.recetarios.facturar', $prescription) }}">
+                                                        @csrf
+                                                        <button type="submit" class="history-prescription-action">Facturar</button>
+                                                    </form>
+                                                </div>
+
+                                                @if($prescriptionItems->isNotEmpty())
+                                                    <div class="history-prescription-details">
+                                                        @foreach($prescriptionItems as $item)
+                                                            @php
+                                                                $medicationName = $item->manual_name ?: optional($item->product)->name ?: 'Medicamento';
+                                                                $qty = $item->qty_requested ? ' (' . $item->qty_requested . ')' : '';
+                                                            @endphp
+                                                            <span class="history-prescription-item">{{ $medicationName }}{{ $qty }}</span>
+                                                        @endforeach
+                                                    </div>
+                                                @endif
+                                            </div>
+                                        @endif
+                                    </div>
+                                @endif
+                            @elseif(!empty($event['meta']))
                                 <p class="history-meta mb-0">{{ collect($event['meta'])->filter()->map(fn($v, $k) => ucfirst($k).': '.$v)->join(' · ') }}</p>
                             @endif
                         </div>
-                        <div class="history-actions">
+                        <div class="history-actions d-flex flex-column align-items-end gap-2">
+                            @if($event['type'] === 'historia' && isset($event['record']) && $event['record'])
+                                <a href="{{ route('historias-clinicas.recetarios.create', $event['record']) }}" class="history-action-link">Añadir receta</a>
+                                <a href="{{ route('historias-clinicas.remisiones.create', $event['record']) }}" class="history-action-link">Añadir remisión</a>
+                            @endif
                             @if($event['url'])
-                                <a href="{{ $event['url'] }}">Ver detalle</a>
+                                <a href="{{ $event['url'] }}" class="history-action-link">Ver detalle</a>
                             @endif
                         </div>
                     </div>
@@ -692,7 +894,11 @@
             </div>
         </div>
         @if($timeline instanceof \Illuminate\Pagination\LengthAwarePaginator)
-            <div class="card-footer bg-white">{{ $timeline->withQueryString()->links() }}</div>
+            <div class="card-footer bg-white d-flex justify-content-end">
+                @if($timeline->hasMorePages())
+                    <a href="{{ $timeline->nextPageUrl() }}" class="pill-action">Ver más</a>
+                @endif
+            </div>
         @endif
     </div>
 </div>
