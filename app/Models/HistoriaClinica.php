@@ -96,6 +96,13 @@ class HistoriaClinica extends Model
         return $this->hasMany(HistoriaClinicaDiagnostico::class);
     }
 
+
+    public function prescriptions(): HasMany
+    {
+        return $this->hasMany(Prescription::class, 'historia_clinica_id')
+            ->latest();
+    }
+
     public function adjuntos(): HasMany
     {
         return $this->hasMany(ClinicalAttachment::class, 'historia_id')
