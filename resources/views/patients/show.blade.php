@@ -377,6 +377,21 @@
         border-color: #c9f2dd;
     }
 
+
+    .history-prescription-details {
+        margin-top: 0.4rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+
+    .history-prescription-item {
+        display: block;
+        font-size: 0.8rem;
+        color: #166534;
+        line-height: 1.3;
+    }
+
     .history-actions {
         min-width: 170px;
     }
@@ -788,9 +803,30 @@
                                         @endforeach
 
                                         @if(!empty($event['prescription']))
+                                            @php
+                                                $prescriptionItems = $event['prescription']->items->take(2);
+                                            @endphp
                                             <div class="history-clinical-chip history-clinical-chip--recipe">
                                                 <small>Receta</small>
                                                 <span>Recetario #{{ $event['prescription']->id }}</span>
+
+                                                @if($prescriptionItems->isNotEmpty())
+                                                    <div class="history-prescription-details">
+                                                        @foreach($prescriptionItems as $item)
+                                                            @php
+                                                                $medicationName = $item->manual_name ?: optional($item->product)->name ?: 'Medicamento';
+                                                                $medicationSpecs = collect([
+                                                                    $item->dose,
+                                                                    $item->frequency,
+                                                                    $item->duration_days ? $item->duration_days.' días' : null,
+                                                                ])->filter()->join(' · ');
+                                                            @endphp
+                                                            <span class="history-prescription-item">
+                                                                {{ $medicationName }}@if($medicationSpecs !== '') — {{ $medicationSpecs }}@endif
+                                                            </span>
+                                                        @endforeach
+                                                    </div>
+                                                @endif
                                             </div>
                                         @endif
                                     </div>
