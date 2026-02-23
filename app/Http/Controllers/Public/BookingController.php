@@ -11,7 +11,6 @@ use App\Models\Owner;
 use App\Models\Patient;
 use App\Models\Reserva;
 use App\Models\Tipocita;
-use App\Models\User;
 use App\Support\RoleLabelResolver;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -546,25 +545,33 @@ class BookingController extends Controller
 
     private function availableStylists(Clinica $clinica)
     {
-        $stylists = User::on('mysql')
-            ->where('clinica_id', $clinica->id)
-            ->where('role', 'medico')
-            ->get();
+        $stylists = collect(
+            DB::connection('mysql')
+                ->table('users')
+                ->where('clinica_id', $clinica->id)
+                ->where('role', 'medico')
+                ->get()
+                ->all()
+        );
 
         if ($stylists->isEmpty()) {
-            $stylists = User::on('mysql')
-                ->where('clinica_id', $clinica->id)
-                ->where('role', 'médico')
-                ->get();
+            $stylists = collect(
+                DB::connection('mysql')
+                    ->table('users')
+                    ->where('clinica_id', $clinica->id)
+                    ->where('role', 'médico')
+                    ->get()
+                    ->all()
+            );
         }
 
         return $stylists
-            ->map(function (User $user) {
-                $user->setAttribute('nombres', trim((string) ($user->nombres ?? $user->nombre ?? '')));
+            ->map(function ($user) {
+                $user->nombres = trim((string) ($user->nombres ?? $user->nombre ?? ''));
 
                 return $user;
             })
-            ->sortBy(fn (User $user) => Str::lower((string) ($user->name ?? '')))
+            ->sortBy(fn ($user) => Str::lower(trim((string) (($user->nombres ?? '') . ' ' . ($user->apellidos ?? '')))))
             ->unique('id')
             ->values();
     }
@@ -610,7 +617,8 @@ class BookingController extends Controller
 
     private function stylistExists(Clinica $clinica, int $stylistId): bool
     {
-        return User::on('mysql')
+        return DB::connection('mysql')
+            ->table('users')
             ->where('clinica_id', $clinica->id)
             ->where('id', $stylistId)
             ->exists();
