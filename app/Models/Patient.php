@@ -51,6 +51,13 @@ class Patient extends BaseModel
         return $this->belongsTo(Owner::class, 'owner_id');
     }
 
+    public function tutors()
+    {
+        return $this->belongsToMany(Owner::class, 'patient_owner', 'patient_id', 'owner_id')
+            ->withPivot(['relationship', 'is_primary'])
+            ->withTimestamps();
+    }
+
     public function species()
     {
         return $this->belongsTo(Species::class, 'species_id');

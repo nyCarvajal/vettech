@@ -82,7 +82,12 @@ class HospitalController extends Controller
                 $query
                     ->orderByDesc('date')
                     ->orderByDesc('day_number')
-                    ->with(['orders', 'administrations', 'vitals', 'progressNotes']);
+                    ->with([
+                        'orders.product',
+                        'administrations.order.product',
+                        'vitals',
+                        'progressNotes',
+                    ]);
             },
         ]);
 

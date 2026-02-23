@@ -23,7 +23,7 @@ class PrescriptionsController extends Controller
 
     public function store(PrescriptionRequest $request): RedirectResponse
     {
-        $prescription = Prescription::create($request->only(['encounter_id', 'patient_id', 'professional_id', 'status']));
+        $prescription = Prescription::create($request->only(['encounter_id', 'patient_id', 'professional_id', 'status', 'observations']));
         foreach ($request->input('items') as $item) {
             PrescriptionItem::create($item + ['prescription_id' => $prescription->id]);
         }

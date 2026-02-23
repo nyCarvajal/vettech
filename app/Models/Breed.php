@@ -8,7 +8,7 @@ class Breed extends BaseModel
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'species_id'];
+    protected $fillable = ['name', 'normalized_name', 'species_id'];
 
     public function species()
     {
