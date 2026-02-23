@@ -22,7 +22,9 @@ class ViewServiceProvider extends ServiceProvider
     public function boot(): void
     {
         View::composer('*', function ($view) {
-            $view->with('clinica', ClinicaActual::get());
+            if (! array_key_exists('clinica', $view->getData())) {
+                $view->with('clinica', ClinicaActual::get());
+            }
         });
     }
 }
