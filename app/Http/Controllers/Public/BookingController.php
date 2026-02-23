@@ -548,16 +548,22 @@ class BookingController extends Controller
     {
         $stylists = User::on('mysql')
             ->where('clinica_id', $clinica->id)
-            ->whereIn('role', [11, '11', 'groomer', 'medico', 'médico'])
+            ->where('role', 'medico')
             ->get();
 
         if ($stylists->isEmpty()) {
             $stylists = User::on('mysql')
                 ->where('clinica_id', $clinica->id)
+                ->where('role', 'médico')
                 ->get();
         }
 
         return $stylists
+            ->map(function (User $user) {
+                $user->setAttribute('nombres', trim((string) ($user->nombres ?? $user->nombre ?? '')));
+
+                return $user;
+            })
             ->sortBy(fn (User $user) => Str::lower((string) ($user->name ?? '')))
             ->unique('id')
             ->values();
