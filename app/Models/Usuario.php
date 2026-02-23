@@ -11,7 +11,7 @@ class Usuario extends Model
 {
     protected $connection = 'tenant';
 
-    protected $table = 'users';
+    protected $table = 'usuarios';
 
     protected $fillable = [
         'nombre',

@@ -121,8 +121,7 @@ class UsuarioController extends Controller
         $signatureData = $this->processSignatureUpload($request, $user);
 
         $updateData = [
-            'nombre' => $data['nombre'],
-            'apellidos' => $data['apellidos'],
+            'nombres' => trim($data['nombre'] . ' ' . $data['apellidos']),
             'email' => $data['email'],
             'tipo_identificacion' => $data['tipo_identificacion'],
             'numero_identificacion' => $data['numero_identificacion'],
@@ -139,12 +138,16 @@ class UsuarioController extends Controller
             $updateData['password'] = Hash::make($data['password']);
         }
 
-        $user->update($updateData);
+        DB::connection('mysql')
+            ->table('users')
+            ->where('id', $user->id)
+            ->update($updateData);
 
         return redirect()
             ->route('users.index')
             ->with('success', 'Usuario actualizado correctamente.');
     }
+
 
     public function destroy(User $user)
     {

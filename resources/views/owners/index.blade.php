@@ -42,7 +42,11 @@
                             <div>{{ $owner->phone }}</div>
                             <div>{{ $owner->email }}</div>
                         </td>
-                        <td><span class="badge bg-soft-primary text-primary">{{ $owner->patients_count }}</span></td>
+                        <td>
+                            <span class="badge bg-soft-primary text-primary">
+                                {{ ($owner->patients_count ?? 0) + ($owner->tutored_patients_count ?? 0) }}
+                            </span>
+                        </td>
                         <td class="text-end">
                             <a href="{{ route('owners.show', $owner) }}" class="btn btn-sm btn-outline-primary">Ver perfil</a>
                         </td>
