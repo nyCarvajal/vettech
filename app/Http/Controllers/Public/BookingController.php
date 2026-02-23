@@ -546,26 +546,25 @@ class BookingController extends Controller
 
     private function availableStylists(Clinica $clinica)
     {
-        $stylists = collect();
+        $stylists = User::on('mysql')
+            ->where('clinica_id', $clinica->id)
+            ->whereIn('role', [11, '11', 'groomer', 'medico', 'médico'])
+            ->get();
 
-        foreach ($this->connectionsFor($clinica) as $connection) {
-            $connectionStylists = User::on($connection)
+        if ($stylists->isEmpty()) {
+            $stylists = User::on('mysql')
                 ->where('clinica_id', $clinica->id)
-                ->whereIn('role', [11, '11', 'groomer', 'medico', 'médico'])
                 ->get();
-
-            if ($connectionStylists->isEmpty()) {
-                $connectionStylists = User::on($connection)
-                    ->where('clinica_id', $clinica->id)
-                    ->get();
-            }
-
-            if ($connectionStylists->isNotEmpty()) {
-                $stylists = $stylists->merge($this->sortStylists($connectionStylists));
-            }
         }
 
-        return $stylists->unique('id')->values();
+        return $this->sortStylists($stylists)->unique('id')->values();
+    }
+
+    private function sortStylists(Collection $stylists): Collection
+    {
+        return $stylists
+            ->sortBy(fn (User $user) => Str::lower((string) ($user->name ?? '')))
+            ->values();
     }
 
     private function sortStylists(Collection $stylists): Collection
