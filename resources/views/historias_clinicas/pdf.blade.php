@@ -169,6 +169,67 @@
     <div class="card">
         <div class="section-title">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 2v4" />
+                <path d="M12 18v4" />
+                <path d="M5 5l3 3" />
+                <path d="M16 16l3 3" />
+                <circle cx="12" cy="12" r="4" />
+            </svg>
+            <h3>Examen físico (ECOP)</h3>
+        </div>
+        <table class="table">
+            <tr>
+                <th class="field-label" style="width:35%">E. Evaluación general</th>
+                <td>
+                    <div><strong>T°:</strong> {{ $historiaClinica->temperatura ?? 'N/D' }} °C</div>
+                    <div><strong>Peso:</strong> {{ $historiaClinica->peso ?? 'N/D' }} Kg</div>
+                    <div><strong>FC:</strong> {{ $historiaClinica->frecuencia_cardiaca ?? 'N/D' }} Lpm</div>
+                    <div><strong>FR:</strong> {{ $historiaClinica->frecuencia_respiratoria ?? 'N/D' }} Rpm</div>
+                    <div><strong>TA:</strong> {{ $historiaClinica->tension_arterial ?? 'N/D' }}</div>
+                    <div><strong>Sat O₂:</strong> {{ $historiaClinica->saturacion_oxigeno ?? 'N/D' }} %</div>
+                    <div><strong>TRC:</strong> {{ $historiaClinica->trc ?? 'N/D' }}</div>
+                    <div><strong>Mucosas:</strong> {{ $historiaClinica->mucosas ?? 'N/D' }}</div>
+                    <div><strong>Hidratación:</strong> {{ $historiaClinica->hidratacion ?? 'N/D' }}</div>
+                    <div><strong>Condición corporal:</strong> {{ $historiaClinica->condicion_corporal ?? 'N/D' }}</div>
+                </td>
+            </tr>
+            <tr>
+                <th class="field-label">C. Condición clínica</th>
+                <td>
+                    <div><strong>Estado mental:</strong> {{ $historiaClinica->estado_mental ?? 'N/D' }}</div>
+                    <div><strong>Postura:</strong> {{ $historiaClinica->postura ?? 'N/D' }}</div>
+                    <div><strong>Marcha:</strong> {{ $historiaClinica->marcha ?? 'N/D' }}</div>
+                    <div><strong>Dolor:</strong> {{ $historiaClinica->dolor ?? 'N/D' }}</div>
+                </td>
+            </tr>
+            <tr>
+                <th class="field-label">O. Observaciones por sistemas</th>
+                <td>
+                    <div><strong>Piel:</strong> {{ $historiaClinica->examen_piel ?? 'N/D' }}</div>
+                    <div><strong>Ojos:</strong> {{ $historiaClinica->examen_ojos ?? 'N/D' }}</div>
+                    <div><strong>Oídos:</strong> {{ $historiaClinica->examen_oidos ?? 'N/D' }}</div>
+                    <div><strong>Boca:</strong> {{ $historiaClinica->examen_boca ?? 'N/D' }}</div>
+                    <div><strong>Cabeza/cuello:</strong> {{ $historiaClinica->examen_cabeza_cuello ?? 'N/D' }}</div>
+                    <div><strong>Ganglios:</strong> {{ $historiaClinica->examen_ganglios ?? 'N/D' }}</div>
+                    <div><strong>Cardio-respiratorio:</strong> {{ $historiaClinica->examen_torax ?? 'N/D' }}</div>
+                    <div><strong>Corazón:</strong> {{ $historiaClinica->examen_corazon ?? 'N/D' }}</div>
+                    <div><strong>Gastrointestinal:</strong> {{ $historiaClinica->examen_abdomen ?? 'N/D' }}</div>
+                    <div><strong>Genitourinario:</strong> {{ $historiaClinica->examen_genitales ?? 'N/D' }}</div>
+                    <div><strong>Neurológico:</strong> {{ $historiaClinica->examen_neurologico ?? 'N/D' }}</div>
+                    <div><strong>Músculo-esquelético:</strong> {{ $historiaClinica->examen_extremidades ?? 'N/D' }}</div>
+                    <div><strong>Mamas:</strong> {{ $historiaClinica->examen_mama ?? 'N/D' }}</div>
+                </td>
+            </tr>
+            <tr>
+                <th class="field-label">P. Plan / impresión</th>
+                <td>Consultar sección de plan clínico.</td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="card">
+        <div class="section-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M8.5 20h-2A2.5 2.5 0 0 1 4 17.5v-11A2.5 2.5 0 0 1 6.5 4H13l6 6v7.5A2.5 2.5 0 0 1 16.5 20H15" />
                 <path d="M13 4v4a2 2 0 0 0 2 2h4" />
                 <path d="M9.5 17.5 11 19l3.5-3.5" />
@@ -208,9 +269,10 @@
     @php
         $imageAttachments = $historiaClinica->adjuntos->where('file_type', 'image');
         $pdfAttachments = $historiaClinica->adjuntos->where('file_type', 'pdf');
+        $documentAttachments = $historiaClinica->adjuntos->where('file_type', 'document');
     @endphp
 
-    @if($imageAttachments->count() || $pdfAttachments->count())
+    @if($imageAttachments->count() || $pdfAttachments->count() || $documentAttachments->count())
         <div class="card">
             <div class="section-title">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
@@ -240,6 +302,18 @@
                         <li class="list-item">
                             <strong>{{ $pdf->titulo_limpio }}</strong>
                             <span class="badge">PDF</span>
+                        </li>
+                    @endforeach
+                </ul>
+            @endif
+
+            @if($documentAttachments->count())
+                <p class="muted" style="margin: 12px 0 4px 0;">Documentos</p>
+                <ul class="list">
+                    @foreach($documentAttachments as $document)
+                        <li class="list-item">
+                            <strong>{{ $document->titulo_limpio }}</strong>
+                            <span class="badge">DOC</span>
                         </li>
                     @endforeach
                 </ul>

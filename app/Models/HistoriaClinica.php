@@ -48,11 +48,25 @@ class HistoriaClinica extends Model
         'antecedentes_ginecologicos',
         'antecedentes_familiares',
         'revision_sistemas',
+        'temperatura',
+        'peso',
+        'trc',
+        'mucosas',
+        'hidratacion',
+        'condicion_corporal',
         'frecuencia_cardiaca',
         'tension_arterial',
         'saturacion_oxigeno',
         'frecuencia_respiratoria',
+        'estado_mental',
+        'postura',
+        'marcha',
+        'dolor',
         'examen_cabeza_cuello',
+        'examen_ojos',
+        'examen_oidos',
+        'examen_boca',
+        'examen_ganglios',
         'examen_torax',
         'examen_corazon',
         'examen_mama',
@@ -80,6 +94,13 @@ class HistoriaClinica extends Model
     public function diagnosticos()
     {
         return $this->hasMany(HistoriaClinicaDiagnostico::class);
+    }
+
+
+    public function prescriptions(): HasMany
+    {
+        return $this->hasMany(Prescription::class, 'historia_clinica_id')
+            ->latest();
     }
 
     public function adjuntos(): HasMany
