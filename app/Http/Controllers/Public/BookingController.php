@@ -608,31 +608,12 @@ class BookingController extends Controller
         return $intValue > 0 ? $intValue : null;
     }
 
-    private function connectionsFor(Clinica $clinica): array
-    {
-        $connections = ['mysql'];
-
-        if (! empty($clinica->db)) {
-            $connections[] = 'tenant';
-        }
-
-        return array_unique($connections);
-    }
-
     private function stylistExists(Clinica $clinica, int $stylistId): bool
     {
-        foreach ($this->connectionsFor($clinica) as $connection) {
-            $exists = User::on($connection)
-                ->where('clinica_id', $clinica->id)
-                ->where('id', $stylistId)
-                ->exists();
-
-            if ($exists) {
-                return true;
-            }
-        }
-
-        return false;
+        return User::on('mysql')
+            ->where('clinica_id', $clinica->id)
+            ->where('id', $stylistId)
+            ->exists();
     }
 
     private function setTenantConnection(Clinica $clinica): void
