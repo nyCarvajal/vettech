@@ -557,20 +557,9 @@ class BookingController extends Controller
                 ->get();
         }
 
-        return $this->sortStylists($stylists)->unique('id')->values();
-    }
-
-    private function sortStylists(Collection $stylists): Collection
-    {
         return $stylists
             ->sortBy(fn (User $user) => Str::lower((string) ($user->name ?? '')))
-            ->values();
-    }
-
-    private function sortStylists(Collection $stylists): Collection
-    {
-        return $stylists
-            ->sortBy(fn (User $user) => Str::lower((string) ($user->name ?? '')))
+            ->unique('id')
             ->values();
     }
 
