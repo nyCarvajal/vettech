@@ -4,7 +4,6 @@ namespace App\Support;
 
 use App\Models\Clinica;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 
 class ClinicaActual
 {
@@ -25,12 +24,6 @@ class ClinicaActual
 
     public static function connectionName(): string
     {
-        $tenantDatabase = config('database.connections.tenant.database');
-
-        if ($tenantDatabase) {
-            return 'tenant';
-        }
-
-        return DB::getDefaultConnection();
+        return 'mysql';
     }
 }

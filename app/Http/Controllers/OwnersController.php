@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\OwnerRequest;
+use App\Mail\OwnerCredentialsMail;
 use App\Models\Departamentos;
 use App\Models\Municipios;
 use App\Models\Owner;
@@ -10,6 +11,8 @@ use App\Models\TipoIdentificacion;
 use App\Services\TimelineService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 use Illuminate\View\View;
 
 class OwnersController extends Controller
@@ -50,9 +53,22 @@ class OwnersController extends Controller
         $data = $request->validated();
         $data['document_type'] = optional(TipoIdentificacion::find($request->integer('document_type_id')))->tipo;
 
-        unset($data['document_type_id'], $data['whatsapp_prefix'], $data['whatsapp_number']);
+        $plainPassword = $this->resolveOwnerPassword($request);
+        $data['password'] = $plainPassword;
+        $data['email_verified_at'] = now();
+
+        unset(
+            $data['document_type_id'],
+            $data['whatsapp_prefix'],
+            $data['whatsapp_number'],
+            $data['password_confirmation'],
+            $data['generate_random_password'],
+            $data['send_credentials'],
+        );
 
         $owner = Owner::create($data);
+
+        $this->sendCredentialsIfNeeded($request, $owner, $plainPassword);
 
         return redirect()->route('owners.show', $owner)->with('status', 'Tutor creado correctamente');
     }
@@ -86,10 +102,50 @@ class OwnersController extends Controller
         $data = $request->validated();
         $data['document_type'] = optional(TipoIdentificacion::find($request->integer('document_type_id')))->tipo;
 
-        unset($data['document_type_id'], $data['whatsapp_prefix'], $data['whatsapp_number']);
+        $plainPassword = null;
+        if ($request->boolean('generate_random_password')) {
+            $plainPassword = Str::password(10)->toString();
+            $data['password'] = $plainPassword;
+            $data['email_verified_at'] = now();
+        } elseif ($request->filled('password')) {
+            $plainPassword = $request->string('password')->toString();
+            $data['password'] = $plainPassword;
+            $data['email_verified_at'] = now();
+        }
+
+        unset(
+            $data['document_type_id'],
+            $data['whatsapp_prefix'],
+            $data['whatsapp_number'],
+            $data['password_confirmation'],
+            $data['generate_random_password'],
+            $data['send_credentials'],
+        );
 
         $owner->update($data);
 
+        if ($plainPassword) {
+            $this->sendCredentialsIfNeeded($request, $owner, $plainPassword);
+        }
+
         return redirect()->route('owners.show', $owner)->with('status', 'Tutor actualizado');
+    }
+
+    private function resolveOwnerPassword(OwnerRequest $request): string
+    {
+        if ($request->boolean('generate_random_password') || ! $request->filled('password')) {
+            return Str::password(10)->toString();
+        }
+
+        return $request->string('password')->toString();
+    }
+
+    private function sendCredentialsIfNeeded(OwnerRequest $request, Owner $owner, string $plainPassword): void
+    {
+        if (! $request->boolean('send_credentials', true) || ! $owner->email) {
+            return;
+        }
+
+        Mail::to($owner->email)->send(new OwnerCredentialsMail($owner, $plainPassword));
     }
 }
