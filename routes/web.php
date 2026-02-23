@@ -27,6 +27,7 @@ use App\Http\Controllers\ConfiguracionController;
 use App\Http\Controllers\ProveedorController;
 use App\Http\Controllers\HistoriaClinicaController;
 use App\Http\Controllers\OwnersController;
+use App\Http\Controllers\PatientTutorController;
 use App\Http\Controllers\PatientsController;
 use App\Http\Controllers\SpeciesController;
 use App\Http\Controllers\TravelCertificateController;
@@ -153,6 +154,10 @@ Route::prefix('settings')
         Route::delete('clinica/logo', [ClinicSettingsController::class, 'removeLogo'])->name('clinica.logo.destroy');
     });
 Route::resource('patients', PatientsController::class)->middleware('feature:pacientes');
+Route::post('patients/{patient}/tutors', [PatientTutorController::class, 'store'])->name('patients.tutors.store');
+Route::post('patients/{patient}/tutors/attach', [PatientTutorController::class, 'attach'])->name('patients.tutors.attach');
+Route::delete('patients/{patient}/tutors/{owner}', [PatientTutorController::class, 'detach'])->name('patients.tutors.detach');
+Route::patch('patients/{patient}/tutors/{owner}/principal', [PatientTutorController::class, 'setPrimary'])->name('patients.tutors.primary');
 
 Route::get('reports/quick', [QuickReportsController::class, 'index'])
     ->middleware('feature:reportes_basicos')

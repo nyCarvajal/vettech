@@ -567,6 +567,13 @@ class BookingController extends Controller
             ->values();
     }
 
+    private function sortStylists(Collection $stylists): Collection
+    {
+        return $stylists
+            ->sortBy(fn (User $user) => Str::lower((string) ($user->name ?? '')))
+            ->values();
+    }
+
     private function normalizeStylistId($value): ?int
     {
         if ($value === null || $value === '') {
