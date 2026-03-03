@@ -30,7 +30,7 @@ class HospitalBillingService
             ]);
 
             $total = 0;
-            foreach ($stay->charges as $charge) {
+            foreach ($stay->charges->where('status', 'pending') as $charge) {
                 $lineTotal = $charge->total ?? ($charge->qty * $charge->unit_price);
                 $total += $lineTotal;
                 SaleItem::create([
@@ -45,6 +45,8 @@ class HospitalBillingService
             }
 
             $sale->update(['total' => $total]);
+
+            $stay->charges()->where('status', 'pending')->update(['status' => 'invoiced']);
 
             return $sale->fresh(['items']);
         });

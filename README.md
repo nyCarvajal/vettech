@@ -163,3 +163,16 @@ Menta se usa solo como acento: borde superior de KPIs, resaltado de sidebar acti
 ### Adjuntos de paraclínicos
 - Desde la historia clínica se pueden adjuntar archivos (PDF, imágenes, documentos Office, ZIP y videos).
 - El límite de tamaño es configurable vía `CLINICAL_ATTACHMENTS_MAX_KB` (por defecto 20480 KB / 20MB).
+
+## Hospitalización: programación automática y facturación invisible (resumen interno)
+
+- Nuevos campos de órdenes: `frequency_type`, `frequency_value`, `duration_days`, `next_due_at`, `last_applied_at`.
+- Nuevo flujo de aplicación 1-click (`POST /hospital/{stay}/orders/{order}/apply`):
+  1. Registra aplicación.
+  2. Recalcula `next_due_at` con `DoseSchedulerService`.
+  3. Descuenta inventario (hook en `InventoryIntegrationService`).
+  4. Genera cargo `pending` con `ChargeService` sin exponerlo al rol médico.
+- Anti duplicados configurable: `HOSPITAL_DUPLICATE_WINDOW_MINUTES` (default 5).
+- Vista hospitalización por rol:
+  - Médico: sin elementos financieros.
+  - Admin: tab/section de facturación con subtotal y cargos pendientes.
