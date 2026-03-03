@@ -433,6 +433,7 @@ Route::middleware([Authenticate::class, ConnectTenantDB::class, SubstituteBindin
                 Route::post('/{stay}/orders', [HospitalController::class, 'addOrder'])->name('orders.store')->whereNumber('stay');
                 Route::post('/orders/{order}/stop', [HospitalController::class, 'stopOrder'])->name('orders.stop');
                 Route::post('/orders/{order}/administrations', [HospitalController::class, 'addAdministration'])->name('orders.administrations');
+                Route::post('/{stay}/orders/{order}/apply', [HospitalController::class, 'applyOrder'])->name('orders.apply')->whereNumber('stay')->whereNumber('order');
                 Route::post('/{stay}/vitals', [HospitalController::class, 'addVitals'])->name('vitals.store')->whereNumber('stay');
                 Route::post('/{stay}/progress', [HospitalController::class, 'addProgress'])->name('progress.store')->whereNumber('stay');
                 Route::post('/{stay}/charges', [HospitalController::class, 'addCharge'])->name('charges.store')->whereNumber('stay');
