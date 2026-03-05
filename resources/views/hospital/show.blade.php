@@ -8,6 +8,9 @@
     $currentDay = $stay->days->sortByDesc('date')->first();
     $activeOrders = $stay->orders->where('status', 'active')->sortBy('next_due_at');
     $pendingOrders = $activeOrders->filter(fn ($order) => $order->next_due_at && $order->next_due_at->lte(now()->addMinutes(30)));
+    $todayProgress = ($currentDay?->progressNotes ?? collect())->sortByDesc('logged_at');
+    $todayVitals = ($currentDay?->vitals ?? collect())->sortByDesc('measured_at');
+    $recentOrders = $stay->orders->sortByDesc('created_at')->take(6);
 @endphp
 
 <div class="mx-auto max-w-7xl space-y-5 pb-10">
@@ -110,6 +113,23 @@
                 </div>
             </section>
 
+            <section class="space-y-3 rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
+                <h2 class="text-xl font-bold text-slate-800">Medicamentos / órdenes recientes</h2>
+                <div class="space-y-2">
+                    @forelse($recentOrders as $order)
+                        <div class="flex items-center justify-between rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm">
+                            <div>
+                                <p class="font-semibold text-slate-800">{{ $order->manual_name ?? $order->product?->name ?? 'Tratamiento' }}</p>
+                                <p class="text-slate-600">{{ $order->dose ?: 'Sin dosis' }} · {{ $order->route ?: 'Sin vía' }}</p>
+                            </div>
+                            <span class="rounded-full px-2.5 py-1 text-xs font-semibold {{ $order->status === 'active' ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-200 text-slate-700' }}">{{ $order->status }}</span>
+                        </div>
+                    @empty
+                        <div class="rounded-2xl border border-dashed border-slate-300 p-6 text-center text-slate-500">Aún no hay órdenes registradas.</div>
+                    @endforelse
+                </div>
+            </section>
+
             <section id="aplicaciones" class="space-y-3 rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
                 <h2 class="text-xl font-bold text-slate-800">Aplicaciones del día</h2>
                 <div class="space-y-2">
@@ -155,6 +175,17 @@
                     <input type="hidden" name="author_id" value="{{ auth()->id() }}" />
                     <x-button type="submit" class="w-full">Guardar evolución</x-button>
                 </form>
+
+                <div class="mt-3 space-y-2">
+                    @forelse($todayProgress as $note)
+                        <div class="rounded-xl border border-slate-200 bg-slate-50 p-2">
+                            <p class="text-xs text-slate-500">{{ $note->logged_at?->format('d/m H:i') }} · {{ ucfirst($note->shift ?? 'turno') }}</p>
+                            <p class="text-sm text-slate-700">{{ $note->content }}</p>
+                        </div>
+                    @empty
+                        <p class="text-sm text-slate-500">Sin evolución registrada hoy.</p>
+                    @endforelse
+                </div>
             </section>
 
             <section id="signos" class="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
@@ -168,6 +199,17 @@
                     <input type="hidden" name="measured_by" value="{{ auth()->id() }}" />
                     <x-button type="submit" class="col-span-2">Guardar signos</x-button>
                 </form>
+
+                <div class="mt-3 space-y-2">
+                    @forelse($todayVitals as $vital)
+                        <div class="rounded-xl border border-slate-200 bg-slate-50 px-2 py-1.5 text-sm text-slate-700">
+                            <p class="text-xs text-slate-500">{{ $vital->measured_at?->format('d/m H:i') }}</p>
+                            <p>T: {{ $vital->temp ?? '--' }} · FC: {{ $vital->hr ?? '--' }} · FR: {{ $vital->rr ?? '--' }} · SpO2: {{ $vital->spo2 ?? '--' }}</p>
+                        </div>
+                    @empty
+                        <p class="text-sm text-slate-500">Sin signos registrados hoy.</p>
+                    @endforelse
+                </div>
             </section>
         </aside>
     </div>
