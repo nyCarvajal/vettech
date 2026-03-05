@@ -4,133 +4,207 @@
 @php
     $role = strtolower((string) (auth()->user()->role ?? ''));
     $isAdmin = in_array($role, ['admin', 'administrator'], true);
-    $isMedico = $role === 'medico';
+    $owner = $stay->owner ?? $stay->patient?->owner;
     $currentDay = $stay->days->sortByDesc('date')->first();
-    $activeOrders = $stay->orders->where('status', 'active');
+    $activeOrders = $stay->orders->where('status', 'active')->sortBy('next_due_at');
+    $pendingOrders = $activeOrders->filter(fn ($order) => $order->next_due_at && $order->next_due_at->lte(now()->addMinutes(30)));
 @endphp
 
-<div class="max-w-7xl mx-auto space-y-4">
-    <x-card class="bg-white border border-emerald-100">
-        @php($owner = $stay->owner ?? $stay->patient?->owner)
-        <div class="flex items-center justify-between gap-4 flex-wrap">
-            <div>
-                <p class="text-sm text-gray-500">Día {{ $stay->daysSinceAdmission() }} · {{ ucfirst($stay->severity) }}</p>
-                <h2 class="text-2xl font-semibold text-emerald-700">{{ $stay->patient->display_name ?? 'Paciente' }}</h2>
-                <p class="text-sm text-gray-600">Tutor: {{ $owner->name ?? 'N/D' }}</p>
+<div class="mx-auto max-w-7xl space-y-5 pb-10">
+    <section class="rounded-3xl border border-emerald-100 bg-gradient-to-r from-emerald-50 via-teal-50 to-cyan-50 p-5 shadow-sm">
+        <div class="flex flex-wrap items-start justify-between gap-4">
+            <div class="space-y-1">
+                <p class="text-xs font-semibold uppercase tracking-widest text-emerald-700/80">Hospitalización activa</p>
+                <h1 class="text-3xl font-extrabold tracking-tight text-slate-800">{{ $stay->patient->display_name ?? 'Paciente' }}</h1>
+                <p class="text-sm text-slate-600">Tutor: <span class="font-semibold">{{ $owner->name ?? 'N/D' }}</span> · {{ $owner->phone ?? 'Sin teléfono' }}</p>
+                <div class="flex flex-wrap items-center gap-2 pt-1">
+                    <span class="rounded-full bg-white px-3 py-1 text-xs font-semibold text-slate-700 shadow-sm">Día {{ $stay->daysSinceAdmission() }}</span>
+                    <span class="rounded-full bg-white px-3 py-1 text-xs font-semibold text-emerald-700 shadow-sm">{{ ucfirst($stay->severity) }}</span>
+                    <span class="rounded-full bg-white px-3 py-1 text-xs font-semibold text-amber-700 shadow-sm">{{ $pendingOrders->count() }} pendientes</span>
+                </div>
             </div>
-            <div class="flex gap-2">
-                <form method="POST" action="{{ route('hospital.discharge', $stay) }}">@csrf <x-button type="submit" color="danger">{{ $isAdmin ? 'Dar alta' : 'Solicitar alta' }}</x-button></form>
-                <a href="{{ route('hospital.index') }}" class="inline-flex"><x-button color="secondary">Ver resumen</x-button></a>
-                @if($isAdmin)
-                    <form method="POST" action="{{ route('hospital.invoice', $stay) }}">@csrf <x-button>Generar factura</x-button></form>
-                @endif
+
+            <div class="grid grid-cols-2 gap-2 text-center sm:grid-cols-3">
+                <div class="rounded-2xl bg-white/90 p-3 shadow-sm">
+                    <p class="text-xs text-slate-500">Órdenes activas</p>
+                    <p class="text-2xl font-bold text-slate-800">{{ $activeOrders->count() }}</p>
+                </div>
+                <div class="rounded-2xl bg-white/90 p-3 shadow-sm">
+                    <p class="text-xs text-slate-500">Aplicaciones hoy</p>
+                    <p class="text-2xl font-bold text-slate-800">{{ ($currentDay?->administrations ?? collect())->count() }}</p>
+                </div>
+                <div class="rounded-2xl bg-white/90 p-3 shadow-sm col-span-2 sm:col-span-1">
+                    <p class="text-xs text-slate-500">Evoluciones</p>
+                    <p class="text-2xl font-bold text-slate-800">{{ ($currentDay?->progressNotes ?? collect())->count() }}</p>
+                </div>
             </div>
         </div>
-    </x-card>
 
-    <div class="bg-emerald-50 border border-emerald-100 rounded-lg p-3">
-        <div class="flex gap-2 text-sm mb-3">
-            <a href="#ordenes" class="px-3 py-1 rounded-full bg-white shadow">Órdenes</a>
-            <a href="#aplicaciones" class="px-3 py-1 rounded-full bg-white shadow">Aplicaciones</a>
-            <a href="#evolucion" class="px-3 py-1 rounded-full bg-white shadow">Evolución</a>
-            <a href="#signos" class="px-3 py-1 rounded-full bg-white shadow">Signos</a>
-            @if($isAdmin)<a href="#facturacion" class="px-3 py-1 rounded-full bg-white shadow">Facturación</a>@endif
+        <div class="mt-4 flex flex-wrap gap-2">
+            <form method="POST" action="{{ route('hospital.discharge', $stay) }}">@csrf
+                <x-button type="submit" color="danger">{{ $isAdmin ? 'Dar alta' : 'Solicitar alta' }}</x-button>
+            </form>
+            <a href="{{ route('hospital.index') }}" class="inline-flex"><x-button color="secondary">Ver resumen</x-button></a>
+            @if($isAdmin)
+                <form method="POST" action="{{ route('hospital.invoice', $stay) }}">@csrf <x-button>Generar factura</x-button></form>
+            @endif
+        </div>
+    </section>
+
+    <section class="sticky top-2 z-10 rounded-2xl border border-slate-200 bg-white/95 p-2 shadow-sm backdrop-blur">
+        <nav class="grid grid-cols-2 gap-2 text-sm font-semibold md:grid-cols-5">
+            <a href="#ordenes" class="rounded-xl bg-slate-900 px-3 py-2 text-center text-white">Órdenes</a>
+            <a href="#aplicaciones" class="rounded-xl bg-slate-100 px-3 py-2 text-center text-slate-700 hover:bg-slate-200">Aplicaciones</a>
+            <a href="#evolucion" class="rounded-xl bg-slate-100 px-3 py-2 text-center text-slate-700 hover:bg-slate-200">Evolución</a>
+            <a href="#signos" class="rounded-xl bg-slate-100 px-3 py-2 text-center text-slate-700 hover:bg-slate-200">Signos</a>
+            @if($isAdmin)
+                <a href="#facturacion" class="rounded-xl bg-slate-100 px-3 py-2 text-center text-slate-700 hover:bg-slate-200">Facturación</a>
+            @endif
+        </nav>
+    </section>
+
+    <div class="grid gap-5 lg:grid-cols-3">
+        <div class="space-y-5 lg:col-span-2">
+            <section id="ordenes" class="space-y-3 rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
+                <div class="flex items-center justify-between">
+                    <h2 class="text-xl font-bold text-slate-800">Órdenes activas</h2>
+                    <span class="rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-700">Pendientes: {{ $pendingOrders->count() }}</span>
+                </div>
+
+                <div class="space-y-3">
+                    @forelse($activeOrders as $order)
+                        @php
+                            $isPending = $order->next_due_at && $order->next_due_at->lte(now()->addMinutes(30));
+                            $orderName = $order->manual_name ?? $order->product?->name ?? 'Tratamiento';
+                        @endphp
+                        <article class="rounded-2xl border {{ $isPending ? 'border-amber-200 bg-amber-50/60' : 'border-slate-200 bg-slate-50/70' }} p-4">
+                            <div class="flex flex-wrap items-center justify-between gap-3">
+                                <div>
+                                    <h3 class="text-lg font-bold text-slate-800">{{ $orderName }}</h3>
+                                    <p class="text-sm text-slate-600">{{ $order->dose ?: 'Sin dosis' }} · {{ $order->route ?: 'Sin vía' }} · {{ strtoupper((string) $order->frequency_type) }} ({{ $order->frequency_value }})</p>
+                                    <div class="mt-2 grid gap-1 text-sm text-slate-600 sm:grid-cols-2">
+                                        <p>Última: <span class="font-semibold text-slate-800">{{ optional($order->last_applied_at)?->format('d/m H:i') ?? 'Sin aplicaciones' }}</span></p>
+                                        <p>Próxima: <span class="font-semibold {{ $isPending ? 'text-amber-700' : 'text-emerald-700' }}">{{ optional($order->next_due_at)?->format('d/m H:i') ?? 'Finalizada' }}</span></p>
+                                    </div>
+                                </div>
+                                <div class="flex flex-col items-end gap-2">
+                                    @if($isPending)
+                                        <span class="rounded-full bg-amber-200 px-3 py-1 text-xs font-bold text-amber-800">PENDIENTE</span>
+                                    @endif
+                                    <form method="POST" action="{{ route('hospital.orders.apply', ['stay' => $stay->id, 'order' => $order->id]) }}" class="flex flex-wrap items-center gap-2">
+                                        @csrf
+                                        <input name="notes" class="rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm focus:border-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-200" placeholder="Observación opcional" />
+                                        <x-button type="submit" class="!rounded-xl !px-5 !py-2.5 !text-sm !font-bold">APLICAR</x-button>
+                                    </form>
+                                    @if($isAdmin)
+                                        <form method="POST" action="{{ route('hospital.orders.stop', ['order' => $order->id]) }}">@csrf
+                                            <x-button type="submit" size="sm" color="danger">Detener</x-button>
+                                        </form>
+                                    @endif
+                                </div>
+                            </div>
+                        </article>
+                    @empty
+                        <div class="rounded-2xl border border-dashed border-slate-300 p-6 text-center text-slate-500">No hay órdenes activas.</div>
+                    @endforelse
+                </div>
+            </section>
+
+            <section id="aplicaciones" class="space-y-3 rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
+                <h2 class="text-xl font-bold text-slate-800">Aplicaciones del día</h2>
+                <div class="space-y-2">
+                    @forelse(($currentDay?->administrations ?? collect())->sortByDesc('administered_at') as $admin)
+                        <div class="flex items-start gap-3 rounded-xl border border-slate-200 bg-slate-50 p-3">
+                            <span class="mt-1 h-2.5 w-2.5 rounded-full bg-emerald-500"></span>
+                            <div class="flex-1">
+                                <p class="text-sm font-semibold text-slate-800">{{ $admin->order->manual_name ?? $admin->order->product?->name }}</p>
+                                <p class="text-sm text-slate-600">{{ $admin->dose_given ?: 'Sin dosis registrada' }}</p>
+                            </div>
+                            <p class="text-sm font-semibold text-slate-700">{{ $admin->administered_at?->format('H:i') }}</p>
+                        </div>
+                    @empty
+                        <div class="rounded-2xl border border-dashed border-slate-300 p-6 text-center text-slate-500">Sin aplicaciones registradas hoy.</div>
+                    @endforelse
+                </div>
+            </section>
         </div>
 
-        <details class="mb-3" open>
-            <summary class="cursor-pointer font-semibold text-emerald-700">Timeline de días</summary>
-            <div class="mt-2 max-h-36 overflow-y-auto space-y-1">
-                @foreach($stay->days->sortByDesc('date') as $day)
-                    <div class="text-sm border rounded px-2 py-1 bg-white">Día {{ $day->day_number }} · {{ $day->date->format('d/m/Y') }}</div>
+        <aside class="space-y-5">
+            <section class="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
+                <details open>
+                    <summary class="cursor-pointer text-lg font-bold text-slate-800">Timeline de días</summary>
+                    <div class="mt-3 max-h-56 space-y-2 overflow-y-auto pr-1">
+                        @foreach($stay->days->sortByDesc('date') as $day)
+                            <div class="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700">
+                                <p class="font-semibold">Día {{ $day->day_number }}</p>
+                                <p>{{ $day->date->format('d/m/Y') }}</p>
+                            </div>
+                        @endforeach
+                    </div>
+                </details>
+            </section>
+
+            <section id="evolucion" class="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
+                <h2 class="text-lg font-bold text-slate-800">Evolución rápida</h2>
+                <form method="POST" action="{{ route('hospital.progress.store', $stay) }}" class="mt-3 space-y-3">@csrf
+                    <x-select name="shift">
+                        <option value="manana">Mañana</option><option value="tarde">Tarde</option><option value="noche">Noche</option>
+                    </x-select>
+                    <x-textarea name="content" rows="3" placeholder="Resumen breve del turno..." />
+                    <input type="hidden" name="logged_at" value="{{ now()->format('Y-m-d\TH:i') }}" />
+                    <input type="hidden" name="author_id" value="{{ auth()->id() }}" />
+                    <x-button type="submit" class="w-full">Guardar evolución</x-button>
+                </form>
+            </section>
+
+            <section id="signos" class="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
+                <h2 class="text-lg font-bold text-slate-800">Signos vitales</h2>
+                <form method="POST" action="{{ route('hospital.vitals.store', $stay) }}" class="mt-3 grid grid-cols-2 gap-2">@csrf
+                    <x-input name="measured_at" type="datetime-local" value="{{ now()->format('Y-m-d\TH:i') }}" class="col-span-2" />
+                    <x-input name="temp" placeholder="Temp" />
+                    <x-input name="hr" placeholder="FC" />
+                    <x-input name="rr" placeholder="FR" />
+                    <x-input name="spo2" placeholder="SpO2" />
+                    <input type="hidden" name="measured_by" value="{{ auth()->id() }}" />
+                    <x-button type="submit" class="col-span-2">Guardar signos</x-button>
+                </form>
+            </section>
+        </aside>
+    </div>
+
+    @if($isAdmin)
+        <section id="facturacion" class="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
+            <div class="mb-3 flex items-center justify-between">
+                <h2 class="text-xl font-bold text-slate-800">Facturación</h2>
+                <span class="rounded-full bg-emerald-100 px-3 py-1 text-sm font-semibold text-emerald-700">Subtotal: ${{ number_format($stay->charges->sum('total'),2) }}</span>
+            </div>
+            <div class="space-y-2">
+                @foreach($stay->charges as $charge)
+                    <div class="flex items-center justify-between rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm">
+                        <p class="text-slate-700">{{ $charge->description }} <span class="text-slate-500">({{ $charge->status }})</span></p>
+                        <p class="font-semibold text-slate-800">${{ number_format($charge->total,2) }}</p>
+                    </div>
                 @endforeach
             </div>
-        </details>
-
-        <section id="ordenes" class="space-y-2 mb-4">
-            <h3 class="font-semibold text-emerald-700">ÓRDENES ACTIVAS</h3>
-            @foreach($activeOrders as $order)
-                <x-card class="border border-emerald-100">
-                    <div class="flex justify-between items-center gap-3 flex-wrap">
-                        <div>
-                            <p class="font-semibold">{{ $order->manual_name ?? $order->product?->name ?? 'Tratamiento' }}</p>
-                            <p class="text-sm text-gray-600">{{ $order->dose }} · {{ $order->route }} · {{ $order->frequency_type }} ({{ $order->frequency_value }})</p>
-                            <p class="text-sm">Última: {{ optional($order->last_applied_at)?->format('d/m H:i') ?? 'Sin aplicaciones' }}</p>
-                            <p class="text-sm">Próxima: {{ optional($order->next_due_at)?->format('d/m H:i') ?? 'Finalizada' }}</p>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            @if($order->next_due_at && $order->next_due_at->lte(now()->addMinutes(30)))
-                                <x-badge color="warning">Pendiente</x-badge>
-                            @endif
-                            <form method="POST" action="{{ route('hospital.orders.apply', ['stay' => $stay->id, 'order' => $order->id]) }}" class="flex gap-2">
-                                @csrf
-                                <input name="notes" class="border rounded px-2 py-1 text-sm" placeholder="Obs. opcional" />
-                                <x-button type="submit">APLICAR</x-button>
-                            </form>
-                            @if($isAdmin)
-                                <form method="POST" action="{{ route('hospital.orders.stop', ['order' => $order->id]) }}">@csrf<x-button type="submit" size="sm" color="danger">Detener</x-button></form>
-                            @endif
-                        </div>
-                    </div>
-                </x-card>
-            @endforeach
-
-            <x-card class="bg-white border border-emerald-100">
-                <h4 class="font-semibold">Nueva orden</h4>
-                <form method="POST" action="{{ route('hospital.orders.store', $stay) }}" class="grid md:grid-cols-4 gap-2 mt-2">@csrf
-                    <x-select name="source"><option value="inventory">Inventario</option><option value="manual">Manual</option></x-select>
-                    <x-input name="product_id" placeholder="Producto ID" />
-                    <x-input name="manual_name" placeholder="Nombre manual" />
-                    <x-input name="dose" placeholder="Dosis" />
-                    <x-input name="route" placeholder="Vía" />
-                    <x-select name="frequency_type"><option value="q_hours">Cada X horas</option><option value="times_per_day">X veces al día</option><option value="q_days">Cada X días</option></x-select>
-                    <x-input name="frequency_value" type="number" min="1" value="8" placeholder="Valor" />
-                    <x-input name="start_at" type="datetime-local" value="{{ now()->format('Y-m-d\TH:i') }}" />
-                    <x-input name="duration_days" type="number" min="1" placeholder="Duración días" />
-                    <input type="hidden" name="type" value="medication" /><input type="hidden" name="created_by" value="{{ auth()->id() }}" />
-                    <div class="md:col-span-4"><x-button type="submit" size="sm">Guardar orden</x-button></div>
-                </form>
-            </x-card>
         </section>
+    @endif
 
-        <section id="aplicaciones" class="mb-4">
-            <h3 class="font-semibold text-emerald-700">APLICACIONES DEL DÍA</h3>
-            @foreach(($currentDay?->administrations ?? collect())->sortByDesc('administered_at') as $admin)
-                <div class="border rounded p-2 bg-white text-sm">{{ $admin->administered_at?->format('H:i') }} · {{ $admin->order->manual_name ?? $admin->order->product?->name }} · {{ $admin->dose_given }}</div>
-            @endforeach
-        </section>
-
-        <section id="evolucion" class="mb-4">
-            <h3 class="font-semibold text-emerald-700">EVOLUCIÓN</h3>
-            <form method="POST" action="{{ route('hospital.progress.store', $stay) }}" class="grid md:grid-cols-4 gap-2">@csrf
-                <x-select name="shift"><option value="manana">Mañana</option><option value="tarde">Tarde</option><option value="noche">Noche</option></x-select>
-                <x-textarea name="content" class="md:col-span-2" />
-                <input type="hidden" name="logged_at" value="{{ now()->format('Y-m-d\TH:i') }}" /><input type="hidden" name="author_id" value="{{ auth()->id() }}" />
-                <x-button type="submit">Guardar</x-button>
-            </form>
-        </section>
-
-        <section id="signos" class="mb-2">
-            <h3 class="font-semibold text-emerald-700">SIGNOS VITALES</h3>
-            <form method="POST" action="{{ route('hospital.vitals.store', $stay) }}" class="grid md:grid-cols-5 gap-2">@csrf
-                <x-input name="measured_at" type="datetime-local" value="{{ now()->format('Y-m-d\TH:i') }}" />
-                <x-input name="temp" placeholder="Temp" /><x-input name="hr" placeholder="FC" /><x-input name="rr" placeholder="FR" /><x-input name="spo2" placeholder="SpO2" />
-                <input type="hidden" name="measured_by" value="{{ auth()->id() }}" />
-                <div class="md:col-span-5"><x-button type="submit">Guardar signos</x-button></div>
-            </form>
-        </section>
-
-        @if($isAdmin)
-        <section id="facturacion" class="mt-6">
-            <h3 class="font-semibold text-emerald-700">Facturación</h3>
-            <p class="text-sm text-gray-500 mb-2">Subtotal: ${{ number_format($stay->charges->sum('total'),2) }}</p>
-            @foreach($stay->charges as $charge)
-                <div class="flex justify-between border rounded bg-white p-2 text-sm mb-1">
-                    <span>{{ $charge->description }} ({{ $charge->status }})</span>
-                    <span>${{ number_format($charge->total,2) }}</span>
-                </div>
-            @endforeach
-        </section>
-        @endif
-    </div>
+    <section class="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
+        <h2 class="text-xl font-bold text-slate-800">Nueva orden</h2>
+        <form method="POST" action="{{ route('hospital.orders.store', $stay) }}" class="mt-3 grid gap-2 md:grid-cols-4">@csrf
+            <x-select name="source"><option value="inventory">Inventario</option><option value="manual">Manual</option></x-select>
+            <x-input name="product_id" placeholder="Producto ID" />
+            <x-input name="manual_name" placeholder="Nombre manual" />
+            <x-input name="dose" placeholder="Dosis" />
+            <x-input name="route" placeholder="Vía" />
+            <x-select name="frequency_type"><option value="q_hours">Cada X horas</option><option value="times_per_day">X veces al día</option><option value="q_days">Cada X días</option></x-select>
+            <x-input name="frequency_value" type="number" min="1" value="8" placeholder="Valor" />
+            <x-input name="start_at" type="datetime-local" value="{{ now()->format('Y-m-d\TH:i') }}" />
+            <x-input name="duration_days" type="number" min="1" placeholder="Duración días" />
+            <input type="hidden" name="type" value="medication" />
+            <input type="hidden" name="created_by" value="{{ auth()->id() }}" />
+            <div class="md:col-span-4"><x-button type="submit">Guardar orden</x-button></div>
+        </form>
+    </section>
 </div>
 @endsection
