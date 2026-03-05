@@ -12,13 +12,23 @@ use Illuminate\Validation\ValidationException;
 
 class HospitalTreatmentService
 {
+    public function __construct(
+        private readonly DoseSchedulerService $doseSchedulerService,
+        private readonly ChargeService $chargeService,
+        private readonly InventoryIntegrationService $inventoryIntegrationService,
+    ) {
+    }
+
     public function createOrder(array $data): HospitalOrder
     {
         $data = $this->normalizeSource($data);
         $this->validateSource($data);
+        $data['start_at'] = $data['start_at'] ?? now();
+        $data['status'] = $data['status'] ?? 'active';
 
         return DB::transaction(function () use ($data) {
             $order = HospitalOrder::create($data);
+            $order->update(['next_due_at' => $this->doseSchedulerService->calculateFirstDueAt($order)]);
 
             return $order->fresh(['product']);
         });
@@ -26,19 +36,9 @@ class HospitalTreatmentService
 
     public function stopOrder(HospitalOrder $order): HospitalOrder
     {
-        $order->update(['status' => 'stopped', 'end_at' => now()]);
+        $order->update(['status' => 'stopped', 'end_at' => now(), 'next_due_at' => null]);
 
         return $order->refresh();
-    }
-
-    public function scheduleFromFrequency(string $frequency): array
-    {
-        return match (strtolower($frequency)) {
-            'bid', 'c/12h' => ['08:00', '20:00'],
-            'tid', 'c/8h' => ['07:00', '15:00', '23:00'],
-            'qid', 'c/6h' => ['06:00', '12:00', '18:00', '00:00'],
-            default => [],
-        };
     }
 
     public function createAdministration(HospitalOrder $order, array $payload): HospitalAdministration
@@ -46,13 +46,32 @@ class HospitalTreatmentService
         return DB::transaction(function () use ($order, $payload) {
             $stay = HospitalStay::findOrFail($order->stay_id);
             $administeredAt = Carbon::parse($payload['administered_at'] ?? now());
-            $day = $this->resolveDay($stay, $administeredAt);
 
+            $this->guardAgainstDuplicateApplication($order, $administeredAt, $payload['is_admin'] ?? false);
+
+            $day = $this->resolveDay($stay, $administeredAt);
             $payload['stay_id'] = $stay->id;
             $payload['day_id'] = $day->id;
             $payload['order_id'] = $order->id;
 
-            return HospitalAdministration::create($payload);
+            $application = HospitalAdministration::create($payload);
+
+            if ($order->source === 'inventory' && $order->product_id) {
+                $this->inventoryIntegrationService->deductStock([
+                    ['product_id' => $order->product_id, 'qty' => 1, 'reason' => 'hospital_application', 'ref_id' => $application->id],
+                ]);
+            }
+
+            $nextDueAt = $this->doseSchedulerService->calculateNextDueAt($order, $administeredAt);
+            $order->update([
+                'last_applied_at' => $administeredAt,
+                'next_due_at' => $nextDueAt,
+                'status' => $nextDueAt ? 'active' : 'stopped',
+            ]);
+
+            $this->chargeService->createFromApplication($application->fresh(['order.product', 'stay']));
+
+            return $application;
         });
     }
 
@@ -86,6 +105,27 @@ class HospitalTreatmentService
         if ($data['source'] === 'manual' && empty($data['manual_name'])) {
             throw ValidationException::withMessages([
                 'manual_name' => 'El nombre es requerido para órdenes manuales.',
+            ]);
+        }
+    }
+
+    private function guardAgainstDuplicateApplication(HospitalOrder $order, Carbon $administeredAt, bool $isAdmin): void
+    {
+        if ($isAdmin) {
+            return;
+        }
+
+        $windowMinutes = (int) config('hospital.duplicate_window_minutes', 5);
+
+        $exists = $order->administrations()
+            ->whereBetween('administered_at', [
+                $administeredAt->copy()->subMinutes($windowMinutes),
+                $administeredAt->copy()->addMinutes($windowMinutes),
+            ])->exists();
+
+        if ($exists) {
+            throw ValidationException::withMessages([
+                'administered_at' => 'Ya existe una aplicación en una ventana cercana para esta orden.',
             ]);
         }
     }

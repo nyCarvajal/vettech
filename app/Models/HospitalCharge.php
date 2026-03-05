@@ -14,12 +14,18 @@ class HospitalCharge extends BaseModel
     protected $fillable = [
         'stay_id',
         'day_id',
+        'patient_id',
+        'order_id',
+        'application_id',
         'source',
+        'ref_type',
+        'ref_id',
         'product_id',
         'description',
         'qty',
         'unit_price',
         'total',
+        'status',
         'created_by',
         'created_at',
     ];
@@ -36,6 +42,16 @@ class HospitalCharge extends BaseModel
     public function day(): BelongsTo
     {
         return $this->belongsTo(HospitalDay::class, 'day_id');
+    }
+
+    public function order(): BelongsTo
+    {
+        return $this->belongsTo(HospitalOrder::class, 'order_id');
+    }
+
+    public function application(): BelongsTo
+    {
+        return $this->belongsTo(HospitalAdministration::class, 'application_id');
     }
 
     public function product(): BelongsTo
