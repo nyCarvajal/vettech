@@ -24,7 +24,7 @@ class ReservaController extends Controller
         $pacientes = Paciente::orderBy('nombres')->get();
         $clinicId = Auth::user()?->clinica_id;
 
-        $medicos = User::query()
+        $medicos = User::on('mysql')
             ->when($clinicId, fn ($query) => $query->where('clinica_id', $clinicId))
             ->where(function ($query) {
                 $query->where('role', 'medico')
