@@ -78,6 +78,7 @@ class HospitalController extends Controller
             'owner',
             'cage',
             'charges',
+            'orders.product',
             'days' => function ($query) {
                 $query
                     ->orderByDesc('date')
@@ -120,9 +121,31 @@ class HospitalController extends Controller
     {
         $this->ensureTenantConnection();
 
-        $this->treatmentService->createAdministration($order, $request->validated());
+        $payload = $request->validated();
+        $payload['is_admin'] = strtolower((string) ($request->user()?->role ?? '')) === 'admin';
+        $this->treatmentService->createAdministration($order, $payload);
 
         return back()->with('status', 'Aplicación registrada.');
+    }
+
+    public function applyOrder(Request $request, HospitalStay $stay, HospitalOrder $order): RedirectResponse
+    {
+        $this->ensureTenantConnection();
+
+        abort_unless($order->stay_id === $stay->id, 404);
+
+        $payload = [
+            'administered_at' => now(),
+            'dose_given' => $order->dose,
+            'status' => 'done',
+            'notes' => $request->input('notes'),
+            'administered_by' => $request->user()->id,
+            'is_admin' => strtolower((string) ($request->user()?->role ?? '')) === 'admin',
+        ];
+
+        $this->treatmentService->createAdministration($order, $payload);
+
+        return back()->with('status', 'Aplicación registrada en 1 clic.');
     }
 
     public function addVitals(VitalsRequest $request, HospitalStay $stay): RedirectResponse

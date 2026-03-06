@@ -31,9 +31,12 @@ class OrderRequest extends FormRequest
             'dose' => ['nullable', 'string', 'max:80'],
             'route' => ['nullable', 'string', 'max:50'],
             'frequency' => ['nullable', 'string', 'max:50'],
+            'frequency_type' => ['required', Rule::in(['q_hours', 'times_per_day', 'q_days'])],
+            'frequency_value' => ['required', 'integer', 'min:1', 'max:24'],
             'schedule_json' => ['nullable', 'array'],
-            'start_at' => ['required', 'date'],
+            'start_at' => ['nullable', 'date'],
             'end_at' => ['nullable', 'date', 'after_or_equal:start_at'],
+            'duration_days' => ['nullable', 'integer', 'min:1'],
             'instructions' => ['nullable', 'string'],
             'created_by' => ['required', 'exists:users,id'],
         ];

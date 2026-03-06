@@ -20,9 +20,14 @@ class HospitalOrder extends BaseModel
         'dose',
         'route',
         'frequency',
+        'frequency_type',
+        'frequency_value',
         'schedule_json',
         'start_at',
         'end_at',
+        'duration_days',
+        'next_due_at',
+        'last_applied_at',
         'instructions',
         'status',
         'created_by',
@@ -32,6 +37,8 @@ class HospitalOrder extends BaseModel
         'schedule_json' => 'array',
         'start_at' => 'datetime',
         'end_at' => 'datetime',
+        'next_due_at' => 'datetime',
+        'last_applied_at' => 'datetime',
     ];
 
     public function stay(): BelongsTo
