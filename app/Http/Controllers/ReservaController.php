@@ -5,9 +5,10 @@ namespace App\Http\Controllers;
 use App\Models\Paciente;
 use App\Models\Reserva;
 use App\Models\Tipocita;
-use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Validator;
 
@@ -21,7 +22,22 @@ class ReservaController extends Controller
     public function calendar(Request $request)
     {
         $pacientes = Paciente::orderBy('nombres')->get();
-        $medicos = User::orderBy('nombres')->get();
+        $clinicId = Auth::user()?->clinica_id;
+
+        $medicos = DB::connection('mysql')
+            ->table('users')
+            ->when($clinicId, fn ($query) => $query->where('clinica_id', $clinicId))
+            ->where(function ($query) {
+                $query->where('role', 'medico')
+                    ->orWhere('role', 'médico');
+            })
+            ->orderBy('nombres')
+            ->get()
+            ->map(function ($medico) {
+                $medico->nombres = trim((string) ($medico->nombres ?? ''));
+
+                return $medico;
+            });
         $tipos = Tipocita::orderBy('nombre')->get();
 
         $selectedDate = Carbon::parse($request->input('fecha', now()->toDateString()))->startOfDay();
