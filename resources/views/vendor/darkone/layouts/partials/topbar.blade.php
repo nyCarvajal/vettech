@@ -4,9 +4,8 @@
                <div class="d-flex align-items-center gap-2">
                     <!-- Menu Toggle Button -->
                     <div class="topbar-item">
-                         <button type="button" class="button-toggle-menu topbar-button">
-                              <iconify-icon icon="solar:hamburger-menu-outline"
-                                   class="fs-24 align-middle"></iconify-icon>
+                         <button type="button" class="button-toggle-menu topbar-button" aria-label="Abrir menú principal">
+                              <i class="bx bx-menu fs-24 align-middle"></i>
                          </button>
                     </div>
 

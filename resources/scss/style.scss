@@ -334,6 +334,11 @@
     justify-content: center;
   }
 
+  .app-topbar .button-toggle-menu i {
+    display: inline-block !important;
+    line-height: 1;
+  }
+
   html[data-sidebar-size="sm-hover"] .app-topbar .button-toggle-menu,
   html[data-sidebar-size="sm-hover-active"] .app-topbar .button-toggle-menu {
     display: inline-flex !important;

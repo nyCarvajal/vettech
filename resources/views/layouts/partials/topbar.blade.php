@@ -9,7 +9,7 @@
                     </div>
                     <!-- Menu Toggle Button -->
                     <div class="topbar-item">
-                         <button type="button" class="button-toggle-menu topbar-button">
+                         <button type="button" class="button-toggle-menu topbar-button" aria-label="Abrir menú principal">
                               <i class="bx bx-menu fs-24 align-middle"></i>
                          </button>
                     </div>
