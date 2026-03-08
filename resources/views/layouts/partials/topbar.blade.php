@@ -261,18 +261,16 @@
             };
 
             const bindButtons = () => {
-                const buttons = document.querySelectorAll('.button-toggle-menu');
-                if (!buttons.length) {
-                    return false;
-                }
+                document.addEventListener('click', (event) => {
+                    const button = event.target.closest('.button-toggle-menu');
+                    if (!button) {
+                        return;
+                    }
 
-                buttons.forEach((button) => {
                     button.dataset.manualSidebarToggle = '1';
-                    button.addEventListener('click', (event) => {
-                        event.preventDefault();
-                        event.stopImmediatePropagation();
-                        toggleSidebar();
-                    });
+                    event.preventDefault();
+                    event.stopPropagation();
+                    toggleSidebar();
                 });
 
                 return true;
@@ -301,4 +299,3 @@
         })();
     </script>
 @endonce
-
