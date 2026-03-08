@@ -446,7 +446,7 @@ html[data-sidebar-size="sm-hover"] {
      }
 
      .button-toggle-menu {
-          display: none;
+          display: inline-flex;
      }
 
      .app-sidebar:not(:hover) {
@@ -527,7 +527,7 @@ html[data-sidebar-size="sm-hover"] {
 // Small Hover Active
 html[data-sidebar-size="sm-hover-active"] {
      .button-toggle-menu {
-          display: none;
+          display: inline-flex;
      }
 
      .app-sidebar {

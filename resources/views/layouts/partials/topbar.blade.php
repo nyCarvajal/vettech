@@ -266,6 +266,12 @@
                         return;
                     }
 
+                buttons.forEach((button) => {
+                    if (button.dataset.manualSidebarBound === '1') {
+                        return;
+                    }
+
+                    button.dataset.manualSidebarBound = '1';
                     button.dataset.manualSidebarToggle = '1';
                     event.preventDefault();
                     event.stopPropagation();
