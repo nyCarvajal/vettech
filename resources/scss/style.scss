@@ -324,3 +324,18 @@
 }
 
 
+
+
+/* Fuerza visibilidad del botón hamburguesa en móvil */
+@media (max-width: 1140px) {
+  .app-topbar .button-toggle-menu {
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+  }
+
+  html[data-sidebar-size="sm-hover"] .app-topbar .button-toggle-menu,
+  html[data-sidebar-size="sm-hover-active"] .app-topbar .button-toggle-menu {
+    display: inline-flex !important;
+  }
+}

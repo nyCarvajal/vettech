@@ -10,8 +10,7 @@
                     <!-- Menu Toggle Button -->
                     <div class="topbar-item">
                          <button type="button" class="button-toggle-menu topbar-button">
-                              <iconify-icon icon="solar:hamburger-menu-outline"
-                                   class="fs-24 align-middle"></iconify-icon>
+                              <i class="bx bx-menu fs-24 align-middle"></i>
                          </button>
                     </div>
 
@@ -261,18 +260,16 @@
             };
 
             const bindButtons = () => {
-                const buttons = document.querySelectorAll('.button-toggle-menu');
-                if (!buttons.length) {
-                    return false;
-                }
+                document.addEventListener('click', (event) => {
+                    const button = event.target.closest('.button-toggle-menu');
+                    if (!button) {
+                        return;
+                    }
 
-                buttons.forEach((button) => {
                     button.dataset.manualSidebarToggle = '1';
-                    button.addEventListener('click', (event) => {
-                        event.preventDefault();
-                        event.stopImmediatePropagation();
-                        toggleSidebar();
-                    });
+                    event.preventDefault();
+                    event.stopPropagation();
+                    toggleSidebar();
                 });
 
                 return true;
@@ -301,4 +298,3 @@
         })();
     </script>
 @endonce
-
