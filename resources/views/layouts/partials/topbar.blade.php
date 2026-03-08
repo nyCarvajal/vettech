@@ -9,9 +9,8 @@
                     </div>
                     <!-- Menu Toggle Button -->
                     <div class="topbar-item">
-                         <button type="button" class="button-toggle-menu topbar-button">
-                              <iconify-icon icon="solar:hamburger-menu-outline"
-                                   class="fs-24 align-middle"></iconify-icon>
+                         <button type="button" class="button-toggle-menu topbar-button" aria-label="Abrir menú principal">
+                              <i class="bx bx-menu fs-24 align-middle"></i>
                          </button>
                     </div>
 
@@ -267,6 +266,11 @@
                 }
 
                 buttons.forEach((button) => {
+                    if (button.dataset.manualSidebarBound === '1') {
+                        return;
+                    }
+
+                    button.dataset.manualSidebarBound = '1';
                     button.dataset.manualSidebarToggle = '1';
                     button.addEventListener('click', (event) => {
                         event.preventDefault();
@@ -301,4 +305,3 @@
         })();
     </script>
 @endonce
-
