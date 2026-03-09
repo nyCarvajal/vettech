@@ -248,6 +248,21 @@
     <div class="card">
         <div class="section-title">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+            <h3>Abordaje diagnóstico</h3>
+        </div>
+        <ul class="list">
+            <li class="list-item"><strong>Lista de problemas:</strong> {{ $historiaClinica->abordaje_lista_problemas ?: 'Sin registrar' }}</li>
+            <li class="list-item"><strong>Lista maestra:</strong> {{ $historiaClinica->abordaje_lista_maestra ?: 'Sin registrar' }}</li>
+            <li class="list-item"><strong>Diagnósticos diferenciales:</strong> {{ $historiaClinica->abordaje_diagnosticos_diferenciales ?: 'Sin registrar' }}</li>
+            <li class="list-item"><strong>Diagnóstico definitivo:</strong> {{ $historiaClinica->diagnostico_definitivo ?: 'Sin registrar' }}</li>
+        </ul>
+    </div>
+
+    <div class="card">
+        <div class="section-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M5 7a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2z" />
                 <path d="M16 3v4" />
                 <path d="M8 3v4" />

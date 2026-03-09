@@ -111,7 +111,7 @@ class TimelineService
                     'type' => 'historia',
                     'occurred_at' => $historia->updated_at ?? $historia->created_at,
                     'title' => 'Historia clínica',
-                    'summary' => $historia->motivo_consulta ?: 'Consulta clínica',
+                    'summary' => $historia->diagnostico_definitivo ?: ($historia->motivo_consulta ?: 'Consulta clínica'),
                     'url' => route('historias-clinicas.show', $historia),
                     'record' => $historia,
                     'prescription' => $historia->prescriptions->first(),

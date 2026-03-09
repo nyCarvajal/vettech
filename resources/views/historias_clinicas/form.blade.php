@@ -543,6 +543,26 @@
                 <textarea name="analisis" id="analisis" class="form-control textarea-soft" rows="3"
                     placeholder="Conclusiones clínicas y correlación de hallazgos">{{ old('analisis', $historia->analisis) }}</textarea>
             </div>
+            <div class="col-md-4">
+                <label class="form-label" for="abordaje_lista_problemas">Lista de problemas</label>
+                <textarea name="abordaje_lista_problemas" id="abordaje_lista_problemas" class="form-control textarea-soft" rows="3"
+                    placeholder="Problemas clínicos identificados">{{ old('abordaje_lista_problemas', $historia->abordaje_lista_problemas) }}</textarea>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label" for="abordaje_lista_maestra">Lista maestra</label>
+                <textarea name="abordaje_lista_maestra" id="abordaje_lista_maestra" class="form-control textarea-soft" rows="3"
+                    placeholder="Síndromes o ejes priorizados">{{ old('abordaje_lista_maestra', $historia->abordaje_lista_maestra) }}</textarea>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label" for="abordaje_diagnosticos_diferenciales">Diagnósticos diferenciales</label>
+                <textarea name="abordaje_diagnosticos_diferenciales" id="abordaje_diagnosticos_diferenciales" class="form-control textarea-soft" rows="3"
+                    placeholder="Posibles diagnósticos a descartar">{{ old('abordaje_diagnosticos_diferenciales', $historia->abordaje_diagnosticos_diferenciales) }}</textarea>
+            </div>
+            <div class="col-md-12">
+                <label class="form-label" for="diagnostico_definitivo">Diagnóstico definitivo</label>
+                <textarea name="diagnostico_definitivo" id="diagnostico_definitivo" class="form-control textarea-soft" rows="2"
+                    placeholder="Diagnóstico final de la consulta">{{ old('diagnostico_definitivo', $historia->diagnostico_definitivo) }}</textarea>
+            </div>
             <div class="col-md-6">
                 <label class="form-label" for="plan_procedimientos">Procedimientos</label>
                 <textarea name="plan_procedimientos" id="plan_procedimientos" class="form-control textarea-soft" rows="3"

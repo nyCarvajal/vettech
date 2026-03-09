@@ -267,6 +267,22 @@
                         <p class="mt-1 text-gray-600">{{ $historia->analisis ?: 'Sin registrar' }}</p>
                     </div>
                     <div>
+                        <p class="font-semibold text-gray-900">Lista de problemas</p>
+                        <p class="mt-1 text-gray-600">{{ $historia->abordaje_lista_problemas ?: 'Sin registrar' }}</p>
+                    </div>
+                    <div>
+                        <p class="font-semibold text-gray-900">Lista maestra</p>
+                        <p class="mt-1 text-gray-600">{{ $historia->abordaje_lista_maestra ?: 'Sin registrar' }}</p>
+                    </div>
+                    <div>
+                        <p class="font-semibold text-gray-900">Diagnósticos diferenciales</p>
+                        <p class="mt-1 text-gray-600">{{ $historia->abordaje_diagnosticos_diferenciales ?: 'Sin registrar' }}</p>
+                    </div>
+                    <div>
+                        <p class="font-semibold text-gray-900">Diagnóstico definitivo</p>
+                        <p class="mt-1 text-gray-600">{{ $historia->diagnostico_definitivo ?: 'Sin registrar' }}</p>
+                    </div>
+                    <div>
                         <p class="font-semibold text-gray-900">Plan procedimientos</p>
                         <p class="mt-1 text-gray-600">{{ $historia->plan_procedimientos ?: 'Sin registrar' }}</p>
                     </div>
