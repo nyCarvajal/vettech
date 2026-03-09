@@ -4,9 +4,8 @@
                <div class="d-flex align-items-center gap-2">
                     <!-- Menu Toggle Button -->
                     <div class="topbar-item">
-                         <button type="button" class="button-toggle-menu topbar-button">
-                              <iconify-icon icon="solar:hamburger-menu-outline"
-                                   class="fs-24 align-middle"></iconify-icon>
+                         <button type="button" id="primary-sidebar-toggle" class="button-toggle-menu topbar-button always-visible-menu-toggle" aria-label="Abrir menú principal">
+                              <i class="bx bx-menu fs-24 align-middle"></i>
                          </button>
                     </div>
 
@@ -193,6 +192,31 @@
 </header>
 
 @once
+    <style>
+        /* mobile-menu-toggle-guard: fallback inline para asegurar visibilidad */
+        @media (max-width: 1140px) {
+            .app-topbar .always-visible-menu-toggle {
+                display: inline-flex !important;
+                align-items: center;
+                justify-content: center;
+                visibility: visible !important;
+                opacity: 1 !important;
+                pointer-events: auto !important;
+                position: relative;
+                z-index: 1102;
+            }
+
+            .app-topbar .always-visible-menu-toggle i,
+            .app-topbar .always-visible-menu-toggle iconify-icon {
+                display: inline-block !important;
+                opacity: 1 !important;
+                visibility: visible !important;
+            }
+        }
+    </style>
+@endonce
+
+@once
     <script>
         (() => {
             if (window.__appManualSidebarToggleInitialized) {
@@ -341,7 +365,7 @@
             };
 
             const bindButtons = () => {
-                const buttons = document.querySelectorAll('.button-toggle-menu');
+                const buttons = document.querySelectorAll('.button-toggle-menu, .always-visible-menu-toggle, #primary-sidebar-toggle');
                 if (!buttons.length) {
                     return false;
                 }
@@ -370,6 +394,7 @@
                 syncLastKnownSize();
                 handleResize();
                 window.addEventListener('resize', handleResize);
+                window.addEventListener('layout:config-ready', handleResize);
                 document.addEventListener('keydown', handleKeydown);
             };
 
