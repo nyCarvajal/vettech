@@ -297,11 +297,9 @@
 
                     button.dataset.manualSidebarBound = '1';
                     button.dataset.manualSidebarToggle = '1';
-                    button.addEventListener('click', (event) => {
-                        event.preventDefault();
-                        event.stopImmediatePropagation();
-                        toggleSidebar();
-                    });
+                    event.preventDefault();
+                    event.stopPropagation();
+                    toggleSidebar();
                 });
 
                 return true;
