@@ -122,10 +122,18 @@
     @stack('styles')
 </head>
 <body class="bg-gray-50">
-    <div id="app" class="min-h-screen flex flex-col">
+    <div id="app" x-data="{ mobileMenuOpen: false }" @keydown.escape.window="mobileMenuOpen = false" class="min-h-screen flex flex-col">
         <header class="bg-white border-b border-gray-200">
             <div class="h-16 px-6 flex items-center justify-between gap-6">
-                <div class="flex items-center">
+                <div class="flex items-center gap-3">
+                    <button
+                        type="button"
+                        class="inline-flex lg:hidden items-center justify-center h-10 w-10 rounded-lg border border-gray-200 text-gray-700 hover:bg-gray-100"
+                        aria-label="Abrir menú principal"
+                        @click="mobileMenuOpen = true"
+                    >
+                        <i class="ri-menu-line text-xl"></i>
+                    </button>
                     <a href="{{ route('dashboard') }}" class="inline-flex items-center" aria-label="Ir al dashboard">
                         <img
                             src="{{ asset('images/logo-dark.png') }}"
@@ -157,6 +165,120 @@
                 </div>
             </div>
         </header>
+
+        <div
+            x-cloak
+            x-show="mobileMenuOpen"
+            x-transition.opacity
+            class="fixed inset-0 z-40 bg-black/40 lg:hidden"
+            @click="mobileMenuOpen = false"
+        ></div>
+
+        <aside
+            x-cloak
+            x-show="mobileMenuOpen"
+            x-transition:enter="transition ease-out duration-200"
+            x-transition:enter-start="-translate-x-full"
+            x-transition:enter-end="translate-x-0"
+            x-transition:leave="transition ease-in duration-150"
+            x-transition:leave-start="translate-x-0"
+            x-transition:leave-end="-translate-x-full"
+            class="fixed inset-y-0 left-0 z-50 w-72 max-w-[85vw] bg-white border-r border-gray-200 lg:hidden overflow-y-auto"
+        >
+            <div class="h-16 px-4 flex items-center justify-between border-b border-gray-200">
+                <span class="text-sm font-semibold text-gray-700">Menú principal</span>
+                <button
+                    type="button"
+                    class="inline-flex items-center justify-center h-9 w-9 rounded-lg border border-gray-200 text-gray-700 hover:bg-gray-100"
+                    aria-label="Cerrar menú principal"
+                    @click="mobileMenuOpen = false"
+                >
+                    <i class="ri-close-line text-lg"></i>
+                </button>
+            </div>
+
+            @php
+                $featureDefaults = \App\Models\Clinica::featureDefaults();
+                $featureEnabled = function (string $key) use ($clinica, $featureDefaults): bool {
+                    if ($clinica) {
+                        return $clinica->featureEnabled($key, $featureDefaults[$key] ?? true);
+                    }
+
+                    return $featureDefaults[$key] ?? true;
+                };
+
+                $navSections = [
+                    [
+                        'title' => 'OPERACIÓN',
+                        'items' => array_filter([
+                            ['label' => 'Dashboard', 'route' => 'dashboard'],
+                            $featureEnabled('agenda') ? ['label' => 'Agenda', 'route' => 'agenda.index'] : null,
+                            $featureEnabled('facturacion_pos') ? ['label' => 'Facturación POS', 'route' => 'invoices.pos'] : null,
+                            $featureEnabled('tutores') ? ['label' => 'Tutores', 'route' => 'owners.index'] : null,
+                            $featureEnabled('pacientes') ? ['label' => 'Pacientes', 'route' => 'patients.index'] : null,
+                            ['label' => 'Inventario', 'route' => 'items.index'],
+                        ]),
+                    ],
+                    [
+                        'title' => 'SERVICIOS / CLÍNICA',
+                        'items' => array_filter([
+                             $featureEnabled('hospitalizacion') ? ['label' => 'Hospitalización 24/7', 'route' => 'hospital.index'] : null,
+                            $featureEnabled('belleza') ? ['label' => 'Peluquería', 'route' => 'groomings.index'] : null,
+                            $featureEnabled('consentimientos') ? ['label' => 'Consentimientos', 'route' => 'consents.index'] : null,
+                            $featureEnabled('plantillas_consentimientos') ? ['label' => 'Plantillas de consentimientos', 'route' => 'consent-templates.index'] : null,
+                        ]),
+                    ],
+                    [
+                        'title' => 'CAJA Y REPORTES',
+                        'items' => array_filter([
+                            $featureEnabled('arqueo_caja') ? ['label' => 'Arqueo de caja', 'route' => 'cash.closures.create'] : null,
+                            $featureEnabled('reportes_basicos') ? [
+                                'label' => 'Reportes básicos',
+                                'route' => 'reports.quick',
+                                'active' => 'reports.quick*',
+                            ] : null,
+                            $featureEnabled('reportes_avanzados') ? [
+                                'label' => 'Reportes avanzados',
+                                'route' => 'reports.home',
+                                'active' => 'reports.*',
+                            ] : null,
+                        ]),
+
+                    ],
+                    [
+                        'title' => 'CONFIGURACIÓN',
+                        'items' => array_filter([
+                            ['label' => 'Catálogos', 'route' => 'configuracion.index'],
+                            $featureEnabled('config_clinica') ? ['label' => 'Configuración de clínicas', 'route' => 'settings.clinica.edit'] : null,
+                            $featureEnabled('plantillas_consentimientos') ? ['label' => 'Plantillas de consentimientos', 'route' => 'consent-templates.index'] : null,
+     ]),
+                    ],
+                ];
+
+                $navSections = array_filter($navSections, fn ($section) => count($section['items']) > 0);
+            @endphp
+
+            <nav class="p-4 space-y-4">
+                @foreach($navSections as $section)
+                    <div class="space-y-1">
+                        <p class="px-3 text-xs font-semibold uppercase tracking-wide text-gray-400">
+                            {{ $section['title'] }}
+                        </p>
+                        @foreach($section['items'] as $item)
+                            @php
+                                $isAvailable = isset($item['route']) && Route::has($item['route']);
+                                $url = $isAvailable ? route($item['route']) : '#';
+                                $activePattern = $item['active'] ?? ($item['route'] . '*');
+                                $active = $isAvailable && request()->routeIs($activePattern);
+                            @endphp
+                            <a href="{{ $url }}" class="sidebar-link {{ $active ? 'sidebar-link-active' : '' }}" @click="mobileMenuOpen = false">
+                                <span>{{ $item['label'] }}</span>
+                            </a>
+                        @endforeach
+                    </div>
+                @endforeach
+            </nav>
+        </aside>
 
         <div class="flex flex-1">
             <aside class="hidden lg:block w-64 bg-white border-r border-gray-200">
