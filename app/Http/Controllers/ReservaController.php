@@ -7,6 +7,7 @@ use App\Models\Reserva;
 use App\Models\Tipocita;
 use App\Models\User;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
@@ -24,19 +25,21 @@ class ReservaController extends Controller
         $pacientes = Paciente::orderBy('nombres')->get();
         $clinicId = Auth::user()?->clinica_id;
 
-        $medicos = User::on('mysql')
+        $medicos = DB::connection('mysql')
+            ->table('users')
             ->when($clinicId, fn ($query) => $query->where('clinica_id', $clinicId))
             ->where(function ($query) {
                 $query->where('role', 'medico')
                     ->orWhere('role', 'médico');
             })
-            ->orderByRaw('COALESCE(NULLIF(nombres, ""), nombre) asc')
             ->get()
-            ->map(function (User $medico) {
+            ->map(function ($medico) {
                 $medico->nombres = trim((string) ($medico->nombres ?? $medico->nombre ?? ''));
 
                 return $medico;
-            });
+            })
+            ->sortBy('nombres', SORT_NATURAL | SORT_FLAG_CASE)
+            ->values();
         $tipos = Tipocita::orderBy('nombre')->get();
 
         $selectedDate = Carbon::parse($request->input('fecha', now()->toDateString()))->startOfDay();
