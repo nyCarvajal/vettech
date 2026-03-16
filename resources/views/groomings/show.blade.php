@@ -41,7 +41,7 @@
                     @if($grooming->status === 'en_proceso')
                         <a href="{{ route('groomings.report.create', $grooming) }}" class="inline-flex items-center gap-2 rounded-xl bg-purple-50 px-4 py-2 text-sm font-semibold text-purple-700 ring-1 ring-purple-200 transition hover:bg-purple-100">Informe</a>
                     @endif
-                    @if($grooming->product_service_id && $grooming->status === 'finalizado')
+                    @if(($grooming->service_name || $grooming->service_price) && $grooming->status === 'finalizado')
                         <form method="POST" action="{{ route('groomings.charge', $grooming) }}">
                             @csrf
                             <button class="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-purple-500 to-mint-500 px-4 py-2 text-sm font-semibold text-white shadow-md transition hover:scale-[1.02] hover:shadow-lg">Cobrar</button>

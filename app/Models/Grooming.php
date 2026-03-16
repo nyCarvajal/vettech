@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Support\Facades\DB;
 
 class Grooming extends BaseModel
 {
@@ -30,6 +31,8 @@ class Grooming extends BaseModel
         'service_source',
         'service_id',
         'product_service_id',
+        'service_item_id',
+        'service_item_name',
         'service_price',
         'created_by',
         'started_at',
@@ -100,8 +103,18 @@ class Grooming extends BaseModel
         return match ($this->service_source) {
             'product' => optional($this->serviceProduct)->name,
             'grooming_service' => optional($this->groomingService)->name,
+            'item' => $this->resolveItemServiceName(),
             default => null,
         };
+    }
+
+    private function resolveItemServiceName(): ?string
+    {
+        if (! $this->service_id) {
+            return null;
+        }
+
+        return DB::table('Items')->where('id', $this->service_id)->value('nombre');
     }
 
     public function getStatusBadgeClassAttribute(): string
