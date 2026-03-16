@@ -30,6 +30,8 @@ class Grooming extends BaseModel
         'service_source',
         'service_id',
         'product_service_id',
+        'service_item_id',
+        'service_item_name',
         'service_price',
         'created_by',
         'started_at',
@@ -100,6 +102,7 @@ class Grooming extends BaseModel
         return match ($this->service_source) {
             'product' => optional($this->serviceProduct)->name,
             'grooming_service' => optional($this->groomingService)->name,
+            'item' => $this->service_item_name,
             default => null,
         };
     }
