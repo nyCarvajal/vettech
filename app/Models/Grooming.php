@@ -31,6 +31,8 @@ class Grooming extends BaseModel
         'service_source',
         'service_id',
         'product_service_id',
+        'service_item_id',
+        'service_item_name',
         'service_price',
         'created_by',
         'started_at',
