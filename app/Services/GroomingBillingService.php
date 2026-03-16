@@ -17,7 +17,7 @@ class GroomingBillingService
             return null;
         }
 
-        $itemId = $grooming->service_item_id ?? $grooming->product_service_id;
+        $itemId = $grooming->service_source === 'item' ? $grooming->service_id : $grooming->product_service_id;
 
         if (! $itemId) {
             throw new InvalidArgumentException('Se requiere seleccionar un servicio para facturar.');

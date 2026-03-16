@@ -30,6 +30,7 @@ class GroomingService
                 if ($product) {
                     $grooming->service_source = 'product';
                     $grooming->service_price = $product->sale_price;
+                    $grooming->service_id = null;
                 } else {
                     $item = DB::table('Items')
                         ->where('id', $grooming->product_service_id)
@@ -38,11 +39,11 @@ class GroomingService
                     if ($item) {
                         $grooming->service_source = 'item';
                         $grooming->service_price = $item->valor;
-                        $grooming->service_item_id = $item->id;
-                        $grooming->service_item_name = $item->nombre;
+                        $grooming->service_id = $item->id;
                     } else {
                         $grooming->service_source = 'none';
                         $grooming->service_price = null;
+                        $grooming->service_id = null;
                     }
 
                     $grooming->product_service_id = null;
@@ -50,6 +51,7 @@ class GroomingService
             } else {
                 $grooming->service_source = 'none';
                 $grooming->service_price = null;
+                $grooming->service_id = null;
             }
 
             $grooming->save();
