@@ -1,7 +1,32 @@
 @extends('layouts.app')
 
 @section('content')
-    <div x-data="posInvoice()" class="space-y-6">
+    @php
+        $prefillData = $prefillInvoice ? [
+            'owner_id' => $prefillInvoice->owner_id,
+            'is_credit' => (bool) $prefillInvoice->is_credit,
+            'credit_days' => $prefillInvoice->credit_days ?? 5,
+            'lines' => $prefillInvoice->lines->map(fn ($line) => [
+                'item_id' => $line->item_id,
+                'description' => $line->description,
+                'quantity' => (float) $line->quantity,
+                'unit_price' => (float) $line->unit_price,
+                'discount_rate' => (float) $line->discount_rate,
+                'tax_rate' => (float) $line->tax_rate,
+                'commission_rate' => (float) $line->commission_rate,
+            ])->values(),
+            'payments' => $prefillInvoice->payments->map(fn ($payment) => [
+                'method' => $payment->method,
+                'amount' => (float) $payment->amount,
+                'received' => (float) $payment->received,
+                'reference' => $payment->reference,
+                'card_type' => $payment->card_type ?: 'debit',
+                'bank_id' => $payment->bank_id,
+            ])->values(),
+        ] : null;
+    @endphp
+
+    <div x-data="posInvoice(@js($prefillData))" class="space-y-6">
         <div class="flex items-start justify-between gap-4">
             <div>
                 <h1 class="text-2xl font-semibold text-gray-900">POS - Facturación</h1>
@@ -38,6 +63,9 @@
                         <label class="text-xs font-semibold uppercase tracking-wide text-gray-500">Selecciona un cliente</label>
                         <select id="owner_id" name="owner_id" class="mt-2 w-full" x-ref="ownerSelect" required>
                             <option value="">Buscar cliente...</option>
+                            @if($prefillInvoice && !$owners->contains('id', $prefillInvoice->owner_id) && $prefillInvoice->owner)
+                                <option value="{{ $prefillInvoice->owner_id }}">{{ $prefillInvoice->owner->name }}</option>
+                            @endif
                             @foreach($owners as $owner)
                                 <option value="{{ $owner->id }}">{{ $owner->name }}</option>
                             @endforeach
@@ -264,7 +292,7 @@
 @push('scripts')
     <script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
     <script>
-        function posInvoice() {
+        function posInvoice(prefill = null) {
             return {
                 itemQuery: '',
                 itemResults: [],
@@ -275,7 +303,35 @@
                     { uid: crypto.randomUUID(), method: 'cash', amount: 0, received: 0, reference: '', card_type: 'debit', bank_id: '' }
                 ],
                 init() {
-                    new TomSelect(this.$refs.ownerSelect, {
+                    if (prefill) {
+                        this.lines = (prefill.lines || []).map(line => ({
+                            uid: crypto.randomUUID(),
+                            item_id: line.item_id || '',
+                            description: line.description || '',
+                            quantity: Number(line.quantity || 0),
+                            unit_price: Number(line.unit_price || 0),
+                            discount_rate: Number(line.discount_rate || 0),
+                            tax_rate: Number(line.tax_rate || 0),
+                            commission_rate: Number(line.commission_rate || 0),
+                        }));
+                        this.is_credit = Boolean(prefill.is_credit);
+                        this.credit_days = Number(prefill.credit_days || 5);
+                        this.payments = (prefill.payments || []).map(payment => ({
+                            uid: crypto.randomUUID(),
+                            method: payment.method || 'cash',
+                            amount: Number(payment.amount || 0),
+                            received: Number(payment.received || 0),
+                            reference: payment.reference || '',
+                            card_type: payment.card_type || 'debit',
+                            bank_id: payment.bank_id || '',
+                        }));
+
+                        if (!this.is_credit && this.payments.length === 0) {
+                            this.addPayment();
+                        }
+                    }
+
+                    const ownerSelect = new TomSelect(this.$refs.ownerSelect, {
                         create: false,
                         placeholder: 'Buscar cliente...',
                         valueField: 'id',
@@ -286,6 +342,18 @@
                                 .then(response => response.json())
                                 .then(data => callback(data))
                                 .catch(() => callback());
+                        }
+                    });
+
+                    if (prefill?.owner_id) {
+                        ownerSelect.setValue(String(prefill.owner_id));
+                    }
+
+                    this.$watch('is_credit', (value) => {
+                        if (value) {
+                            this.payments = [];
+                        } else if (this.payments.length === 0) {
+                            this.addPayment();
                         }
                     });
                 },
@@ -299,14 +367,6 @@
                         .then(data => {
                             this.itemResults = data;
                         });
-
-                    this.$watch('is_credit', (value) => {
-                        if (value) {
-                            this.payments = [];
-                        } else if (this.payments.length === 0) {
-                            this.addPayment();
-                        }
-                    });
                 },
                 addItem(item) {
                     this.lines.push({
@@ -333,6 +393,11 @@
                         tax_rate: 0,
                         commission_rate: 0
                     });
+
+                    if (prefill?.owner_id) {
+                        ownerSelect.setValue(String(prefill.owner_id));
+                    }
+
                 },
                 removeLine(index) {
                     this.lines.splice(index, 1);
