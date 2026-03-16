@@ -21,19 +21,19 @@ class GroomingService
                 $grooming->owner_id = $grooming->patient->owner_id;
             }
 
-            $grooming->service_item_id = null;
-            $grooming->service_item_name = null;
+            $selectedServiceId = $data['service_id'] ?? $data['product_service_id'] ?? null;
 
-            if ($grooming->product_service_id) {
-                $product = Product::find($grooming->product_service_id);
+            if ($selectedServiceId) {
+                $product = Product::find($selectedServiceId);
 
                 if ($product) {
                     $grooming->service_source = 'product';
                     $grooming->service_price = $product->sale_price;
+                    $grooming->product_service_id = $selectedServiceId;
                     $grooming->service_id = null;
                 } else {
                     $item = DB::table('Items')
-                        ->where('id', $grooming->product_service_id)
+                        ->where('id', $selectedServiceId)
                         ->first(['id', 'nombre', 'valor']);
 
                     if ($item) {
@@ -52,6 +52,7 @@ class GroomingService
                 $grooming->service_source = 'none';
                 $grooming->service_price = null;
                 $grooming->service_id = null;
+                $grooming->product_service_id = null;
             }
 
             $grooming->save();

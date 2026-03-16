@@ -24,16 +24,20 @@ class GroomingRequest extends FormRequest
             'deworming_source' => ['required_if:external_deworming,1', 'in:none,manual,inventory'],
             'deworming_product_id' => ['required_if:deworming_source,inventory', 'nullable', 'exists:products,id'],
             'deworming_product_name' => ['required_if:deworming_source,manual', 'nullable', 'string', 'max:255'],
+            'service_id' => ['nullable', 'integer'],
             'product_service_id' => ['nullable', 'integer'],
         ];
     }
 
     protected function prepareForValidation(): void
     {
+        $selectedServiceId = $this->input('service_id', $this->input('product_service_id'));
+
         $this->merge([
             'needs_pickup' => $this->boolean('needs_pickup'),
             'external_deworming' => $this->boolean('external_deworming'),
-            'service_source' => $this->input('product_service_id') ? 'product' : 'none',
+            'service_id' => $selectedServiceId,
+            'service_source' => $selectedServiceId ? 'item' : 'none',
         ]);
     }
 }
