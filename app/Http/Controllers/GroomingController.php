@@ -12,6 +12,7 @@ use App\Services\GroomingService as GroomingWorkflowService;
 use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
 class GroomingController extends Controller
@@ -54,7 +55,7 @@ class GroomingController extends Controller
         $owners = Owner::orderBy('name')->get();
         $patients = Patient::with('owner')->orderBy('nombres')->get();
 
-        $serviceProducts = Item::query()
+        $serviceProducts = DB::table('Items')
             ->where('tipo', 0)
             ->orderBy('nombre')
             ->get(['id', 'nombre as name', 'valor as sale_price']);
