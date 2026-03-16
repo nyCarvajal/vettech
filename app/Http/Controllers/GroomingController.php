@@ -53,8 +53,7 @@ class GroomingController extends Controller
         $owners = Owner::orderBy('name')->get();
         $patients = Patient::with('owner')->orderBy('nombres')->get();
 
-        $serviceProducts = Product::where('type', 'servicio')
-            ->where('inventariable', 0)
+        $serviceProducts = Product::whereIn('type', ['servicio', 'service'])
             ->orderBy('name')
             ->get();
         $inventoryProducts = Product::whereIn('type', ['med', 'insumo'])->orderBy('name')->get();
