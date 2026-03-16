@@ -55,8 +55,9 @@ class ItemController extends Controller
     /**
      * Mostrar formulario para crear un nuevo item.
      */
-    public function create()
+    public function create(Request $request)
     {
+        $requestedType = $this->resolveRequestedType($request->query('tipo'));
         $areas = Area::orderBy('descripcion')->get();
         $costProducts = Item::query()
             ->where('type', 'product')
@@ -69,7 +70,7 @@ class ItemController extends Controller
             ->orderBy('tipo')
             ->pluck('tipo');
 
-        return view('items.create', compact('areas', 'categoryOptions', 'costProducts'));
+        return view('items.create', compact('areas', 'categoryOptions', 'costProducts', 'requestedType'));
     }
 
     /**
@@ -214,6 +215,16 @@ class ItemController extends Controller
         $normalized = str_replace(',', '.', $normalized);
 
         return is_numeric($normalized) ? (float) $normalized : null;
+    }
+
+    private function resolveRequestedType(mixed $value): string
+    {
+        $normalized = strtolower(trim((string) $value));
+
+        return match ($normalized) {
+            '1', 'service', 'servicio' => 'service',
+            default => 'product',
+        };
     }
 
     /**

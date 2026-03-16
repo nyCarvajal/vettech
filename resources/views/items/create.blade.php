@@ -2,7 +2,7 @@
 
 @section('content')
 @php
-    $typeValue = old('type', 'product');
+    $typeValue = old('type', $requestedType ?? 'product');
     $inventariableValue = old('inventariable', true) ? 'true' : 'false';
     $trackValue = old('track_inventory', true) ? 'true' : 'false';
     $costProductsForJs = $costProducts->map(fn ($product) => [
@@ -88,7 +88,8 @@
             </div>
         </div>
 
-        <div class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm space-y-5">
+        <div id="service-config" class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm space-y-5">
+            <h2 class="text-lg font-semibold text-slate-800">Configuración de servicio</h2>
             <p class="rounded-md bg-amber-50 px-3 py-2 text-xs text-amber-700" x-show="type !== 'service'">Esta sección es opcional y solo aplica cuando el tipo es <strong>Servicio</strong>. Cambia el tipo arriba para activarla.</p>
             <div class="grid gap-4 md:grid-cols-2">
                 <div>
@@ -227,5 +228,15 @@ function serviceForm(config) {
         netMargin() { return Number(this.salePrice || 0) > 0 ? (this.grossProfit() / Number(this.salePrice)) * 100 : 0; },
     }
 }
+
+document.addEventListener('alpine:init', () => {
+    const params = new URLSearchParams(window.location.search);
+    if ((params.get('tipo') || '').toLowerCase() === '1' || (params.get('tipo') || '').toLowerCase() === 'service' || (params.get('tipo') || '').toLowerCase() === 'servicio') {
+        const section = document.getElementById('service-config');
+        if (section) {
+            setTimeout(() => section.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
+        }
+    }
+});
 </script>
 @endsection
