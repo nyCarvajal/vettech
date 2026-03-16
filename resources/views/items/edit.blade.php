@@ -86,7 +86,7 @@
                         <h3 class="font-semibold text-slate-800">Estructura de costos (opcional)</h3>
                         <p class="text-xs text-slate-500">Agrega varios productos/insumos usados en el servicio para calcular el costo real.</p>
                     </div>
-                    <button type="button" @click="addRow()" :disabled="type !== 'service'" class="rounded bg-mint-600 disabled:opacity-50 px-3 py-1 text-xs font-semibold text-white">Agregar producto</button>
+                    <button type="button" @click="addRow()" :disabled="type !== 'service'" class="rounded bg-violet-600 px-3 py-1 text-xs font-semibold text-white shadow-sm hover:bg-violet-700 disabled:opacity-50">Agregar producto</button>
                 </div>
                 <div class="overflow-x-auto rounded-lg border border-slate-200">
                     <table class="min-w-full text-sm">
