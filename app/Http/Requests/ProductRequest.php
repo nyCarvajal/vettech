@@ -23,6 +23,16 @@ class ProductRequest extends FormRequest
             'sale_price' => 'required|numeric|min:0',
             'cost_avg' => 'nullable|numeric|min:0',
             'active' => 'boolean',
+            'estimated_duration_minutes' => 'nullable|integer|min:1|max:1440',
+            'authorized_roles' => 'nullable|array',
+            'authorized_roles.*' => 'nullable|string|max:120',
+            'cost_structure' => 'nullable|array',
+            'cost_structure.*.product_id' => 'nullable|integer|exists:products,id',
+            'cost_structure.*.quantity_available' => 'nullable|numeric|min:0',
+            'cost_structure.*.unit_cost' => 'nullable|numeric|min:0',
+            'cost_structure.*.quantity_used' => 'nullable|numeric|min:0',
+            'cost_structure.*.application_cost' => 'nullable|numeric|min:0',
+            'cost_structure_commission_percent' => 'nullable|numeric|min:0|max:100',
         ];
     }
 }
