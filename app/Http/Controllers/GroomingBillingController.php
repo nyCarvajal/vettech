@@ -21,6 +21,6 @@ class GroomingBillingController extends Controller
             return back()->with('info', 'Módulo de ventas no disponible en este entorno.');
         }
 
-        return back()->with('success', 'Cobro generado en la venta #' . $sale->id);
+        return back()->with('success', 'Cobro generado en la venta #' . $sale->id . ' (orden #' . $sale->cuenta . ')');
     }
 }
