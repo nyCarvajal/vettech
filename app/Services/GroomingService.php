@@ -21,6 +21,9 @@ class GroomingService
                 $grooming->owner_id = $grooming->patient->owner_id;
             }
 
+            $grooming->service_item_id = null;
+            $grooming->service_item_name = null;
+
             if ($grooming->product_service_id) {
                 $product = Product::find($grooming->product_service_id);
 

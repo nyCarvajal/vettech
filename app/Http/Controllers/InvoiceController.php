@@ -43,12 +43,21 @@ class InvoiceController extends Controller
         return view('invoices.index', compact('invoices', 'owners'));
     }
 
-    public function create()
+    public function create(Request $request)
     {
         $owners = Owner::query()->orderBy('name')->limit(50)->get();
         $banks = Banco::query()->orderBy('nombre')->get();
+        $prefillInvoice = null;
 
-        return view('invoices.pos', compact('owners', 'banks'));
+        if ($request->filled('from_invoice')) {
+            $prefillInvoice = Invoice::query()
+                ->with(['owner', 'lines.item', 'payments'])
+                ->findOrFail($request->integer('from_invoice'));
+
+            $this->authorize('view', $prefillInvoice);
+        }
+
+        return view('invoices.pos', compact('owners', 'banks', 'prefillInvoice'));
     }
 
     public function store(StoreInvoiceRequest $request)

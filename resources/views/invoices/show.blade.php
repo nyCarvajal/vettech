@@ -15,6 +15,7 @@
             <div class="flex items-center gap-2">
                 <a href="{{ route('invoices.print', [$invoice, 'paper' => 'letter']) }}" target="_blank" rel="noopener" class="rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-600">Imprimir carta (PDF)</a>
                 <a href="{{ route('invoices.print', [$invoice, 'paper' => 'ticket']) }}" target="_blank" rel="noopener" class="rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-600">Imprimir ticket 80mm</a>
+                <a href="{{ route('invoices.pos', ['from_invoice' => $invoice->id]) }}" class="rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-600">Editar en POS</a>
                 @if($invoice->status !== 'void')
                     <form method="POST" action="{{ route('invoices.void', $invoice) }}">
                         @csrf
