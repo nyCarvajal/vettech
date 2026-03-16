@@ -12,11 +12,14 @@ class Product extends Model
     protected $fillable = [
         'name', 'type', 'sku', 'unit', 'requires_batch', 'min_stock',
         'sale_price', 'cost_avg', 'active',
+        'estimated_duration_minutes', 'authorized_roles', 'cost_structure', 'cost_structure_commission_percent',
     ];
 
     protected $casts = [
         'requires_batch' => 'boolean',
         'active' => 'boolean',
+        'authorized_roles' => 'array',
+        'cost_structure' => 'array',
     ];
 
     public function batches()
