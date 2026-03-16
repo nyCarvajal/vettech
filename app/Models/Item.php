@@ -55,6 +55,10 @@ class Item extends Model
         'sale_price',
         'cost_price',
         'inventariable',
+        'estimated_duration_minutes',
+        'authorized_roles',
+        'cost_structure',
+        'cost_structure_commission_percent',
     ];
 
     protected $casts = [
@@ -65,6 +69,10 @@ class Item extends Model
         'sale_price' => 'decimal:2',
         'cost_price' => 'decimal:2',
         'inventariable' => 'boolean',
+        'estimated_duration_minutes' => 'integer',
+        'authorized_roles' => 'array',
+        'cost_structure' => 'array',
+        'cost_structure_commission_percent' => 'decimal:2',
     ];
 
     public function movimientos()
