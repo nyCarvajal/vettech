@@ -74,20 +74,6 @@
             </div>
         </div>
 
-        <div class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-            <h2 class="text-lg font-semibold text-slate-800">Precios</h2>
-            <div class="mt-4 grid gap-4 md:grid-cols-2">
-                <div>
-                    <label class="text-sm font-semibold text-slate-700">Precio de venta</label>
-                    <input type="number" name="sale_price" x-model.number="salePrice" step="0.01" min="0" class="mt-2 w-full rounded-lg border-slate-200 px-3 py-2 text-sm">
-                </div>
-                <div>
-                    <label class="text-sm font-semibold text-slate-700">Costo</label>
-                    <input type="number" name="cost_price" x-model.number="costPrice" step="0.01" min="0" class="mt-2 w-full rounded-lg border-slate-200 px-3 py-2 text-sm">
-                </div>
-            </div>
-        </div>
-
         <div id="service-config" class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm space-y-5">
             <h2 class="text-lg font-semibold text-slate-800">Configuración de servicio</h2>
             <p class="rounded-md bg-amber-50 px-3 py-2 text-xs text-amber-700" x-show="type !== 'service'">Esta sección es opcional y solo aplica cuando el tipo es <strong>Servicio</strong>. Cambia el tipo arriba para activarla.</p>
@@ -164,6 +150,21 @@
             </div>
         </div>
 
+        
+<div class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+            <h2 class="text-lg font-semibold text-slate-800">Precios</h2>
+            <div class="mt-4 grid gap-4 md:grid-cols-2">
+                <div>
+                    <label class="text-sm font-semibold text-slate-700">Precio de venta</label>
+                    <input type="number" name="sale_price" x-model.number="salePrice" step="0.01" min="0" class="mt-2 w-full rounded-lg border-slate-200 px-3 py-2 text-sm">
+                </div>
+                <div>
+                    <label class="text-sm font-semibold text-slate-700">Costo</label>
+                    <input type="number" name="cost_price" x-model.number="costPrice" step="0.01" min="0" class="mt-2 w-full rounded-lg border-slate-200 px-3 py-2 text-sm">
+                </div>
+            </div>
+        </div>
+
         <div class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
             <h2 class="text-lg font-semibold text-slate-800">Inventario</h2>
             <div class="mt-4 space-y-4">
@@ -201,6 +202,9 @@
 function serviceForm(config) {
     const defaultRow = () => ({ item_id: '', unit_cost: 0, quantity_available: 0, quantity_used: 0, cost_per_ml: 0, application_cost: 0 });
     const normalizedRows = (config.rows || []).map((row) => ({ ...defaultRow(), ...row }));
+    if (normalizedRows.length === 0) {
+        normalizedRows.push(defaultRow());
+    }
 
     return {
         ...config,

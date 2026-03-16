@@ -145,6 +145,9 @@
 function serviceForm(config) {
     const defaultRow = () => ({ item_id: '', unit_cost: 0, quantity_available: 0, quantity_used: 0, cost_per_ml: 0, application_cost: 0 });
     const normalizedRows = (config.rows || []).map((row) => ({ ...defaultRow(), ...row }));
+    if (normalizedRows.length === 0) {
+        normalizedRows.push(defaultRow());
+    }
     return {
         ...config,
         rows: normalizedRows,
