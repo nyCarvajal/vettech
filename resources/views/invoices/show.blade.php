@@ -1,6 +1,10 @@
 @extends('layouts.app')
 
 @section('content')
+    @php
+        $pendingAmount = max((float) $invoice->total - (float) $invoice->paid_total, 0);
+    @endphp
+
     <div class="space-y-6">
         <div class="flex items-start justify-between gap-4">
             <div>
@@ -42,6 +46,9 @@
                     <div class="flex items-center justify-between border-t border-gray-100 pt-2 font-semibold">
                         <span>Total</span><span>{{ number_format($invoice->total, 2) }}</span>
                     </div>
+                    <div class="flex items-center justify-between font-semibold text-red-600">
+                        <span>Debe</span><span>{{ number_format($pendingAmount, 2) }}</span>
+                    </div>
                 </div>
             </div>
             <div class="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
@@ -64,9 +71,12 @@
         </div>
 
 
-        <div class="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm" x-data="invoicePaymentsForm()">
+        <div class="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm" x-data="invoicePaymentsForm(@js($pendingAmount))">
             <div class="flex items-center justify-between gap-3">
-                <h2 class="text-sm font-semibold text-gray-700">Registrar pagos adicionales</h2>
+                <div>
+                    <h2 class="text-sm font-semibold text-gray-700">Registrar pagos adicionales</h2>
+                    <p class="text-xs text-gray-500 mt-1">Saldo pendiente actual: <span class="font-semibold text-red-600">{{ number_format($pendingAmount, 2) }}</span></p>
+                </div>
                 <button type="button" @click="addPayment()" class="rounded-lg border border-gray-200 px-3 py-2 text-xs text-gray-600 hover:bg-gray-50">Agregar método</button>
             </div>
             @if($errors->any())
@@ -164,10 +174,10 @@
 
 @push('scripts')
     <script>
-        function invoicePaymentsForm() {
+        function invoicePaymentsForm(pendingAmount = 0) {
             return {
                 payments: [
-                    { uid: crypto.randomUUID(), method: 'cash', amount: 0, received: 0, reference: '', card_type: 'debit', bank_id: '' }
+                    { uid: crypto.randomUUID(), method: 'cash', amount: Number(pendingAmount || 0), received: Number(pendingAmount || 0), reference: '', card_type: 'debit', bank_id: '' }
                 ],
                 addPayment() {
                     this.payments.push({ uid: crypto.randomUUID(), method: 'cash', amount: 0, received: 0, reference: '', card_type: 'debit', bank_id: '' });
