@@ -55,9 +55,14 @@ class ItemController extends Controller
     /**
      * Mostrar formulario para crear un nuevo item.
      */
-    public function create()
+    public function create(Request $request)
     {
+        $requestedType = $this->resolveRequestedType($request->query('tipo'));
         $areas = Area::orderBy('descripcion')->get();
+        $costProducts = Item::query()
+            ->where('type', 'product')
+            ->orderBy('nombre')
+            ->get(['id', 'nombre', 'cost_price', 'stock']);
         $categoryOptions = Item::query()
             ->select('tipo')
             ->whereNotNull('tipo')
@@ -65,7 +70,7 @@ class ItemController extends Controller
             ->orderBy('tipo')
             ->pluck('tipo');
 
-        return view('items.create', compact('areas', 'categoryOptions'));
+        return view('items.create', compact('areas', 'categoryOptions', 'costProducts', 'requestedType'));
     }
 
     /**
@@ -109,6 +114,10 @@ class ItemController extends Controller
     public function edit(Item $item)
     {
         $areas = Area::orderBy('descripcion')->get();
+        $costProducts = Item::query()
+            ->where('type', 'product')
+            ->orderBy('nombre')
+            ->get(['id', 'nombre', 'cost_price', 'stock']);
         $categoryOptions = Item::query()
             ->select('tipo')
             ->whereNotNull('tipo')
@@ -116,7 +125,7 @@ class ItemController extends Controller
             ->orderBy('tipo')
             ->pluck('tipo');
 
-        return view('items.edit', compact('item', 'areas', 'categoryOptions'));
+        return view('items.edit', compact('item', 'areas', 'categoryOptions', 'costProducts'));
     }
 
     /**
@@ -159,6 +168,33 @@ class ItemController extends Controller
         if (($data['type'] ?? 'product') === 'service') {
             $data['inventariable'] = false;
             $data['track_inventory'] = false;
+
+            $data['authorized_roles'] = collect($data['authorized_roles'] ?? [])
+                ->map(fn ($role) => trim((string) $role))
+                ->filter()
+                ->values()
+                ->all();
+
+            $data['cost_structure'] = collect($data['cost_structure'] ?? [])
+                ->map(function (array $row) {
+                    return [
+                        'item_id' => isset($row['item_id']) ? (int) $row['item_id'] : null,
+                        'quantity_available' => $this->normalizeCurrency($row['quantity_available'] ?? null),
+                        'unit_cost' => $this->normalizeCurrency($row['unit_cost'] ?? null),
+                        'quantity_used' => $this->normalizeCurrency($row['quantity_used'] ?? null),
+                        'application_cost' => $this->normalizeCurrency($row['application_cost'] ?? null),
+                    ];
+                })
+                ->filter(fn (array $row) => $row['item_id'] || $row['quantity_used'] || $row['application_cost'])
+                ->values()
+                ->all();
+
+            $data['cost_structure_commission_percent'] = $this->normalizeCurrency($data['cost_structure_commission_percent'] ?? null);
+        } else {
+            $data['estimated_duration_minutes'] = null;
+            $data['authorized_roles'] = null;
+            $data['cost_structure'] = null;
+            $data['cost_structure_commission_percent'] = null;
         }
 
         return $data;
@@ -179,6 +215,16 @@ class ItemController extends Controller
         $normalized = str_replace(',', '.', $normalized);
 
         return is_numeric($normalized) ? (float) $normalized : null;
+    }
+
+    private function resolveRequestedType(mixed $value): string
+    {
+        $normalized = strtolower(trim((string) $value));
+
+        return match ($normalized) {
+            '1', 'service', 'servicio' => 'service',
+            default => 'product',
+        };
     }
 
     /**
