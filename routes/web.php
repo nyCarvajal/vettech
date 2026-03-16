@@ -142,6 +142,7 @@ Route::get('invoices/pos', [InvoiceController::class, 'create'])
     ->middleware('feature:facturacion_pos')
     ->name('invoices.pos');
 Route::post('invoices/{invoice}/void', [InvoiceController::class, 'void'])->name('invoices.void');
+Route::post('invoices/{invoice}/payments', [InvoiceController::class, 'storePayments'])->name('invoices.payments.store');
 Route::get('invoices/{invoice}/print', [InvoiceController::class, 'print'])->name('invoices.print');
 Route::resource('invoices', InvoiceController::class)->middleware('feature:facturacion_pos');
 Route::prefix('settings')

@@ -63,6 +63,72 @@
             </div>
         </div>
 
+
+        <div class="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm" x-data="invoicePaymentsForm()">
+            <div class="flex items-center justify-between gap-3">
+                <h2 class="text-sm font-semibold text-gray-700">Registrar pagos adicionales</h2>
+                <button type="button" @click="addPayment()" class="rounded-lg border border-gray-200 px-3 py-2 text-xs text-gray-600 hover:bg-gray-50">Agregar método</button>
+            </div>
+            @if($errors->any())
+                <div class="mt-3 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700">
+                    {{ $errors->first() }}
+                </div>
+            @endif
+            <form method="POST" action="{{ route('invoices.payments.store', $invoice) }}" class="mt-4 space-y-3">
+                @csrf
+                <template x-for="(payment, index) in payments" :key="payment.uid">
+                    <div class="rounded-xl border border-gray-100 p-3 space-y-3">
+                        <div class="flex items-center justify-between gap-2">
+                            <select class="rounded-md border border-gray-200 px-2 py-2 text-sm" x-model="payment.method" :name="`payments[${index}][method]`">
+                                <option value="cash">Efectivo</option>
+                                <option value="transfer">Transferencia</option>
+                                <option value="card">Banco (tarjeta)</option>
+                            </select>
+                            <button type="button" @click="removePayment(index)" class="rounded-md bg-red-50 px-2 py-1 text-xs text-red-600 hover:bg-red-100">Quitar</button>
+                        </div>
+                        <div>
+                            <label class="text-xs text-gray-500">Monto aplicado</label>
+                            <input type="number" step="0.01" min="0" class="mt-1 w-full rounded-md border border-gray-200 px-3 py-2 text-sm" x-model.number="payment.amount" :name="`payments[${index}][amount]`" required>
+                        </div>
+                        <template x-if="payment.method === 'cash'">
+                            <div>
+                                <label class="text-xs text-gray-500">Recibido</label>
+                                <input type="number" step="0.01" min="0" class="mt-1 w-full rounded-md border border-gray-200 px-3 py-2 text-sm" x-model.number="payment.received" :name="`payments[${index}][received]`">
+                            </div>
+                        </template>
+                        <template x-if="payment.method === 'card'">
+                            <div>
+                                <label class="text-xs text-gray-500">Tipo de tarjeta</label>
+                                <select class="mt-1 w-full rounded-md border border-gray-200 px-3 py-2 text-sm" x-model="payment.card_type" :name="`payments[${index}][card_type]`">
+                                    <option value="debit">Débito</option>
+                                    <option value="credit">Crédito</option>
+                                </select>
+                            </div>
+                        </template>
+                        <template x-if="payment.method === 'card' || payment.method === 'transfer'">
+                            <div>
+                                <label class="text-xs text-gray-500">Banco</label>
+                                <select class="mt-1 w-full rounded-md border border-gray-200 px-3 py-2 text-sm" x-model="payment.bank_id" :name="`payments[${index}][bank_id]`">
+                                    <option value="">Selecciona un banco</option>
+                                    @foreach($banks as $bank)
+                                        <option value="{{ $bank->id }}">{{ $bank->nombre }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </template>
+                        <div>
+                            <label class="text-xs text-gray-500">Referencia</label>
+                            <input type="text" class="mt-1 w-full rounded-md border border-gray-200 px-3 py-2 text-sm" x-model="payment.reference" :name="`payments[${index}][reference]`">
+                        </div>
+                    </div>
+                </template>
+
+                <button type="submit" class="rounded-lg bg-mint-600 px-4 py-2 text-sm font-semibold text-white hover:bg-mint-700" style="background-color: var(--mint-600);">
+                    Guardar pagos
+                </button>
+            </form>
+        </div>
+
         <div class="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
             <h2 class="text-sm font-semibold text-gray-700">Líneas</h2>
             <div class="mt-4 overflow-hidden rounded-xl border border-gray-100">
@@ -95,4 +161,27 @@
             </div>
         </div>
     </div>
+
+@push('scripts')
+    <script>
+        function invoicePaymentsForm() {
+            return {
+                payments: [
+                    { uid: crypto.randomUUID(), method: 'cash', amount: 0, received: 0, reference: '', card_type: 'debit', bank_id: '' }
+                ],
+                addPayment() {
+                    this.payments.push({ uid: crypto.randomUUID(), method: 'cash', amount: 0, received: 0, reference: '', card_type: 'debit', bank_id: '' });
+                },
+                removePayment(index) {
+                    if (this.payments.length === 1) {
+                        return;
+                    }
+
+                    this.payments.splice(index, 1);
+                },
+            };
+        }
+    </script>
+@endpush
+
 @endsection
