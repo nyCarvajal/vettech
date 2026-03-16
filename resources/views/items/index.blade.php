@@ -175,6 +175,12 @@
                                 adjust: '{{ route('items.movements.adjust', $selectedItem) }}',
                             }
                         }">
+                            <a
+                                href="{{ route('items.edit', $selectedItem) }}"
+                                class="mb-3 inline-flex w-full items-center justify-center gap-2 rounded-lg border border-violet-200 bg-violet-50 px-3 py-2 text-sm font-semibold text-violet-700 hover:bg-violet-100"
+                            >
+                                Editar producto / servicio
+                            </a>
                             <div class="grid grid-cols-3 gap-2">
                                 <button type="button" @click="type='entry'; open=true" class="rounded-lg border border-mint-200 bg-mint-50 px-3 py-2 text-xs font-semibold text-mint-700 hover:border-mint-600 hover:bg-mint-100">Entrada</button>
                                 <button type="button" @click="type='exit'; open=true" class="rounded-lg border border-violet-200 bg-violet-50 px-3 py-2 text-xs font-semibold text-violet-700 hover:border-violet-400 hover:bg-violet-100">Salida</button>
