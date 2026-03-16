@@ -97,10 +97,10 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                     <p class="text-sm text-gray-600 mb-2">Selecciona un servicio de inventario (tipo <strong>servicio</strong> y <strong>no inventariable</strong>). El precio se toma automáticamente.</p>
-                    <select name="product_service_id" class="w-full rounded-lg border-purple-200 focus:ring-purple-400 focus:border-purple-400 bg-white">
+                    <select name="service_id" class="w-full rounded-lg border-purple-200 focus:ring-purple-400 focus:border-purple-400 bg-white">
                         <option value="">Sin servicio por ahora</option>
                         @foreach($serviceProducts as $product)
-                            <option value="{{ $product->id }}" @selected(old('product_service_id')==$product->id)>{{ $product->name }} ({{ number_format($product->sale_price,0) }})</option>
+                            <option value="{{ $product->id }}" @selected(old('service_id', old('product_service_id'))==$product->id)>{{ $product->name }} ({{ number_format($product->sale_price,0) }})</option>
                         @endforeach
                     </select>
                 </div>
