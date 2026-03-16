@@ -68,10 +68,11 @@
             </div>
         </div>
 
-        <div x-show="type === 'service'" x-cloak class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm space-y-5">
+        <div class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm space-y-5">
+            <p class="rounded-md bg-amber-50 px-3 py-2 text-xs text-amber-700" x-show="type !== 'service'">Esta sección es opcional y solo aplica cuando el tipo es <strong>Servicio</strong>. Cambia el tipo arriba para activarla.</p>
             <div class="grid gap-4 md:grid-cols-2">
-                <input type="number" name="estimated_duration_minutes" value="{{ old('estimated_duration_minutes', $item->estimated_duration_minutes) }}" min="1" class="rounded-lg border-slate-200 px-3 py-2 text-sm" placeholder="Tiempo estimado (min)">
-                <select name="authorized_roles[]" multiple class="rounded-lg border-slate-200 px-3 py-2 text-sm">
+                <input type="number" name="estimated_duration_minutes" :disabled="type !== 'service'" value="{{ old('estimated_duration_minutes', $item->estimated_duration_minutes) }}" min="1" class="rounded-lg border-slate-200 px-3 py-2 text-sm" placeholder="Tiempo estimado (min)">
+                <select name="authorized_roles[]" multiple :disabled="type !== 'service'" class="rounded-lg border-slate-200 px-3 py-2 text-sm">
                     @php($roles = old('authorized_roles', $item->authorized_roles ?? []))
                     @foreach (['Administrador', 'Veterinario', 'Auxiliar', 'Groomer', 'Bañador'] as $role)
                         <option value="{{ $role }}" @selected(in_array($role, $roles, true))>{{ $role }}</option>
@@ -82,7 +83,7 @@
             <div>
                 <div class="mb-2 flex items-center justify-between">
                     <h3 class="font-semibold text-slate-800">Estructura de costos (opcional)</h3>
-                    <button type="button" @click="addRow()" class="rounded bg-mint-600 px-3 py-1 text-xs font-semibold text-white">Agregar producto</button>
+                    <button type="button" @click="addRow()" :disabled="type !== 'service'" class="rounded bg-mint-600 disabled:opacity-50 px-3 py-1 text-xs font-semibold text-white">Agregar producto</button>
                 </div>
                 <div class="overflow-x-auto rounded-lg border border-slate-200">
                     <table class="min-w-full text-sm">
@@ -90,13 +91,13 @@
                         <tbody>
                         <template x-for="(row, index) in rows" :key="index">
                             <tr class="border-t border-slate-100">
-                                <td class="p-2"><select :name="`cost_structure[${index}][item_id]`" x-model.number="row.item_id" @change="applyProductData(row)" class="w-full rounded border-slate-200 text-sm"><option value="">Selecciona</option><template x-for="product in products" :key="product.id"><option :value="product.id" x-text="product.name"></option></template></select></td>
-                                <td class="p-2"><input :name="`cost_structure[${index}][unit_cost]`" x-model.number="row.unit_cost" @input="recalculate(row)" type="number" step="0.01" min="0" class="w-full rounded border-slate-200"></td>
-                                <td class="p-2"><input :name="`cost_structure[${index}][quantity_available]`" x-model.number="row.quantity_available" @input="recalculate(row)" type="number" step="0.01" min="0" class="w-full rounded border-slate-200"></td>
+                                <td class="p-2"><select :name="`cost_structure[${index}][item_id]`" x-model.number="row.item_id" @change="applyProductData(row)" :disabled="type !== 'service'" class="w-full rounded border-slate-200 text-sm"><option value="">Selecciona</option><template x-for="product in products" :key="product.id"><option :value="product.id" x-text="product.name"></option></template></select></td>
+                                <td class="p-2"><input :name="`cost_structure[${index}][unit_cost]`" x-model.number="row.unit_cost" @input="recalculate(row)" :disabled="type !== 'service'" type="number" step="0.01" min="0" class="w-full rounded border-slate-200"></td>
+                                <td class="p-2"><input :name="`cost_structure[${index}][quantity_available]`" x-model.number="row.quantity_available" @input="recalculate(row)" :disabled="type !== 'service'" type="number" step="0.01" min="0" class="w-full rounded border-slate-200"></td>
                                 <td class="p-2"><input :value="money(row.cost_per_ml)" readonly class="w-full rounded border-slate-200 bg-slate-50"></td>
-                                <td class="p-2"><input :name="`cost_structure[${index}][quantity_used]`" x-model.number="row.quantity_used" @input="recalculate(row)" type="number" step="0.01" min="0" class="w-full rounded border-slate-200"></td>
+                                <td class="p-2"><input :name="`cost_structure[${index}][quantity_used]`" x-model.number="row.quantity_used" @input="recalculate(row)" :disabled="type !== 'service'" type="number" step="0.01" min="0" class="w-full rounded border-slate-200"></td>
                                 <td class="p-2"><input :name="`cost_structure[${index}][application_cost]`" x-model.number="row.application_cost" readonly class="w-full rounded border-slate-200 bg-slate-50"></td>
-                                <td class="p-2"><button type="button" @click="removeRow(index)" class="text-xs text-red-600">Quitar</button></td>
+                                <td class="p-2"><button type="button" @click="removeRow(index)" :disabled="type !== 'service'" class="text-xs text-red-600 disabled:opacity-50">Quitar</button></td>
                             </tr>
                         </template>
                         </tbody>
@@ -105,14 +106,14 @@
             </div>
 
             <div class="grid gap-3 text-sm md:grid-cols-2">
-                <input type="number" name="cost_structure_commission_percent" x-model.number="commissionPercent" min="0" max="100" step="0.01" class="rounded-lg border-slate-200 px-3 py-2" placeholder="Comisión colaborador (%)">
+                <input type="number" name="cost_structure_commission_percent" :disabled="type !== 'service'" x-model.number="commissionPercent" min="0" max="100" step="0.01" class="rounded-lg border-slate-200 px-3 py-2" placeholder="Comisión colaborador (%)">
                 <div class="space-y-1 rounded-lg bg-slate-50 p-3">
                     <p>Costo parcial: <span class="font-semibold" x-text="money(partialCost())"></span></p>
                     <p>Ingreso colaborador: <span class="font-semibold" x-text="money(collaboratorIncome())"></span></p>
                     <p>Costo total: <span class="font-semibold text-red-600" x-text="money(totalCost())"></span></p>
                     <p>Utilidad bruta: <span class="font-semibold text-indigo-600" x-text="money(grossProfit())"></span></p>
                     <p>Margen neto: <span class="font-semibold text-green-600" x-text="`${netMargin().toFixed(2)}%`"></span></p>
-                    <button type="button" class="rounded bg-slate-200 px-2 py-1 text-xs" @click="costPrice = totalCost()">Usar costo total calculado</button>
+                    <button type="button" class="rounded bg-slate-200 px-2 py-1 text-xs disabled:opacity-50" @click="costPrice = totalCost()" :disabled="type !== 'service'">Usar costo total calculado</button>
                 </div>
             </div>
         </div>
