@@ -86,8 +86,13 @@
                             <p class="text-sm text-purple-700">Precio: ${{ number_format($grooming->service_price, 0) }}</p>
                         @endif
 
+                        @php
+                            $accountUrl = \Illuminate\Support\Facades\Route::has('ventas.index')
+                                ? route('ventas.index', ['cliente_id' => $grooming->patient_id])
+                                : url('/ventas?cliente_id=' . $grooming->patient_id);
+                        @endphp
                         <a
-                            href="{{ route('ventas.index', ['cliente_id' => $grooming->patient_id]) }}"
+                            href="{{ $accountUrl }}"
                             class="mt-3 inline-flex items-center gap-2 rounded-xl bg-indigo-50 px-3 py-2 text-sm font-semibold text-indigo-700 ring-1 ring-indigo-200 transition hover:bg-indigo-100"
                         >
                             Ir a cuenta (pagos y más servicios)
