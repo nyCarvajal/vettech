@@ -41,7 +41,7 @@
                     @if($grooming->status === 'en_proceso')
                         <a href="{{ route('groomings.report.create', $grooming) }}" class="inline-flex items-center gap-2 rounded-xl bg-purple-50 px-4 py-2 text-sm font-semibold text-purple-700 ring-1 ring-purple-200 transition hover:bg-purple-100">Informe</a>
                     @endif
-                    @if($grooming->product_service_id && $grooming->status === 'finalizado')
+                    @if(($grooming->service_name || $grooming->service_price) && $grooming->status === 'finalizado')
                         <form method="POST" action="{{ route('groomings.charge', $grooming) }}">
                             @csrf
                             <button class="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-purple-500 to-mint-500 px-4 py-2 text-sm font-semibold text-white shadow-md transition hover:scale-[1.02] hover:shadow-lg">Cobrar</button>
@@ -85,6 +85,13 @@
                         @if($grooming->service_price)
                             <p class="text-sm text-purple-700">Precio: ${{ number_format($grooming->service_price, 0) }}</p>
                         @endif
+
+                        <a
+                            href="{{ url('/invoices/pos?from_invoice=' . $grooming->id) }}"
+                            class="mt-3 inline-flex items-center gap-2 rounded-xl bg-indigo-50 px-3 py-2 text-sm font-semibold text-indigo-700 ring-1 ring-indigo-200 transition hover:bg-indigo-100"
+                        >
+                            Ir a facturar (pagos y más servicios)
+                        </a>
                     @else
                         <p class="text-sm text-purple-700">Sin servicio asociado.</p>
                     @endif
