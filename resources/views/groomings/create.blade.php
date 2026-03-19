@@ -24,19 +24,8 @@
         <x-card class="border-purple-100 shadow-soft">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-1">Paciente</label>
-                    <select name="patient_id" class="w-full rounded-lg border-purple-200 focus:ring-purple-400 focus:border-purple-400" required>
-                        <option value="">Selecciona un paciente</option>
-                        @foreach($patients as $pet)
-                            <option value="{{ $pet->id }}" @selected(old('patient_id', optional($patient)->id) == $pet->id)>
-                                {{ $pet->display_name }} ({{ optional($pet->owner)->name }})
-                            </option>
-                        @endforeach
-                    </select>
-                </div>
-                <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-1">Tutor</label>
-                    <select name="owner_id" class="w-full rounded-lg border-purple-200 focus:ring-purple-400 focus:border-purple-400" required>
+                    <select id="owner_id" name="owner_id" class="w-full rounded-lg border-purple-200 focus:ring-purple-400 focus:border-purple-400" required>
                         <option value="">Selecciona un tutor</option>
                         @foreach($owners as $owner)
                             <option value="{{ $owner->id }}" @selected(old('owner_id', optional($patient?->owner)->id) == $owner->id)>
@@ -44,6 +33,22 @@
                             </option>
                         @endforeach
                     </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Paciente</label>
+                    <select id="patient_id" name="patient_id" class="w-full rounded-lg border-purple-200 focus:ring-purple-400 focus:border-purple-400" required>
+                        <option value="">Selecciona un paciente</option>
+                        @foreach($patients as $pet)
+                            <option
+                                value="{{ $pet->id }}"
+                                data-owner-id="{{ $pet->owner_id }}"
+                                @selected(old('patient_id', optional($patient)->id) == $pet->id)
+                            >
+                                {{ $pet->display_name }} ({{ optional($pet->owner)->name }})
+                            </option>
+                        @endforeach
+                    </select>
+                    <p class="mt-1 text-xs text-gray-500">Primero elige el tutor para ver solo sus mascotas.</p>
                 </div>
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-1">Hora del servicio</label>
@@ -91,11 +96,11 @@
         <x-card title="Servicio opcional" class="border-purple-100 shadow-soft bg-purple-50/50">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                    <p class="text-sm text-gray-600 mb-2">Selecciona un servicio de inventario (no inventariable). El precio se toma automáticamente.</p>
-                    <select name="product_service_id" class="w-full rounded-lg border-purple-200 focus:ring-purple-400 focus:border-purple-400 bg-white">
+                    <p class="text-sm text-gray-600 mb-2">Selecciona un servicio de inventario (tipo <strong>servicio</strong> y <strong>no inventariable</strong>). El precio se toma automáticamente.</p>
+                    <select name="service_id" class="w-full rounded-lg border-purple-200 focus:ring-purple-400 focus:border-purple-400 bg-white">
                         <option value="">Sin servicio por ahora</option>
                         @foreach($serviceProducts as $product)
-                            <option value="{{ $product->id }}" @selected(old('product_service_id')==$product->id)>{{ $product->name }} ({{ number_format($product->sale_price,0) }})</option>
+                            <option value="{{ $product->id }}" @selected(old('service_id', old('product_service_id'))==$product->id)>{{ $product->name }} ({{ number_format($product->sale_price,0) }})</option>
                         @endforeach
                     </select>
                 </div>
@@ -114,4 +119,57 @@
             </button>
         </div>
     </form>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const ownerSelect = document.getElementById('owner_id');
+            const patientSelect = document.getElementById('patient_id');
+
+            if (!ownerSelect || !patientSelect) {
+                return;
+            }
+
+            const patientOptions = Array.from(patientSelect.querySelectorAll('option[data-owner-id]'));
+            const selectedPatientId = patientSelect.value;
+
+            const filterPatientsByOwner = (ownerId) => {
+                patientOptions.forEach((option) => {
+                    option.hidden = !!ownerId && option.dataset.ownerId !== ownerId;
+                });
+
+                if (ownerId && patientSelect.selectedOptions[0]?.dataset.ownerId !== ownerId) {
+                    patientSelect.value = '';
+                }
+
+                patientSelect.disabled = !ownerId;
+            };
+
+            if (!ownerSelect.value && selectedPatientId) {
+                const selectedPatient = patientOptions.find((option) => option.value === selectedPatientId);
+                if (selectedPatient) {
+                    ownerSelect.value = selectedPatient.dataset.ownerId;
+                }
+            }
+
+            filterPatientsByOwner(ownerSelect.value);
+
+            ownerSelect.addEventListener('change', () => {
+                filterPatientsByOwner(ownerSelect.value);
+            });
+
+            patientSelect.addEventListener('change', () => {
+                const selectedOption = patientSelect.selectedOptions[0];
+                const selectedOwnerId = selectedOption?.dataset.ownerId;
+                const selectedPatientId = selectedOption?.value;
+
+                if (selectedOwnerId && ownerSelect.value !== selectedOwnerId) {
+                    ownerSelect.value = selectedOwnerId;
+                    filterPatientsByOwner(ownerSelect.value);
+                    if (selectedPatientId) {
+                        patientSelect.value = selectedPatientId;
+                    }
+                }
+            });
+        });
+    </script>
 @endsection
