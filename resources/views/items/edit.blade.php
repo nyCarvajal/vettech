@@ -82,17 +82,14 @@
 
             <div>
                 <div class="mb-2 flex items-center justify-between">
-                    <div>
-                        <h3 class="font-semibold text-slate-800">Estructura de costos (opcional)</h3>
-                        <p class="text-xs text-slate-500">Agrega varios productos/insumos usados en el servicio para calcular el costo real.</p>
-                    </div>
-                    <button type="button" @click="addRow()" :disabled="type !== 'service'" class="rounded bg-violet-600 px-3 py-1 text-xs font-semibold text-white shadow-sm hover:bg-violet-700 disabled:opacity-50">Agregar producto</button>
+                    <h3 class="font-semibold text-slate-800">Estructura de costos (opcional)</h3>
+                    <button type="button" @click="addRow()" :disabled="type !== 'service'" class="rounded bg-mint-600 disabled:opacity-50 px-3 py-1 text-xs font-semibold text-white">Agregar producto</button>
                 </div>
                 <div class="overflow-x-auto rounded-lg border border-slate-200">
                     <table class="min-w-full text-sm">
                         <thead class="bg-slate-50 text-slate-700"><tr><th class="p-2 text-left">Producto</th><th class="p-2 text-left">Costo producto</th><th class="p-2 text-left">Cantidad</th><th class="p-2 text-left">Costo x ml</th><th class="p-2 text-left">Mls proceso</th><th class="p-2 text-left">Costo aplicación</th><th></th></tr></thead>
                         <tbody>
-                        <template x-for="(row, index) in rows" :key="row._key">
+                        <template x-for="(row, index) in rows" :key="index">
                             <tr class="border-t border-slate-100">
                                 <td class="p-2"><select :name="`cost_structure[${index}][item_id]`" x-model.number="row.item_id" @change="applyProductData(row)" :disabled="type !== 'service'" class="w-full rounded border-slate-200 text-sm"><option value="">Selecciona</option><template x-for="product in products" :key="product.id"><option :value="product.id" x-text="product.name"></option></template></select></td>
                                 <td class="p-2"><input :name="`cost_structure[${index}][unit_cost]`" x-model.number="row.unit_cost" @input="recalculate(row)" :disabled="type !== 'service'" type="number" step="0.01" min="0" class="w-full rounded border-slate-200"></td>
@@ -104,13 +101,6 @@
                             </tr>
                         </template>
                         </tbody>
-                        <tfoot class="bg-slate-50">
-                            <tr>
-                                <td colspan="5" class="p-2 text-right text-xs font-semibold text-slate-600">Total insumos</td>
-                                <td class="p-2 text-sm font-semibold text-slate-800" x-text="money(partialCost())"></td>
-                                <td class="p-2 text-xs text-slate-500" x-text="`${rows.length} producto(s)`"></td>
-                            </tr>
-                        </tfoot>
                     </table>
                 </div>
             </div>
@@ -153,8 +143,8 @@
 
 <script>
 function serviceForm(config) {
-    const defaultRow = () => ({ _key: `${Date.now()}-${Math.random()}`, item_id: '', unit_cost: 0, quantity_available: 0, quantity_used: 0, cost_per_ml: 0, application_cost: 0 });
-    const normalizedRows = (config.rows || []).map((row) => ({ ...defaultRow(), ...row, _key: row?._key || `${Date.now()}-${Math.random()}` }));
+    const defaultRow = () => ({ item_id: '', unit_cost: 0, quantity_available: 0, quantity_used: 0, cost_per_ml: 0, application_cost: 0 });
+    const normalizedRows = (config.rows || []).map((row) => ({ ...defaultRow(), ...row }));
     if (normalizedRows.length === 0) {
         normalizedRows.push(defaultRow());
     }
@@ -162,16 +152,8 @@ function serviceForm(config) {
         ...config,
         rows: normalizedRows,
         products: config.products || [],
-        init() {
-            this.rows.forEach((row) => this.recalculate(row));
-        },
         addRow() { this.rows.push(defaultRow()); },
-        removeRow(index) {
-            this.rows.splice(index, 1);
-            if (this.rows.length === 0) {
-                this.rows.push(defaultRow());
-            }
-        },
+        removeRow(index) { this.rows.splice(index, 1); },
         money(value) { return Number(value || 0).toLocaleString('es-CO', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); },
         applyProductData(row) {
             const product = this.products.find((item) => item.id === Number(row.item_id));

@@ -193,7 +193,7 @@
 
         <div class="flex justify-end gap-3">
             <a href="{{ route('items.index') }}" class="rounded-lg border border-violet-200 bg-violet-50 px-4 py-2 text-sm font-semibold text-violet-700 hover:bg-violet-100">Cancelar</a>
-            <button type="submit" class="rounded-lg bg-mint-600 px-4 py-2 text-sm font-semibold text-white hover:bg-mint-700">Guardar</button>
+            <button type="submit" class="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700">Guardar</button>
         </div>
     </form>
 </div>
