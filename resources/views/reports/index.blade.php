@@ -36,6 +36,10 @@
             <h2 class="font-semibold">Inventario</h2>
             <p class="text-sm text-gray-500">Kardex, rotación y stock crítico.</p>
         </a>
+        <a href="{{ route('reports.vaccines') }}" class="bg-white border border-gray-200 rounded-xl p-4 shadow-soft hover:border-mint-300">
+            <h2 class="font-semibold">Vacunas</h2>
+            <p class="text-sm text-gray-500">Tutor principal, mascota, rabia, lote y origen manual/inventario.</p>
+        </a>
     </div>
 </div>
 @endsection

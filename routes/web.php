@@ -67,6 +67,7 @@ use App\Http\Controllers\Reports\QuickReportsController;
 use App\Http\Controllers\Reports\ReportExportController;
 use App\Http\Controllers\Reports\ReportsHomeController;
 use App\Http\Controllers\Reports\SalesReportController;
+use App\Http\Controllers\Reports\VaccinesReportController;
 use App\Http\Middleware\ConnectTenantDB;
 use App\Http\Controllers\ContadorDashboardController;
 use App\Http\Controllers\DashboardRedirectController;
@@ -187,6 +188,8 @@ Route::middleware(['ensureRole:admin', 'feature:reportes_avanzados'])
         Route::get('/grooming/data', [ReportsGroomingReportController::class, 'data'])->name('grooming.data');
         Route::get('/inventory', [InventoryReportController::class, 'index'])->name('inventory');
         Route::get('/inventory/data', [InventoryReportController::class, 'data'])->name('inventory.data');
+        Route::get('/vaccines', [VaccinesReportController::class, 'index'])->name('vaccines');
+        Route::get('/vaccines/data', [VaccinesReportController::class, 'data'])->name('vaccines.data');
         Route::get('/export', [ReportExportController::class, 'export'])->name('export');
     });
 
