@@ -403,8 +403,7 @@ Route::get('/', [ClientesController::class, 'create']);
 Route::get('/departamentos', [LocationController::class, 'departamentos']);
 	Route::get('/municipios',    [LocationController::class, 'municipios']);
 	
-Route::match(['GET','POST'], 'webhook/whatsapp',
-    \App\Http\Controllers\WhatsappWebhookController::class);
+
 
 
 

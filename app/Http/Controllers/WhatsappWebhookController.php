@@ -1,24 +1,47 @@
 <?php
 
 namespace App\Http\Controllers;
-use App\Http\Controllers\Controller;
 
-class WhatsappWebhookController extends Controller
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+
+class WhatsAppWebhookController extends Controller
 {
-    public function __invoke(Request $r)
+    // 1. Verificación de Meta (Solo ocurre una vez al configurar)
+    public function verify(Request $request)
     {
-        // 1) Validación inicial (Meta envía GET)
-        if ($r->isMethod('get')) {
-            return $r->hub_mode === 'subscribe' &&
-                   $r->hub_verify_token === env('WHATSAPP_VERIFY_TOKEN')
-                ? response($r->hub_challenge, 200)
-                : abort(403, 'Token no válido');
+        $token = env('WHATSAPP_WEBHOOK_VERIFY_TOKEN'); // Crea esta clave en tu .env
+        $mode = $request->query('hub_mode');
+        $hubToken = $request->query('hub_verify_token');
+        $challenge = $request->query('hub_challenge');
+
+        if ($mode && $hubToken) {
+            if ($mode === 'subscribe' && $hubToken === $token) {
+                return response($challenge, 200);
+            }
+        }
+        return response('Forbidden', 403);
+    }
+
+    // 2. Recepción de mensajes (Aquí llegan las respuestas de los médicos)
+    public function receive(Request $request)
+    {
+        $data = $request->all();
+
+        // Log para ver la estructura (revisa storage/logs/laravel.log)
+        Log::info('WhatsApp Webhook:', $data);
+
+        // Ejemplo básico para extraer el mensaje
+        if (isset($data['entry'][0]['changes'][0]['value']['messages'][0])) {
+            $mensaje = $data['entry'][0]['changes'][0]['value']['messages'][0];
+            $from = $mensaje['from']; // Teléfono del médico
+            $text = $mensaje['text']['body'] ?? 'Mensaje no es de texto';
+
+            // Aquí podrías disparar un Evento en Laravel para procesar con IA
+            Log::info("Mensaje de $from: $text");
         }
 
-        // 2) Mensajes / estados
-        \Log::channel('whatsapp')->info($r->getContent());
-        return response()->noContent();
+        return response('EVENT_RECEIVED', 200);
     }
 }
-
 ?>

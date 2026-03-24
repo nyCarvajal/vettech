@@ -55,7 +55,7 @@ class GroomingController extends Controller
         $owners = Owner::orderBy('name')->get();
         $patients = Patient::with('owner')->orderBy('nombres')->get();
 
-        $serviceProducts = DB::table('Items')
+        $serviceProducts = DB::table('items')
             ->where('tipo', 0)
             ->orderBy('nombre')
             ->get(['id', 'nombre as name', 'valor as sale_price']);
