@@ -8,4 +8,5 @@ Route::get('reserva/availability', [ReservaController::class, 'availability']);
 Route::get('/clientesb', [ClientesController::class, 'search'])->name('clientes.search');
 
 
+
 ?>

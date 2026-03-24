@@ -11,6 +11,8 @@ use App\Reports\OperationsReportRepository;
 use App\Reports\PaymentsReportRepository;
 use App\Reports\ReportFilters;
 use App\Reports\SalesReportRepository;
+use App\Reports\VaccinesReportRepository;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 
 class ReportExportController extends Controller
@@ -23,6 +25,7 @@ class ReportExportController extends Controller
         private readonly OperationsReportRepository $operationsRepository,
         private readonly GroomingReportRepository $groomingRepository,
         private readonly InventoryReportRepository $inventoryRepository,
+        private readonly VaccinesReportRepository $vaccinesRepository,
     ) {
     }
 
@@ -32,9 +35,11 @@ class ReportExportController extends Controller
         $report = $request->string('report')->toString();
         $format = $request->string('format', 'csv')->toString();
 
-        if ($format !== 'csv') {
-            abort(422, 'Formato no soportado');
-        }
+        $extraFilters = [
+            'rabies' => $request->string('rabies', 'all')->toString(),
+            'source' => $request->string('source', 'all')->toString(),
+            'q' => $request->string('q')->toString(),
+        ];
 
         $export = match ($report) {
             'sales' => $this->salesRepository->exportData($filters),
@@ -44,20 +49,49 @@ class ReportExportController extends Controller
             'operations' => $this->operationsRepository->exportData($filters),
             'grooming' => $this->groomingRepository->exportData($filters),
             'inventory' => $this->inventoryRepository->exportData($filters),
+            'vaccines' => $this->vaccinesRepository->exportData($filters, $extraFilters),
             default => abort(404),
         };
 
-        $filename = "report-{$report}-" . now()->format('Ymd_His') . '.csv';
+        if ($format === 'csv') {
+            $filename = "report-{$report}-" . now()->format('Ymd_His') . '.csv';
 
-        return response()->streamDownload(function () use ($export) {
-            $handle = fopen('php://output', 'wb');
-            fputcsv($handle, $export['headers']);
-            foreach ($export['rows'] as $row) {
-                fputcsv($handle, array_values($row));
-            }
-            fclose($handle);
-        }, $filename, [
-            'Content-Type' => 'text/csv',
-        ]);
+            return response()->streamDownload(function () use ($export) {
+                $handle = fopen('php://output', 'wb');
+                fputcsv($handle, $export['headers']);
+                foreach ($export['rows'] as $row) {
+                    fputcsv($handle, array_values($row));
+                }
+                fclose($handle);
+            }, $filename, [
+                'Content-Type' => 'text/csv',
+            ]);
+        }
+
+        if ($report === 'vaccines' && $format === 'excel') {
+            $filename = "report-{$report}-" . now()->format('Ymd_His') . '.xls';
+
+            return response()->make(
+                view('reports.vaccines.excel', ['headers' => $export['headers'], 'rows' => $export['rows']])->render(),
+                200,
+                [
+                    'Content-Type' => 'application/vnd.ms-excel; charset=UTF-8',
+                    'Content-Disposition' => "attachment; filename={$filename}",
+                ]
+            );
+        }
+
+        if ($report === 'vaccines' && $format === 'pdf') {
+            $records = $this->vaccinesRepository->recordsForPdf($filters, $extraFilters);
+            $pdf = Pdf::loadView('reports.vaccines.pdf', [
+                'records' => $records,
+                'filters' => $filters,
+                'extraFilters' => $extraFilters,
+            ])->setPaper('a4');
+
+            return $pdf->download("report-{$report}-" . now()->format('Ymd_His') . '.pdf');
+        }
+
+        abort(422, 'Formato no soportado');
     }
 }

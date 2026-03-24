@@ -13,6 +13,7 @@
         "laravel/tinker": "^2.9",
         "laravel/ui": "^4.6",
         "netflie/laravel-notification-whatsapp": "^1.4",
+        "netflie/whatsapp-cloud-api": "^2.2",
         "spatie/laravel-permission": "^6.20",
         "stancl/tenancy": "3.9"
     },

@@ -57,6 +57,7 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\AdministrativeReportController;
 use App\Http\Controllers\AdminDashboardController;
 use App\Http\Controllers\ExpenseController;
+use App\Http\Controllers\MarketingController;
 use App\Http\Controllers\Reports\CashReportController;
 use App\Http\Controllers\Reports\ExpensesReportController;
 use App\Http\Controllers\Reports\GroomingReportController as ReportsGroomingReportController;
@@ -67,6 +68,7 @@ use App\Http\Controllers\Reports\QuickReportsController;
 use App\Http\Controllers\Reports\ReportExportController;
 use App\Http\Controllers\Reports\ReportsHomeController;
 use App\Http\Controllers\Reports\SalesReportController;
+use App\Http\Controllers\Reports\VaccinesReportController;
 use App\Http\Middleware\ConnectTenantDB;
 use App\Http\Controllers\ContadorDashboardController;
 use App\Http\Controllers\DashboardRedirectController;
@@ -142,6 +144,7 @@ Route::get('invoices/pos', [InvoiceController::class, 'create'])
     ->middleware('feature:facturacion_pos')
     ->name('invoices.pos');
 Route::post('invoices/{invoice}/void', [InvoiceController::class, 'void'])->name('invoices.void');
+Route::post('invoices/{invoice}/payments', [InvoiceController::class, 'storePayments'])->name('invoices.payments.store');
 Route::get('invoices/{invoice}/print', [InvoiceController::class, 'print'])->name('invoices.print');
 Route::resource('invoices', InvoiceController::class)->middleware('feature:facturacion_pos');
 Route::prefix('settings')
@@ -186,6 +189,8 @@ Route::middleware(['ensureRole:admin', 'feature:reportes_avanzados'])
         Route::get('/grooming/data', [ReportsGroomingReportController::class, 'data'])->name('grooming.data');
         Route::get('/inventory', [InventoryReportController::class, 'index'])->name('inventory');
         Route::get('/inventory/data', [InventoryReportController::class, 'data'])->name('inventory.data');
+        Route::get('/vaccines', [VaccinesReportController::class, 'index'])->name('vaccines');
+        Route::get('/vaccines/data', [VaccinesReportController::class, 'data'])->name('vaccines.data');
         Route::get('/export', [ReportExportController::class, 'export'])->name('export');
     });
 
@@ -256,6 +261,14 @@ Route::prefix('cash/closures')
         Route::get('/{closure}/print', [CashClosureController::class, 'print'])->name('print');
     });
 		 
+Route::prefix('marketing')
+    ->middleware(['ensureRole:admin', 'feature:marketing'])
+    ->name('marketing.')
+    ->group(function () {
+        Route::get('/', [MarketingController::class, 'index'])->name('index');
+        Route::post('/send', [MarketingController::class, 'send'])->name('send');
+    });
+
         Route::get('/dashboard', DashboardRedirectController::class)
             ->name('dashboard');
 
@@ -399,8 +412,7 @@ Route::get('/', [ClientesController::class, 'create']);
 Route::get('/departamentos', [LocationController::class, 'departamentos']);
 	Route::get('/municipios',    [LocationController::class, 'municipios']);
 	
-Route::match(['GET','POST'], 'webhook/whatsapp',
-    \App\Http\Controllers\WhatsappWebhookController::class);
+
 
 
 

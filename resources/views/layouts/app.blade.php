@@ -147,17 +147,17 @@
                 </div>
                 <div class="flex items-center gap-3">
                     @auth
-                        <div class="relative">
-                            <button class="inline-flex items-center gap-2 rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50" data-bs-toggle="dropdown" aria-expanded="false">
+                        <div class="dropdown relative">
+                            <button id="user-menu-button" class="inline-flex items-center gap-2 rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50" data-bs-toggle="dropdown" aria-expanded="false">
                                 <span class="h-8 w-8 rounded-full bg-mint-50 text-mint-600 flex items-center justify-center font-semibold">{{ strtoupper(Str::substr(Auth::user()->name, 0, 1)) }}</span>
                                 <span class="text-sm font-medium">{{ Auth::user()->name }}</span>
                             </button>
-                            <div class="dropdown-menu dropdown-menu-end mt-2 rounded-xl shadow-soft border border-gray-100 py-2 text-sm" aria-label="Menú de usuario">
+                            <div class="dropdown-menu dropdown-menu-end mt-2 rounded-xl shadow-soft border border-gray-100 py-2 text-sm" aria-label="Menú de usuario" aria-labelledby="user-menu-button">
                                 <a class="dropdown-item" href="{{ Route::has('profile.edit') ? route('profile.edit') : '#' }}">Perfil</a>
                                 <div class="dropdown-divider"></div>
-                                <form method="POST" action="{{ route('logout') }}">
+                                <a href="#" class="dropdown-item text-danger-500" data-logout-trigger>Cerrar sesión</a>
+                                <form id="logout-form" method="POST" action="{{ route('logout') }}" class="hidden">
                                     @csrf
-                                    <button type="submit" class="dropdown-item text-danger-500">Cerrar sesión</button>
                                 </form>
                             </div>
                         </div>
@@ -241,6 +241,11 @@
                                 'label' => 'Reportes avanzados',
                                 'route' => 'reports.home',
                                 'active' => 'reports.*',
+                            ] : null,
+                            $featureEnabled('marketing') ? [
+                                'label' => 'Marketing',
+                                'route' => 'marketing.index',
+                                'active' => 'marketing.*',
                             ] : null,
                         ]),
 
@@ -327,6 +332,11 @@
                                     'route' => 'reports.home',
                                     'active' => 'reports.*',
                                 ] : null,
+                                $featureEnabled('marketing') ? [
+                                    'label' => 'Marketing',
+                                    'route' => 'marketing.index',
+                                    'active' => 'marketing.*',
+                                ] : null,
                             ]),
 
                         ],
@@ -384,6 +394,22 @@
             </main>
         </div>
     </div>
+
+
+    <script>
+        document.addEventListener('click', (event) => {
+            const trigger = event.target.closest('[data-logout-trigger]');
+            if (!trigger) {
+                return;
+            }
+
+            event.preventDefault();
+            const form = document.getElementById('logout-form');
+            if (form) {
+                form.submit();
+            }
+        });
+    </script>
 
     @stack('scripts')
 </body>
