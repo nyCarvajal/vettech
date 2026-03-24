@@ -57,6 +57,7 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\AdministrativeReportController;
 use App\Http\Controllers\AdminDashboardController;
 use App\Http\Controllers\ExpenseController;
+use App\Http\Controllers\MarketingController;
 use App\Http\Controllers\Reports\CashReportController;
 use App\Http\Controllers\Reports\ExpensesReportController;
 use App\Http\Controllers\Reports\GroomingReportController as ReportsGroomingReportController;
@@ -260,6 +261,14 @@ Route::prefix('cash/closures')
         Route::get('/{closure}/print', [CashClosureController::class, 'print'])->name('print');
     });
 		 
+Route::prefix('marketing')
+    ->middleware(['ensureRole:admin', 'feature:marketing'])
+    ->name('marketing.')
+    ->group(function () {
+        Route::get('/', [MarketingController::class, 'index'])->name('index');
+        Route::post('/send', [MarketingController::class, 'send'])->name('send');
+    });
+
         Route::get('/dashboard', DashboardRedirectController::class)
             ->name('dashboard');
 
