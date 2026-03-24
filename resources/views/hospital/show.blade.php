@@ -7,7 +7,7 @@
     $owner = $stay->owner ?? $stay->patient?->owner;
     $currentDay = $stay->days->sortByDesc('date')->first();
     $activeOrders = $stay->orders->where('status', 'active')->sortBy('next_due_at');
-    $pendingOrders = $activeOrders->filter(fn ($order) => $order->next_due_at && $order->next_due_at->lte(now()->addMinutes(30)));
+    $pendingOrders = $activeOrders->filter(fn ($order) => ($order->next_due_at && $order->next_due_at->lte(now()->addMinutes(30))) || ! $order->last_applied_at);
     $todayProgress = ($currentDay?->progressNotes ?? collect())->sortByDesc('logged_at');
     $todayVitals = ($currentDay?->vitals ?? collect())->sortByDesc('measured_at');
     $recentOrders = $stay->orders->sortByDesc('created_at')->take(6);
@@ -74,10 +74,24 @@
                     <span class="rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-700">Pendientes: {{ $pendingOrders->count() }}</span>
                 </div>
 
+                <div class="mb-3 rounded-2xl border border-amber-200 bg-amber-50 p-3">
+                    <p class="text-xs font-semibold uppercase tracking-wide text-amber-700">Pendientes de aplicar ahora</p>
+                    <div class="mt-2 flex flex-wrap gap-2">
+                        @forelse($pendingOrders->take(5) as $pending)
+                            <span class="rounded-full bg-white px-3 py-1 text-xs font-semibold text-slate-700 border border-amber-200">
+                                {{ $pending->manual_name ?? $pending->product?->name ?? 'Tratamiento' }}
+                                @if(!$pending->last_applied_at) · inicial @endif
+                            </span>
+                        @empty
+                            <span class="text-sm text-amber-700">Sin pendientes inmediatos.</span>
+                        @endforelse
+                    </div>
+                </div>
+
                 <div class="space-y-3">
                     @forelse($activeOrders as $order)
                         @php
-                            $isPending = $order->next_due_at && $order->next_due_at->lte(now()->addMinutes(30));
+                            $isPending = ($order->next_due_at && $order->next_due_at->lte(now()->addMinutes(30))) || ! $order->last_applied_at;
                             $orderName = $order->manual_name ?? $order->product?->name ?? 'Tratamiento';
                         @endphp
                         <article class="rounded-2xl border {{ $isPending ? 'border-amber-200 bg-amber-50/60' : 'border-slate-200 bg-slate-50/70' }} p-4">
@@ -87,12 +101,12 @@
                                     <p class="text-sm text-slate-600">{{ $order->dose ?: 'Sin dosis' }} · {{ $order->route ?: 'Sin vía' }} · {{ strtoupper((string) $order->frequency_type) }} ({{ $order->frequency_value }})</p>
                                     <div class="mt-2 grid gap-1 text-sm text-slate-600 sm:grid-cols-2">
                                         <p>Última: <span class="font-semibold text-slate-800">{{ optional($order->last_applied_at)?->format('d/m H:i') ?? 'Sin aplicaciones' }}</span></p>
-                                        <p>Próxima: <span class="font-semibold {{ $isPending ? 'text-amber-700' : 'text-emerald-700' }}">{{ optional($order->next_due_at)?->format('d/m H:i') ?? 'Finalizada' }}</span></p>
+                                        <p>Próxima: <span class="font-semibold {{ $isPending ? 'text-amber-700' : 'text-emerald-700' }}">{{ !$order->last_applied_at ? 'Aplicación inicial pendiente' : (optional($order->next_due_at)?->format('d/m H:i') ?? 'Finalizada') }}</span></p>
                                     </div>
                                 </div>
                                 <div class="flex flex-col items-end gap-2">
                                     @if($isPending)
-                                        <span class="rounded-full bg-amber-200 px-3 py-1 text-xs font-bold text-amber-800">PENDIENTE</span>
+                                        <span class="rounded-full bg-amber-200 px-3 py-1 text-xs font-bold text-amber-800">{{ $order->last_applied_at ? 'PENDIENTE' : 'PENDIENTE INICIAL' }}</span>
                                     @endif
                                     <form method="POST" action="{{ route('hospital.orders.apply', ['stay' => $stay->id, 'order' => $order->id]) }}" class="flex flex-wrap items-center gap-2">
                                         @csrf
