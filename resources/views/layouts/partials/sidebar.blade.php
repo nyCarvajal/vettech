@@ -16,7 +16,8 @@
 
     $showCajaReportes = $featureEnabled('arqueo_caja')
         || $featureEnabled('reportes_basicos')
-        || $featureEnabled('reportes_avanzados');
+        || $featureEnabled('reportes_avanzados')
+        || $featureEnabled('marketing');
 @endphp
 
 <div class="app-sidebar">
@@ -168,6 +169,17 @@
                                       <iconify-icon icon="solar:chart-2-line"></iconify-icon>
                                  </span>
                                  <span class="nav-text">Reportes avanzados</span>
+                            </a>
+                       </li>
+                   @endif
+
+                   @if ($featureEnabled('marketing'))
+                       <li class="nav-item">
+                            <a class="nav-link" href="{{ route('marketing.index') }}">
+                                 <span class="nav-icon">
+                                      <iconify-icon icon="solar:chat-round-money-line"></iconify-icon>
+                                 </span>
+                                 <span class="nav-text">Marketing</span>
                             </a>
                        </li>
                    @endif

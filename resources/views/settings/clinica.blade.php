@@ -62,6 +62,10 @@
                         'label' => 'Peluquería',
                         'description' => 'Servicios de grooming y estética.',
                     ],
+                    'marketing' => [
+                        'label' => 'Marketing',
+                        'description' => 'Campañas segmentadas y reactivación de pacientes.',
+                    ],
                     'consentimientos' => [
                         'label' => 'Consentimientos',
                         'description' => 'Documentos clínicos firmados.',

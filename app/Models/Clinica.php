@@ -35,6 +35,7 @@ class Clinica extends Model
         'hospitalizacion' => false,
         'cirugia' => true,
         'belleza' => true,
+        'marketing' => true,
         'consentimientos' => true,
         'plantillas_consentimientos' => true,
         'arqueo_caja' => true,

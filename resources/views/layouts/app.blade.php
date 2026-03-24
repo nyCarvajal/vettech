@@ -242,6 +242,11 @@
                                 'route' => 'reports.home',
                                 'active' => 'reports.*',
                             ] : null,
+                            $featureEnabled('marketing') ? [
+                                'label' => 'Marketing',
+                                'route' => 'marketing.index',
+                                'active' => 'marketing.*',
+                            ] : null,
                         ]),
 
                     ],
@@ -326,6 +331,11 @@
                                     'label' => 'Reportes avanzados',
                                     'route' => 'reports.home',
                                     'active' => 'reports.*',
+                                ] : null,
+                                $featureEnabled('marketing') ? [
+                                    'label' => 'Marketing',
+                                    'route' => 'marketing.index',
+                                    'active' => 'marketing.*',
                                 ] : null,
                             ]),
 
