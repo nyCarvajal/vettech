@@ -3,10 +3,13 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
-class ConsentAttachment extends BaseModel
+class ConsentAttachment extends Model
 {
     use HasFactory;
+
+    protected $connection = 'tenant';
 
     protected $fillable = [
         'consent_document_id',

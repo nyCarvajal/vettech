@@ -3,10 +3,13 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
-class ConsentPublicLink extends BaseModel
+class ConsentPublicLink extends Model
 {
     use HasFactory;
+
+    protected $connection = 'tenant';
 
     protected $fillable = [
         'tenant_id',
