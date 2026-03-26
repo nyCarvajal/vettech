@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class ConsentPublicLink extends BaseModel
+class ConsentPublicLink extends Model
 {
     use HasFactory;
 
