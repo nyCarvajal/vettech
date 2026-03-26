@@ -10,8 +10,7 @@ class ConsentTemplate extends Model
 {
     use HasFactory;
 
-    protected $connection = 'mysql';
-    use SoftDeletes;
+   
 
     protected $connection = 'tenant';
 

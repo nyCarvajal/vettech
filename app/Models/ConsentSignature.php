@@ -9,11 +9,7 @@ class ConsentSignature extends Model
 {
     use HasFactory;
 
-<<<<<<< codex/fix-public-consent-signing-issue-12m03i
     protected $connection = 'tenant';
-=======
-    protected $connection = 'mysql';
->>>>>>> main
 
     protected $fillable = [
         'tenant_id',
