@@ -3,11 +3,14 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class ConsentDocument extends BaseModel
+class ConsentDocument extends Model
 {
     use HasFactory;
+
+    protected $connection = 'mysql';
     use SoftDeletes;
 
     protected $fillable = [

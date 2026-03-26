@@ -3,12 +3,13 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
+use Illuminate\Database\Eloquent\Model;
 
-class ConsentPublicLink extends BaseModel
+class ConsentPublicLink extends Model
 {
     use HasFactory;
+
+    protected $connection = 'mysql';
 
     protected $fillable = [
         'tenant_id',
