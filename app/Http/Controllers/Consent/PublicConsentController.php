@@ -4,12 +4,12 @@ namespace App\Http\Controllers\Consent;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Consent\PublicSignConsentRequest;
-use App\Models\ConsentDocument;
+use App\Models\Clinica;
 use App\Models\ConsentPublicLink;
 use App\Models\ConsentSignature;
 use App\Services\SignatureService;
-use Illuminate\Http\Request;
-use Illuminate\Support\Str;
+use App\Support\TenantDatabase;
+use Illuminate\Support\Facades\DB;
 
 class PublicConsentController extends Controller
 {
@@ -61,11 +61,42 @@ class PublicConsentController extends Controller
     private function resolveLink(string $token): ?ConsentPublicLink
     {
         $hash = ConsentPublicLink::hashToken($token);
+        if (! $this->connectTenantForPublicToken($hash)) {
+            return null;
+        }
+
         $link = ConsentPublicLink::where('token_hash', $hash)->first();
         if (!$link || !$link->isValid()) {
             return null;
         }
 
         return $link;
+    }
+
+    private function connectTenantForPublicToken(string $hash): bool
+    {
+        if (config('database.connections.tenant.database')) {
+            return true;
+        }
+
+        $tenantId = DB::connection('mysql')
+            ->table('consent_public_links')
+            ->where('token_hash', $hash)
+            ->value('tenant_id');
+
+        if (! $tenantId) {
+            return false;
+        }
+
+        $clinica = Clinica::on('mysql')->find($tenantId);
+        $database = $clinica?->db;
+
+        if (! $database) {
+            return false;
+        }
+
+        TenantDatabase::connect($database);
+
+        return true;
     }
 }
