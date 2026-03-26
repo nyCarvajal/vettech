@@ -13,6 +13,8 @@ class ConsentDocument extends Model
     protected $connection = 'mysql';
     use SoftDeletes;
 
+    protected $connection = 'tenant';
+
     protected $fillable = [
         'patient_id',
         'tenant_id',

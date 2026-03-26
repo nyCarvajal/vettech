@@ -13,6 +13,8 @@ class ConsentTemplate extends Model
     protected $connection = 'mysql';
     use SoftDeletes;
 
+    protected $connection = 'tenant';
+
     protected $fillable = [
         'tenant_id',
         'name',

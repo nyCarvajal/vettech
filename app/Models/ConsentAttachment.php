@@ -9,7 +9,7 @@ class ConsentAttachment extends Model
 {
     use HasFactory;
 
-    protected $connection = 'mysql';
+    protected $connection = 'tenant';
 
     protected $fillable = [
         'consent_document_id',
