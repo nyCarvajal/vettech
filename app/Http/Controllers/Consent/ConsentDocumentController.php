@@ -19,13 +19,13 @@ class ConsentDocumentController extends Controller
 {
     public function index()
     {
-        $consents = ConsentDocument::with('template')->latest()->paginate();
+        $consents = ConsentDocument::on('tenant')->with('template')->latest()->paginate();
         return view('consents.index', compact('consents'));
     }
 
     public function create(Request $request)
     {
-        $templates = ConsentTemplate::where('is_active', true)->get();
+        $templates = ConsentTemplate::on('tenant')->where('is_active', true)->get();
 
         $patient = null;
         $ownerSnapshot = [];
@@ -63,7 +63,7 @@ class ConsentDocumentController extends Controller
 
     public function store(StoreConsentDocumentRequest $request, DocumentTemplateRenderer $renderer, ConsentCodeGenerator $codeGenerator)
     {
-        $template = ConsentTemplate::findOrFail($request->integer('template_id'));
+        $template = ConsentTemplate::on('tenant')->findOrFail($request->integer('template_id'));
 
         $patient = null;
         if ($request->filled('patient_id')) {

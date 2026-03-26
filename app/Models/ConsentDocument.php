@@ -10,6 +10,8 @@ class ConsentDocument extends BaseModel
     use HasFactory;
     use SoftDeletes;
 
+    protected $connection = 'tenant';
+
     protected $fillable = [
         'patient_id',
         'tenant_id',

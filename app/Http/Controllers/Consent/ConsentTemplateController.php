@@ -14,7 +14,7 @@ class ConsentTemplateController extends Controller
 {
     public function index()
     {
-        $templates = ConsentTemplate::latest()->paginate();
+        $templates = ConsentTemplate::on('tenant')->latest()->paginate();
         return view('consents.templates.index', compact('templates'));
     }
 
@@ -31,7 +31,7 @@ class ConsentTemplateController extends Controller
         $data = $request->validated();
         $data['body_html'] = $sanitizer->sanitize($data['body_html']);
         $data['created_by'] = $request->user()?->id;
-        ConsentTemplate::create($data);
+        ConsentTemplate::on('tenant')->create($data);
 
         return redirect()->route('consent-templates.index')->with('status', 'Plantilla creada');
     }

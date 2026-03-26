@@ -8,6 +8,8 @@ class ConsentSignature extends BaseModel
 {
     use HasFactory;
 
+    protected $connection = 'tenant';
+
     protected $fillable = [
         'tenant_id',
         'consent_document_id',

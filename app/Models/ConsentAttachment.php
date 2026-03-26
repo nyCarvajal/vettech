@@ -8,6 +8,8 @@ class ConsentAttachment extends BaseModel
 {
     use HasFactory;
 
+    protected $connection = 'tenant';
+
     protected $fillable = [
         'consent_document_id',
         'title',

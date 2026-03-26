@@ -10,6 +10,8 @@ class ConsentTemplate extends BaseModel
     use HasFactory;
     use SoftDeletes;
 
+    protected $connection = 'tenant';
+
     protected $fillable = [
         'tenant_id',
         'name',
