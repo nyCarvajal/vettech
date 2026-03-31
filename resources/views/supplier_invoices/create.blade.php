@@ -31,8 +31,19 @@
     <div class="row g-2"><div class="col"><input type="number" step="0.01" class="form-control" id="new-cost" placeholder="Costo"></div><div class="col"><input type="number" step="0.01" class="form-control" id="new-sale" placeholder="Venta"></div></div>
 </div><div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button><button type="button" class="btn btn-success" id="save-item">Crear</button></div></div></div></div>
 
+@php
+    $catalogItems = $items->map(function ($item) {
+        return [
+            'id' => $item->id,
+            'nombre' => $item->nombre,
+            'cost' => $item->cost_price ?? $item->costo ?? 0,
+            'sale' => $item->sale_price ?? $item->valor ?? 0,
+        ];
+    })->values();
+@endphp
+
 <script>
-const catalog = @json($items->map(fn($i)=>['id'=>$i->id,'nombre'=>$i->nombre,'cost'=>$i->cost_price ?? $i->costo ?? 0,'sale'=>$i->sale_price ?? $i->valor ?? 0])->values());
+const catalog = @json($catalogItems);
 const tbody = document.querySelector('#detail-table tbody');
 function options(){return catalog.map(i=>`<option value="${i.id}">${i.nombre}</option>`).join('')}
 function recalc(){let subtotal=0;document.querySelectorAll('#detail-table tbody tr').forEach(tr=>{const q=parseFloat(tr.querySelector('.qty').value||0);const c=parseFloat(tr.querySelector('.cost').value||0);const gift=tr.querySelector('.gift').checked;const line=gift?0:q*c;tr.querySelector('.line-subtotal').textContent=line.toFixed(2);if(gift){tr.classList.add('table-warning')} else {tr.classList.remove('table-warning')}subtotal+=line;});const d=parseFloat(document.querySelector('#descuento').value||0);const i=parseFloat(document.querySelector('#impuestos').value||0);document.querySelector('#sum-subtotal').textContent=subtotal.toFixed(2);document.querySelector('#sum-total').textContent=Math.max(0,subtotal-d+i).toFixed(2);} 
