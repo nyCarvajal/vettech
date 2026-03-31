@@ -8,7 +8,7 @@
     </div>
 
     <div class="space-y-4">
-        <x-reports.filters :filters="$filters" :users="$users" :owners="$owners" />
+        <x-reports.filters :filters="$filters"  :owners="$owners" />
 
         <form method="GET" class="bg-white border border-gray-200 rounded-xl p-4">
             <div class="flex flex-wrap gap-4 items-end">
@@ -16,7 +16,7 @@
                 <input type="hidden" name="from" value="{{ $filters->from->format('Y-m-d') }}" />
                 <input type="hidden" name="to" value="{{ $filters->to->format('Y-m-d') }}" />
                 <input type="hidden" name="granularity" value="{{ $filters->granularity }}" />
-                <input type="hidden" name="user_id" value="{{ request('user_id') }}" />
+              
                 <input type="hidden" name="owner_id" value="{{ request('owner_id') }}" />
 
                 <div class="flex flex-col gap-1">

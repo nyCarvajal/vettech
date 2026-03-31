@@ -31,11 +31,7 @@ class VaccinesReportController extends Controller
             'filters' => $filters,
             'extraFilters' => $extraFilters,
             'data' => $data,
-            'users' => Usuario::query()->select('id', 'nombre', 'apellidos')->orderBy('nombre')->get()->map(function ($user) {
-                $user->name = trim($user->nombre . ' ' . ($user->apellidos ?? ''));
-
-                return $user;
-            }),
+           
             'owners' => Owner::query()->select('id', 'name')->orderBy('name')->get(),
         ]);
     }
