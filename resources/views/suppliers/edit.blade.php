@@ -1,0 +1,2 @@
+@extends('layouts.app', ['subtitle' => 'Editar proveedor'])
+@section('content')<div class="container-fluid"><div class="card"><div class="card-body"><form method="POST" action="{{ route('suppliers.update', $supplier) }}">@method('PUT') @include('suppliers._form')<div class="mt-3 d-flex gap-2"><button class="btn btn-primary">Actualizar</button><button name="_method" value="DELETE" formaction="{{ route('suppliers.destroy', $supplier) }}" class="btn btn-outline-danger" onclick="return confirm('¿Eliminar proveedor?')">Eliminar</button></div></form></div></div></div>@endsection

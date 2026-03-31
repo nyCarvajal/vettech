@@ -75,6 +75,10 @@ use App\Http\Controllers\DashboardRedirectController;
 use App\Http\Controllers\MedicoDashboardController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Public\BookingController;
+use App\Http\Controllers\SupplierController;
+use App\Http\Controllers\SupplierInvoiceController;
+use App\Http\Controllers\SupplierPaymentController;
+use App\Http\Controllers\SupplierItemController;
 
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
@@ -241,6 +245,12 @@ Route::post('/ordenes/{orden}/email', [OrdendecompraController::class, 'sendEmai
 
 
 Route::resource('proveedores', ProveedorController::class);
+Route::resource('suppliers', SupplierController::class);
+Route::get('supplier-invoices/due-alerts', [SupplierInvoiceController::class, 'dueAlerts'])->name('supplier-invoices.due-alerts');
+Route::post('supplier-invoices/{supplierInvoice}/cancel', [SupplierInvoiceController::class, 'cancel'])->name('supplier-invoices.cancel');
+Route::resource('supplier-invoices', SupplierInvoiceController::class)->except(['edit', 'update', 'destroy']);
+Route::resource('supplier-payments', SupplierPaymentController::class)->only(['index', 'create', 'store', 'show']);
+Route::post('supplier-items/quick-create', [SupplierItemController::class, 'store'])->name('supplier-items.store');
 Route::resource('tipo-identificaciones', TipoIdentificacionController::class)->except(['show']);
 Route::resource('areas', AreaController::class)->except(['show']);
 Route::resource('bancos', BancoController::class);
