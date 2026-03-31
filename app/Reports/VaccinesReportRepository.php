@@ -156,6 +156,14 @@ class VaccinesReportRepository extends ReportRepository
         $itemNameColumn = $this->resolveItemNameColumn();
         $speciesNameColumn = $this->tableHasColumn('species', 'name') ? 'species.name' : 'species.nombre';
         $breedNameColumn = $this->tableHasColumn('breeds', 'name') ? 'breeds.name' : 'breeds.nombre';
+        $patientEmailColumn = $this->tableHasColumn('pacientes', 'email')
+            ? 'pacientes.email'
+            : ($this->tableHasColumn('pacientes', 'correo') ? 'pacientes.correo' : 'owners.email');
+        $patientWhatsappColumn = $this->tableHasColumn('pacientes', 'whatsapp') ? 'pacientes.whatsapp' : 'owners.whatsapp';
+        $patientAddressColumn = $this->tableHasColumn('pacientes', 'direccion') ? 'pacientes.direccion' : 'owners.address';
+        $patientCityColumn = $this->tableHasColumn('pacientes', 'ciudad')
+            ? 'pacientes.ciudad'
+            : ($this->tableHasColumn('pacientes', 'municipio') ? 'pacientes.municipio' : 'owners.city');
         $vetNameExpression = $hasUsuariosTable
             ? "TRIM(CONCAT(COALESCE(usuarios.nombre, ''), ' ', COALESCE(usuarios.apellidos, '')))"
             : "''";
@@ -204,10 +212,10 @@ class VaccinesReportRepository extends ReportRepository
             ->selectRaw('pacientes.temperamento as patient_temperament')
             ->selectRaw('pacientes.alergias as patient_allergies')
             ->selectRaw('pacientes.observaciones as patient_notes')
-            ->selectRaw('pacientes.email as patient_email')
-            ->selectRaw('pacientes.whatsapp as patient_whatsapp')
-            ->selectRaw('pacientes.direccion as patient_address')
-            ->selectRaw('pacientes.ciudad as patient_city')
+            ->selectRaw("{$patientEmailColumn} as patient_email")
+            ->selectRaw("{$patientWhatsappColumn} as patient_whatsapp")
+            ->selectRaw("{$patientAddressColumn} as patient_address")
+            ->selectRaw("{$patientCityColumn} as patient_city")
             ->selectRaw($patientAgeExpression . ' as patient_age')
             ->selectRaw('owners.name as owner_name')
             ->selectRaw('owners.document_type as owner_document_type')
