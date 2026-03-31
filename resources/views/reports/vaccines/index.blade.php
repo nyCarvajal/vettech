@@ -53,6 +53,7 @@
         <x-reports.kpi-card label="Desde inventario" :value="number_format($data['kpis']['inventory_count'], 0, ',', '.')" />
         <x-reports.kpi-card label="Escritas a mano" :value="number_format($data['kpis']['manual_count'], 0, ',', '.')" />
     </div>
+    
 
     <div class="grid grid-cols-1 xl:grid-cols-2 gap-4">
         <x-reports.chart-card title="Aplicaciones por periodo" chart-id="vaccinesSeriesChart" />

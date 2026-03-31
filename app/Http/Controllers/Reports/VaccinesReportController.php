@@ -31,7 +31,6 @@ class VaccinesReportController extends Controller
             'filters' => $filters,
             'extraFilters' => $extraFilters,
             'data' => $data,
-           
             'owners' => Owner::query()->select('id', 'name')->orderBy('name')->get(),
         ]);
     }
