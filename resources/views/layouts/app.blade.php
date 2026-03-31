@@ -217,6 +217,8 @@
                             $featureEnabled('tutores') ? ['label' => 'Tutores', 'route' => 'owners.index'] : null,
                             $featureEnabled('pacientes') ? ['label' => 'Pacientes', 'route' => 'patients.index'] : null,
                             ['label' => 'Inventario', 'route' => 'items.index'],
+                            ['label' => 'Proveedores', 'route' => 'suppliers.index', 'active' => 'suppliers.*'],
+                            ['label' => 'Facturas de compra', 'route' => 'supplier-invoices.index', 'active' => 'supplier-invoices.*'],
                         ]),
                     ],
                     [
@@ -307,6 +309,8 @@
                                 $featureEnabled('tutores') ? ['label' => 'Tutores', 'route' => 'owners.index'] : null,
                                 $featureEnabled('pacientes') ? ['label' => 'Pacientes', 'route' => 'patients.index'] : null,
                                 ['label' => 'Inventario', 'route' => 'items.index'],
+                                ['label' => 'Proveedores', 'route' => 'suppliers.index', 'active' => 'suppliers.*'],
+                                ['label' => 'Facturas de compra', 'route' => 'supplier-invoices.index', 'active' => 'supplier-invoices.*'],
                             ]),
                         ],
                         [

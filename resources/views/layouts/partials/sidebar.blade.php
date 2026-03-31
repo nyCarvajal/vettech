@@ -56,6 +56,25 @@
                    </li>
                @endif
 
+               <li class="nav-item">
+                    <a class="nav-link" href="{{ route('suppliers.index') }}">
+                         <span class="nav-icon"><iconify-icon icon="solar:users-group-two-rounded-line-duotone"></iconify-icon></span>
+                         <span class="nav-text">Proveedores</span>
+                    </a>
+               </li>
+               <li class="nav-item">
+                    <a class="nav-link" href="{{ route('supplier-invoices.index') }}">
+                         <span class="nav-icon"><iconify-icon icon="solar:bill-list-line-duotone"></iconify-icon></span>
+                         <span class="nav-text">Facturas de compra</span>
+                    </a>
+               </li>
+               <li class="nav-item">
+                    <a class="nav-link" href="{{ route('supplier-payments.index') }}">
+                         <span class="nav-icon"><iconify-icon icon="solar:wallet-money-line-duotone"></iconify-icon></span>
+                         <span class="nav-text">Pagos a proveedores</span>
+                    </a>
+               </li>
+
                @if ($featureEnabled('tutores'))
                    <li class="nav-item">
                         <a class="nav-link" href="{{ route('owners.index') }}">
