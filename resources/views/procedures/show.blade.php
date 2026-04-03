@@ -51,15 +51,35 @@
         @else
             <p class="text-sm text-gray-500">Sin consentimiento asociado.</p>
         @endif
-        <form method="POST" action="{{ route('procedures.consent.link', $procedure) }}" class="mt-2 flex space-x-2">
+
+        <form method="POST" action="{{ route('procedures.consent.link', $procedure) }}" class="mt-3 grid gap-2 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end">
             @csrf
-            <input type="text" name="consent_document_id" class="input input-bordered" placeholder="ID firmado">
-            <button class="bg-gray-800 text-white px-3 py-2 rounded">Vincular firmado</button>
+            <div>
+                <label class="text-sm font-medium text-gray-700">ID consentimientos (firmados)</label>
+                <select name="consent_document_id" class="input input-bordered w-full" required>
+                    <option value="">Selecciona un consentimiento firmado</option>
+                    @foreach($signedPatientConsents as $consent)
+                        <option value="{{ $consent->id }}" @selected($procedure->consent_document_id == $consent->id)>
+                            #{{ $consent->id }} · {{ $consent->template->name ?? 'Sin plantilla' }} · {{ optional($consent->signed_at)->format('d/m/Y H:i') }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+            <button class="bg-gray-800 text-white px-3 py-2 rounded h-fit">Vincular firmado</button>
         </form>
-        <form method="POST" action="{{ route('procedures.consent.create', $procedure) }}" class="mt-2 flex space-x-2">
+
+        <form method="POST" action="{{ route('procedures.consent.create', $procedure) }}" class="mt-3 grid gap-2 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end">
             @csrf
-            <input type="number" name="template_id" class="input input-bordered" placeholder="Plantilla">
-            <button class="bg-indigo-600 text-white px-3 py-2 rounded">Generar desde plantilla</button>
+            <div>
+                <label class="text-sm font-medium text-gray-700">Generar desde plantilla</label>
+                <select name="template_id" class="input input-bordered w-full" required>
+                    <option value="">Selecciona plantilla de consentimiento</option>
+                    @foreach($consentTemplates as $template)
+                        <option value="{{ $template->id }}">{{ $template->name }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <button class="bg-indigo-600 text-white px-3 py-2 rounded h-fit">Generar desde plantilla</button>
         </form>
     </div>
 

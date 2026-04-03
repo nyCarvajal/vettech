@@ -6,6 +6,7 @@ use App\Http\Requests\ChangeProcedureStatusRequest;
 use App\Http\Requests\StoreProcedureRequest;
 use App\Http\Requests\UpdateProcedureRequest;
 use App\Models\ConsentDocument;
+use App\Models\ConsentTemplate;
 use App\Models\Owner;
 use App\Models\Patient;
 use App\Models\Procedure;
@@ -112,8 +113,26 @@ class ProcedureController extends Controller
 
     public function show(Procedure $procedure): View
     {
+        $procedure->load('attachments', 'anesthesiaMedications', 'consentDocument');
+
+        $signedPatientConsents = collect();
+        if ($procedure->patient_id) {
+            $signedPatientConsents = ConsentDocument::with('template')
+                ->where('pet_id', $procedure->patient_id)
+                ->where('status', 'signed')
+                ->latest()
+                ->get();
+        }
+
+        $consentTemplates = ConsentTemplate::query()
+            ->where('is_active', true)
+            ->orderBy('name')
+            ->get();
+
         return view('procedures.show', [
-            'procedure' => $procedure->load('attachments', 'anesthesiaMedications', 'consentDocument'),
+            'procedure' => $procedure,
+            'signedPatientConsents' => $signedPatientConsents,
+            'consentTemplates' => $consentTemplates,
         ]);
     }
 
