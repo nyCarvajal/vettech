@@ -146,6 +146,8 @@ class HistoriaClinicaController extends Controller
             'historia' => $historiaClinica,
             'products' => $products,
             'pacientes' => collect(),
+            'prescription' => null,
+            'formItems' => [],
         ]);
     }
 
@@ -161,6 +163,8 @@ class HistoriaClinicaController extends Controller
             'historia' => null,
             'products' => $products,
             'pacientes' => $pacientes,
+            'prescription' => null,
+            'formItems' => [],
         ]);
     }
 
@@ -216,6 +220,80 @@ class HistoriaClinicaController extends Controller
 
         return redirect()->route('historias-clinicas.show', $historiaClinica)
             ->with('success', 'Recetario creado correctamente.');
+    }
+
+
+    public function editRecetario(Prescription $prescription)
+    {
+        $prescription->load(['items', 'historiaClinica.paciente']);
+        $products = Product::orderBy('name')->get();
+
+        return view('historias_clinicas.recetario', [
+            'historia' => $prescription->historiaClinica,
+            'products' => $products,
+            'pacientes' => collect(),
+            'prescription' => $prescription,
+            'formItems' => $prescription->items->map(fn (PrescriptionItem $item) => [
+                'is_manual' => (bool) $item->is_manual,
+                'product_id' => $item->product_id,
+                'manual_name' => $item->manual_name,
+                'dose' => $item->dose,
+                'frequency' => $item->frequency,
+                'duration_days' => $item->duration_days,
+                'instructions' => $item->instructions,
+                'qty_requested' => $item->qty_requested,
+            ])->toArray(),
+        ]);
+    }
+
+    public function updateRecetario(Request $request, Prescription $prescription)
+    {
+        $data = $request->validate([
+            'items' => ['required', 'array', 'min:1'],
+            'items.*.is_manual' => ['boolean'],
+            'items.*.product_id' => ['required_without:items.*.manual_name', 'nullable', 'exists:products,id'],
+            'items.*.manual_name' => ['required_without:items.*.product_id', 'nullable', 'string', 'max:255'],
+            'items.*.dose' => ['nullable', 'string'],
+            'items.*.frequency' => ['nullable', 'string'],
+            'items.*.duration_days' => ['nullable', 'integer', 'min:1'],
+            'items.*.instructions' => ['nullable', 'string'],
+            'items.*.qty_requested' => ['required', 'numeric', 'min:1'],
+            'observations' => ['nullable', 'string'],
+        ]);
+
+        $prescription->update([
+            'observations' => $data['observations'] ?? null,
+            'professional_id' => Auth::id(),
+        ]);
+
+        $prescription->items()->delete();
+
+        foreach ($data['items'] as $item) {
+            $isManual = (bool) ($item['is_manual'] ?? false);
+
+            PrescriptionItem::create([
+                'prescription_id' => $prescription->id,
+                'product_id' => $isManual ? null : ($item['product_id'] ?? null),
+                'manual_name' => $item['manual_name'] ?? null,
+                'is_manual' => $isManual,
+                'billable' => ! $isManual,
+                'dose' => $item['dose'] ?? '',
+                'frequency' => $item['frequency'] ?? '',
+                'duration_days' => $item['duration_days'] ?? 0,
+                'instructions' => $item['instructions'] ?? null,
+                'qty_requested' => $item['qty_requested'],
+            ]);
+        }
+
+        $historiaClinica = $prescription->historiaClinica;
+
+        if ($historiaClinica) {
+            return redirect()->route('historias-clinicas.show', $historiaClinica)
+                ->with('success', 'Recetario actualizado correctamente.');
+        }
+
+        return redirect()->route('dashboard')
+            ->with('success', 'Recetario actualizado correctamente.');
     }
 
     public function facturarRecetario(Prescription $prescription, BillingService $billingService)

@@ -361,6 +361,10 @@ Route::get('clinica/perfil', [ClinicaController::class,'showOwn'])
         ->name('historias-clinicas.recetarios.facturar');
   Route::get('recetarios/{prescription}/imprimir', [HistoriaClinicaController::class, 'imprimirRecetario'])
         ->name('historias-clinicas.recetarios.print');
+  Route::get('recetarios/{prescription}/editar', [HistoriaClinicaController::class, 'editRecetario'])
+        ->name('historias-clinicas.recetarios.edit');
+  Route::put('recetarios/{prescription}', [HistoriaClinicaController::class, 'updateRecetario'])
+        ->name('historias-clinicas.recetarios.update');
   Route::get('historias-clinicas/{historiaClinica}/remision', [HistoriaClinicaController::class, 'createRemision'])
         ->name('historias-clinicas.remisiones.create');
   Route::post('historias-clinicas/{historiaClinica}/remision', [HistoriaClinicaController::class, 'storeRemision'])
