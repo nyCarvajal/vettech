@@ -67,11 +67,11 @@ html[data-bs-theme="dark"],
 
 /* Main sidebar Light */
 html[data-sidebar-color="light"]{
-    --#{$prefix}sidebar-bg:                               #f8fafc;
-    --#{$prefix}sidebar-item-color:                       #4a5568;
-    --#{$prefix}sidebar-item-hover-bg:                    #e1e8f0;
-    --#{$prefix}sidebar-item-hover-color:                 #1a73e8;
-    --#{$prefix}sidebar-border-color:                     #d6dde6;
+    --#{$prefix}sidebar-bg:                               #5b2be0;
+    --#{$prefix}sidebar-item-color:                       #e6ddff;
+    --#{$prefix}sidebar-item-hover-bg:                    #7a4bfa;
+    --#{$prefix}sidebar-item-hover-color:                 #ffffff;
+    --#{$prefix}sidebar-border-color:                     #6b3ef1;
 }
 
 
